@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block extra_head %}
+<style>
+    .role-info {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-user-plus"></i> Register</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <p>Please correct the following errors:</p>
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li><strong>{{ field|title }}</strong>: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <h5 class="mb-3">Account Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_username">Username:</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.username.errors }}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email">Email:</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password1">Password:</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password1.errors }}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password2">Confirm Password:</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password2.errors }}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ form.password2.help_text }}</small>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3 mt-4">Personal Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_first_name">First Name:</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.first_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_last_name">Last Name:</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.last_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_phone_number">Phone Number:</label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.phone_number.errors }}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">For privacy, only the last 3 digits will be visible to others.</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_citizen_id">Citizen ID (CCCD):</label>
+                                {{ form.citizen_id }}
+                                {% if form.citizen_id.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.citizen_id.errors }}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">For privacy, only the last 3 digits will be visible to others.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_address">Address:</label>
+                            {{ form.address }}
+                            {% if form.address.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.address.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <h5 class="mb-3 mt-4">Role Selection</h5>
+                        <div class="mb-3">
+                            <div class="role-selection">
+                                {{ form.role }}
+                                {% if form.role.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.role.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div id="citizen-info" class="role-info">
+                                <p>As a citizen, you can:</p>
+                                <ul>
+                                    <li>Submit administrative requests</li>
+                                    <li>Track the status of your requests</li>
+                                    <li>Receive notifications about your requests</li>
+                                </ul>
+                            </div>
+                            
+                            <div id="official-info" class="role-info">
+                                <p>As a commune official, you can:</p>
+                                <ul>
+                                    <li>Process administrative requests assigned to you</li>
+                                    <li>Update request statuses</li>
+                                    <li>Communicate with citizens about their requests</li>
+                                </ul>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Your account will need approval from the commune chairman before you can access official functions.
+                                </div>
+                            </div>
+                            
+                            <div id="organization-info" class="role-info">
+                                <p>As an organization/enterprise, you can:</p>
+                                <ul>
+                                    <li>Submit administrative requests for your organization</li>
+                                    <li>Track the status of your requests</li>
+                                    <li>Manage multiple requests under one account</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle"></i> <strong>Note:</strong> The Commune Chairman role is not available for public registration. The chairman account is created by system administrators.
+                            </div>
+                        </div>
+                        
+                        <div id="organization-fields" style="display: none;">
+                            <h5 class="mb-3 mt-4">Organization Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_organization_name">Organization Name: <span class="text-danger">*</span></label>
+                                    {{ form.organization_name }}
+                                    {% if form.organization_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.organization_name.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_business_license">Business License: <span class="text-danger">*</span></label>
+                                    {{ form.business_license }}
+                                    {% if form.business_license.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.business_license.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </div>
+                    </form>
+                    <hr>
+                    <p>Already have an account? <a href="{% url 'accounts:login' %}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Bootstrap classes to form fields
+        const formControls = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"], textarea, select');
+        formControls.forEach(function(element) {
+            element.classList.add('form-control');
+            
+            // Add invalid class to fields with errors
+            if (element.closest('.mb-3') && element.closest('.mb-3').querySelector('.invalid-feedback')) {
+                element.classList.add('is-invalid');
+            }
+        });
+        
+        // Role selection logic
+        const roleInputs = document.querySelectorAll('input[name="role"]');
+        const organizationFields = document.getElementById('organization-fields');
+        const roleInfos = document.querySelectorAll('.role-info');
+        
+        // Check for organization field errors in various ways
+        const hasOrgFieldErrors = function() {
+            // Check for error messages containing organization name or business license
+            const errorMessages = document.querySelectorAll('.alert-danger li, .invalid-feedback');
+            for (let i = 0; i < errorMessages.length; i++) {
+                const text = errorMessages[i].textContent.toLowerCase();
+                if (text.includes('organization name') || text.includes('business license')) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        
+        roleInputs.forEach(function(input) {
+            input.addEventListener('change', function() {
+                // Hide all role info divs
+                roleInfos.forEach(function(info) {
+                    info.style.display = 'none';
+                });
+                
+                // Show the selected role info
+                const selectedRole = document.querySelector('input[name="role"]:checked').value;
+                const selectedInfo = document.getElementById(selectedRole.toLowerCase() + '-info');
+                if (selectedInfo) {
+                    selectedInfo.style.display = 'block';
+                }
+                
+                // Show/hide organization fields
+                if (selectedRole === 'ORGANIZATION') {
+                    organizationFields.style.display = 'block';
+                } else {
+                    organizationFields.style.display = 'none';
+                }
+            });
+        });
+        
+        // Trigger change event on page load to set initial state
+        const defaultRole = document.querySelector('input[name="role"]:checked');
+        if (defaultRole) {
+            defaultRole.dispatchEvent(new Event('change'));
+        }
+        
+        // If there are organization field errors, select the organization role and show fields
+        if (hasOrgFieldErrors()) {
+            console.log("Organization field errors detected");
+            const orgRoleInput = document.querySelector('input[value="ORGANIZATION"]');
+            if (orgRoleInput) {
+                orgRoleInput.checked = true;
+                organizationFields.style.display = 'block';
+                
+                // Show the organization info
+                roleInfos.forEach(function(info) {
+                    info.style.display = 'none';
+                });
+                const orgInfo = document.getElementById('organization-info');
+                if (orgInfo) {
+                    orgInfo.style.display = 'block';
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Document{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-upload"></i> Upload Document</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        Uploading document for request: <strong>{{ request_obj.id }}</strong>
+                        <span class="badge bg-{{ request_obj.status|lower }}">{{ request_obj.get_status_display }}</span>
+                    </p>
+                    
+                    <form method="post" enctype="multipart/form-data" class="mt-4">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.document_type.id_for_label }}" class="form-label">Document Type</label>
+                            {{ form.document_type }}
+                            <div class="form-text">{{ form.document_type.help_text }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+                            {{ form.title }}
+                            <div class="form-text">{{ form.title.help_text }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            <div class="form-text">{{ form.description.help_text }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.file.id_for_label }}" class="form-label">File</label>
+                            {{ form.file }}
+                            <div class="form-text">{{ form.file.help_text }}</div>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            {{ form.is_public }}
+                            <label for="{{ form.is_public.id_for_label }}" class="form-check-label">
+                                Visible to all parties
+                            </label>
+                            <div class="form-text">{{ form.is_public.help_text }}</div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload Document
+                            </button>
+                            <a href="{% url 'blockchain:request_detail' request_obj.id %}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-arrow-left"></i> Back to Request
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

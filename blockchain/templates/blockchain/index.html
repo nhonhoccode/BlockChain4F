@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Commune Blockchain - Administrative Management{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">Welcome to Commune Administrative Management</h1>
+        <p class="lead">
+            A transparent and secure system for managing administrative requests using blockchain technology.
+        </p>
+        <hr class="my-4">
+        <p>
+            Submit administrative requests, track their status, and ensure transparency in the process.
+            All transactions are recorded on the blockchain for immutability and auditability.
+        </p>
+        <div class="mt-4">
+            <a href="{% url 'blockchain:request_form' %}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-file-alt"></i> Submit New Request
+            </a>
+            <a href="{% url 'blockchain:track_request' %}" class="btn btn-info btn-lg">
+                <i class="fas fa-search"></i> Track Request
+            </a>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-clipboard-list"></i> Quick Track Request</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'blockchain:track_request' %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            {{ tracking_form.request_id }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Track
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-info-circle"></i> About Blockchain</h4>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Our system uses blockchain technology to ensure:
+                    </p>
+                    <ul>
+                        <li><strong>Transparency:</strong> All administrative transactions are recorded on a distributed ledger.</li>
+                        <li><strong>Data Integrity:</strong> Once data is recorded, it cannot be modified or deleted.</li>
+                        <li><strong>Fraud Prevention:</strong> Reduces forgery and increases trust in the administrative process.</li>
+                        <li><strong>Easy Auditing:</strong> Allows for easy tracking and verification of transaction history.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-certificate"></i> Birth Certificate</h4>
+                </div>
+                <div class="card-body">
+                    <p>Request a birth certificate for yourself or a family member.</p>
+                    <a href="{% url 'blockchain:request_form' %}?type=BIRTH_CERT" class="btn btn-info">Request Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-home"></i> Residence Certificate</h4>
+                </div>
+                <div class="card-body">
+                    <p>Request a residence certificate for your current address.</p>
+                    <a href="{% url 'blockchain:request_form' %}?type=RESIDENCE_CERT" class="btn btn-info">Request Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-users"></i> Household Registration</h4>
+                </div>
+                <div class="card-body">
+                    <p>Register your household or update existing registration.</p>
+                    <a href="{% url 'blockchain:request_form' %}?type=HOUSEHOLD_REG" class="btn btn-info">Request Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Official Dashboard - Commune Blockchain{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Welcome, {{ user.get_full_name|default:user.username }}</h2>
+            
+            <!-- Authority Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Authority Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Role:</strong> Commune Official
+                                {% if user.profile.ethereum_address %}
+                                    <span class="badge bg-success">Blockchain Verified</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Blockchain Address Not Set</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Authority Level:</strong> 
+                                <span class="badge bg-{{ user.profile.authority_level|lower }}">
+                                    {{ user.profile.get_authority_level_display }}
+                                </span>
+                            </p>
+                            <p class="mb-0">
+                                <strong>Assigned By:</strong> 
+                                {% if user.profile.approved_by %}
+                                    {{ user.profile.approved_by.get_full_name|default:user.profile.approved_by.username }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-2">Your Capabilities:</h6>
+                            <ul class="list-unstyled">
+                                {% if user.profile.authority_level == 'LOW' %}
+                                    <li><i class="fas fa-check text-success"></i> Process basic document requests</li>
+                                    <li><i class="fas fa-check text-success"></i> Update request statuses</li>
+                                    <li><i class="fas fa-check text-success"></i> Request additional documents</li>
+                                {% elif user.profile.authority_level == 'MEDIUM' %}
+                                    <li><i class="fas fa-check text-success"></i> All Low Authority capabilities</li>
+                                    <li><i class="fas fa-check text-success"></i> Verify document authenticity</li>
+                                    <li><i class="fas fa-check text-success"></i> Approve basic requests</li>
+                                {% else %}
+                                    <li><i class="fas fa-check text-success"></i> All Medium Authority capabilities</li>
+                                    <li><i class="fas fa-check text-success"></i> Handle complex administrative requests</li>
+                                    <li><i class="fas fa-check text-success"></i> Full administrative authority</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Task Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Tasks</h5>
+                            <p class="card-text display-6">{{ task_stats.total }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending</h5>
+                            <p class="card-text display-6">{{ task_stats.pending }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">In Progress</h5>
+                            <p class="card-text display-6">{{ task_stats.in_progress }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Completed</h5>
+                            <p class="card-text display-6">{{ task_stats.completed }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Requests -->
+            {% if pending_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Pending Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for request in pending_requests %}
+                        <a href="{% url 'blockchain:request_detail' request.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Request #{{ request.id }}</h6>
+                                    <p class="mb-1 small text-muted">{{ request.get_type_display }}</p>
+                                </div>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- In Progress Requests -->
+            {% if in_progress_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">In Progress Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for request in in_progress_requests %}
+                        <a href="{% url 'blockchain:request_detail' request.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Request #{{ request.id }}</h6>
+                                    <p class="mb-1 small text-muted">{{ request.get_type_display }}</p>
+                                </div>
+                                <span class="badge bg-info">In Progress</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recent Document Requests -->
+            {% if recent_document_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Document Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for doc_request in recent_document_requests %}
+                        <a href="{% url 'blockchain:request_detail' doc_request.request.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ doc_request.title }}</h6>
+                                    <p class="mb-1 small text-muted">Request #{{ doc_request.request.id }}</p>
+                                </div>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recent Status Updates -->
+            {% if recent_status_updates %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Status Updates</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for update in recent_status_updates %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Request #{{ update.request.id }}</h6>
+                                    <p class="mb-1 small text-muted">
+                                        Status changed from {{ update.old_status }} to {{ update.new_status }}
+                                    </p>
+                                    {% if update.comments %}
+                                    <p class="mb-0 small">{{ update.comments }}</p>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">{{ update.created_at|date:"F j, Y, g:i a" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

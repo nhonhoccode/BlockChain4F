@@ -1,0 +1,6 @@
+django==5.0.2
+web3>=6.0.0
+python-dotenv==1.0.1
+# Let pip resolve hexbytes version automatically
+eth-account==0.13.5
+eth-utils==5.1.0 

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if user.profile.is_pending_approval %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> Your account is pending approval from the commune chairman. You will be notified once your account is approved.
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-user-circle"></i> Profile</h4>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-user-circle fa-5x mb-3 text-primary"></i>
+                    <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="card-text">
+                        <span class="badge {% if user.profile.role == 'CHAIRMAN' %}bg-danger{% elif user.profile.role == 'OFFICIAL' %}bg-success{% elif user.profile.role == 'ORGANIZATION' %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ user.profile.get_role_display }}
+                        </span>
+                        
+                        {% if user.profile.role == 'OFFICIAL' %}
+                            <span class="badge {% if user.profile.approval_status == 'APPROVED' %}bg-success{% elif user.profile.approval_status == 'PENDING' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ user.profile.get_approval_status_display }}
+                            </span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">Member since: {{ user.date_joined|date:"F d, Y" }}</small>
+                    </p>
+                </div>
+            </div>
+            
+            {% if user.profile.is_chairman %}
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h4><i class="fas fa-user-shield"></i> Chairman Actions</h4>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'accounts:pending_approvals' %}" class="btn btn-warning btn-block">
+                        <i class="fas fa-user-check"></i> Manage Pending Approvals
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-info-circle"></i> Account Information</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th width="30%">Username:</th>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>Full Name:</th>
+                            <td>{{ user.get_full_name|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ user.email|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Login:</th>
+                            <td>{{ user.last_login|date:"F d, Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4><i class="fas fa-address-card"></i> Personal Information</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th width="30%">Phone Number:</th>
+                            <td>
+                                {{ user.profile.phone_number }}
+                                <small class="text-muted">(Displayed to others as: {{ user.profile.get_masked_phone }})</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Citizen ID:</th>
+                            <td>
+                                {{ user.profile.citizen_id }}
+                                <small class="text-muted">(Displayed to others as: {{ user.profile.get_masked_citizen_id }})</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>{{ user.profile.address|default:"Not provided" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if user.profile.is_organization %}
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h4><i class="fas fa-building"></i> Organization Information</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th width="30%">Organization Name:</th>
+                            <td>{{ user.profile.organization_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Business License:</th>
+                            <td>{{ user.profile.business_license }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

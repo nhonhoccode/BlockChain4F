@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Permit Application Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4 text-primary">Business Permit Application Form</h2>
+        <p class="lead">Complete this form to apply for a new business permit or renew an existing one.</p>
+
+        <form>
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5>Application Type</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="application_type" id="new_permit" value="new" checked required>
+                                <label class="form-check-label" for="new_permit">
+                                    New Business Permit
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="application_type" id="renew_permit" value="renewal">
+                                <label class="form-check-label" for="renew_permit">
+                                    Renewal of Existing Permit
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="existing_permit_section" style="display: none;">
+                        <label for="existing_permit_number" class="form-label">Existing Permit Number</label>
+                        <input type="text" class="form-control" id="existing_permit_number">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5>Business Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="business_name" class="form-label">Business Name</label>
+                        <input type="text" class="form-control" id="business_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="business_address" class="form-label">Business Address</label>
+                        <textarea class="form-control" id="business_address" rows="3" required></textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="business_start_date" class="form-label">Business Start Date</label>
+                            <input type="date" class="form-control" id="business_start_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tax_id" class="form-label">Tax Identification Number</label>
+                            <input type="text" class="form-control" id="tax_id" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="business_type" class="form-label">Business Type</label>
+                        <select class="form-select" id="business_type" required>
+                            <option value="" selected disabled>Select a business type</option>
+                            <option value="sole_proprietorship">Sole Proprietorship</option>
+                            <option value="partnership">Partnership</option>
+                            <option value="corporation">Corporation</option>
+                            <option value="llc">Limited Liability Company (LLC)</option>
+                            <option value="cooperative">Cooperative</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="business_activity" class="form-label">Primary Business Activity</label>
+                            <select class="form-select" id="business_activity" required>
+                                <option value="" selected disabled>Select primary activity</option>
+                                <option value="retail">Retail Trade</option>
+                                <option value="wholesale">Wholesale Trade</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="services">Services</option>
+                                <option value="construction">Construction</option>
+                                <option value="transportation">Transportation</option>
+                                <option value="agriculture">Agriculture/Fishing</option>
+                                <option value="food">Food & Beverage</option>
+                                <option value="technology">Technology</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="num_employees" class="form-label">Number of Employees</label>
+                            <input type="number" class="form-control" id="num_employees" min="1" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5>Owner Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="owner_first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="owner_first_name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="owner_middle_name" class="form-label">Middle Name</label>
+                            <input type="text" class="form-control" id="owner_middle_name">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="owner_last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="owner_last_name" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="owner_phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="owner_phone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="owner_email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="owner_email" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="owner_address" class="form-label">Residential Address</label>
+                        <textarea class="form-control" id="owner_address" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_number" class="form-label">National ID Number</label>
+                        <input type="text" class="form-control" id="id_number" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5>Required Documents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="business_registration" class="form-label">Business Registration Certificate</label>
+                        <input class="form-control" type="file" id="business_registration" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tax_clearance" class="form-label">Tax Clearance Certificate</label>
+                        <input class="form-control" type="file" id="tax_clearance" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="property_document" class="form-label">Property Ownership/Lease Agreement</label>
+                        <input class="form-control" type="file" id="property_document" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_documents" class="form-label">Owner ID Document</label>
+                        <input class="form-control" type="file" id="id_documents" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="additional_docs" class="form-label">Additional Supporting Documents</label>
+                        <input class="form-control" type="file" id="additional_docs" multiple>
+                        <div class="form-text">You may upload multiple additional documents if needed.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="declaration" required>
+                    <label class="form-check-label" for="declaration">
+                        I declare that the information provided is true and accurate to the best of my knowledge.
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">Submit Application</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Show/hide existing permit number field based on application type
+        document.querySelectorAll('input[name="application_type"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                const existingPermitSection = document.getElementById('existing_permit_section');
+                if (this.value === 'renewal') {
+                    existingPermitSection.style.display = 'block';
+                    document.getElementById('existing_permit_number').setAttribute('required', '');
+                } else {
+                    existingPermitSection.style.display = 'none';
+                    document.getElementById('existing_permit_number').removeAttribute('required');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

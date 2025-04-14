@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Commune Blockchain{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Welcome to Commune Blockchain</h1>
+            <p class="col-md-8 fs-4">
+                A transparent and secure platform for managing commune-level administrative requests using blockchain technology.
+            </p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'blockchain:request_form' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-file-alt"></i> Create New Request
+            </a>
+            {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Login to Get Started
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card mb-4 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-alt fa-4x mb-3 text-primary"></i>
+                    <h3 class="card-title">Submit Requests</h3>
+                    <p class="card-text">Submit administrative requests to your commune authorities securely and efficiently.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-4x mb-3 text-primary"></i>
+                    <h3 class="card-title">Track Status</h3>
+                    <p class="card-text">Track the status of your requests in real-time with complete transparency.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-shield-alt fa-4x mb-3 text-primary"></i>
+                    <h3 class="card-title">Blockchain Security</h3>
+                    <p class="card-text">All requests are securely stored on the blockchain ensuring immutability and transparency.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Tracking Section -->
+    <div class="row mt-5">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-search"></i> Track Your Request</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'blockchain:track_request' %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="id_request_id">Request ID:</label>
+                            <input type="text" name="request_id" id="id_request_id" class="form-control" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Track Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
