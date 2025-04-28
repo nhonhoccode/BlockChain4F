@@ -7,7 +7,7 @@ from django.forms.widgets import Input
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
 import json
-from .models import AdministrativeRequest, RequestStatusUpdate, RequestDocument, DocumentRequest, RequestCategory
+from .models import AdministrativeRequest, RequestStatusUpdate, RequestDocument, DocumentRequest, RequestCategory, Comment
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
@@ -267,4 +267,18 @@ class AuthorityDelegationForm(forms.Form):
         ],
         required=True,
         label="Authority Level"
-    ) 
+    )
+
+
+class CommentForm(forms.ModelForm):
+    """Form for adding comments to administrative requests."""
+    
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add a comment...'}),
+        }
+        labels = {
+            'content': '',
+        } 

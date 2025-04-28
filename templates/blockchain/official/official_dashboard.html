@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Official Dashboard - Commune Blockchain{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Welcome, {{ user.get_full_name|default:user.username }}</h2>
+            
+            <!-- Authority Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Authority Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Role:</strong> Commune Official
+                                {% if user.profile.ethereum_address %}
+                                    <span class="badge bg-success">Blockchain Verified</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Blockchain Address Not Set</span>
+                                {% endif %}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Authority Level:</strong> 
+                                <span class="badge bg-{{ user.profile.authority_level|lower }}">
+                                    {{ user.profile.get_authority_level_display }}
+                                </span>
+                            </p>
+                            <p class="mb-0">
+                                <strong>Assigned By:</strong> 
+                                {% if user.profile.approved_by %}
+                                    {{ user.profile.approved_by.get_full_name|default:user.profile.approved_by.username }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-2">Your Capabilities:</h6>
+                            <ul class="list-unstyled">
+                                {% if user.profile.authority_level == 'LOW' %}
+                                    <li><i class="fas fa-check text-success"></i> Process basic document requests</li>
+                                    <li><i class="fas fa-check text-success"></i> Update request statuses</li>
+                                    <li><i class="fas fa-check text-success"></i> Request additional documents</li>
+                                {% elif user.profile.authority_level == 'MEDIUM' %}
+                                    <li><i class="fas fa-check text-success"></i> All Low Authority capabilities</li>
+                                    <li><i class="fas fa-check text-success"></i> Verify document authenticity</li>
+                                    <li><i class="fas fa-check text-success"></i> Approve basic requests</li>
+                                {% else %}
+                                    <li><i class="fas fa-check text-success"></i> All Medium Authority capabilities</li>
+                                    <li><i class="fas fa-check text-success"></i> Handle complex administrative requests</li>
+                                    <li><i class="fas fa-check text-success"></i> Full administrative authority</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Task Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Tasks</h5>
+                            <p class="card-text display-6">{{ task_stats.total }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending</h5>
+                            <p class="card-text display-6">{{ task_stats.pending }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">In Progress</h5>
+                            <p class="card-text display-6">{{ task_stats.in_progress }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Completed</h5>
+                            <p class="card-text display-6">{{ task_stats.completed }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Assigned Categories Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-folder-open"></i> My Assigned Categories</h5>
+                </div>
+                <div class="card-body">
+                    {% if assigned_categories %}
+                    <div class="mb-3">
+                        <p>You are assigned to handle requests in the following categories:</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for category in assigned_categories %}
+                            <a href="?category={{ category.id }}" class="btn {% if current_category == category %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="fas fa-folder"></i> {{ category.name }}
+                            </a>
+                            {% endfor %}
+                            {% if current_category %}
+                            <a href="?" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Clear Filter
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if current_category %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-filter"></i> Filtered by: {{ current_category.name }}</h5>
+                        <p>{{ current_category.description }}</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> You have not been assigned to any specific categories yet.
+                        Contact the commune chief if you believe this is an error.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Requests by Category Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-tasks"></i> Requests by Category</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="categoryTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pending-category-tab" data-bs-toggle="tab" data-bs-target="#pendingByCategory" type="button" role="tab">
+                                Pending <span class="badge bg-primary">{{ task_stats.pending }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="inprogress-category-tab" data-bs-toggle="tab" data-bs-target="#inProgressByCategory" type="button" role="tab">
+                                In Progress <span class="badge bg-info">{{ task_stats.in_progress }}</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="additional-category-tab" data-bs-toggle="tab" data-bs-target="#additionalInfoByCategory" type="button" role="tab">
+                                Additional Info <span class="badge bg-warning">{{ task_stats.additional_info }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content mt-3" id="categoryTabsContent">
+                        <!-- Pending Requests by Category -->
+                        <div class="tab-pane fade show active" id="pendingByCategory" role="tabpanel">
+                            {% if categories_with_requests.PENDING %}
+                                {% for category_group in categories_with_requests.PENDING %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">
+                                        <i class="fas fa-folder text-primary"></i> {{ category_group.category.name }}
+                                        <span class="badge bg-primary">{{ category_group.requests.count }}</span>
+                                    </h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Type</th>
+                                                    <th>Applicant</th>
+                                                    <th>Submission Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for request in category_group.requests %}
+                                                <tr>
+                                                    <td>{{ request.id }}</td>
+                                                    <td>{{ request.get_request_type_display }}</td>
+                                                    <td>{{ request.get_masked_name }}</td>
+                                                    <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                                    <td>
+                                                        <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> No pending requests in your assigned categories.
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- In Progress Requests by Category -->
+                        <div class="tab-pane fade" id="inProgressByCategory" role="tabpanel">
+                            {% if categories_with_requests.IN_PROGRESS %}
+                                {% for category_group in categories_with_requests.IN_PROGRESS %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">
+                                        <i class="fas fa-folder text-info"></i> {{ category_group.category.name }}
+                                        <span class="badge bg-info">{{ category_group.requests.count }}</span>
+                                    </h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Type</th>
+                                                    <th>Applicant</th>
+                                                    <th>Updated Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for request in category_group.requests %}
+                                                <tr>
+                                                    <td>{{ request.id }}</td>
+                                                    <td>{{ request.get_request_type_display }}</td>
+                                                    <td>{{ request.get_masked_name }}</td>
+                                                    <td>{{ request.updated_at|date:"M d, Y" }}</td>
+                                                    <td>
+                                                        <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> No in-progress requests in your assigned categories.
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Additional Info Requests by Category -->
+                        <div class="tab-pane fade" id="additionalInfoByCategory" role="tabpanel">
+                            {% if categories_with_requests.ADDITIONAL_INFO %}
+                                {% for category_group in categories_with_requests.ADDITIONAL_INFO %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">
+                                        <i class="fas fa-folder text-warning"></i> {{ category_group.category.name }}
+                                        <span class="badge bg-warning">{{ category_group.requests.count }}</span>
+                                    </h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Type</th>
+                                                    <th>Applicant</th>
+                                                    <th>Updated Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for request in category_group.requests %}
+                                                <tr>
+                                                    <td>{{ request.id }}</td>
+                                                    <td>{{ request.get_request_type_display }}</td>
+                                                    <td>{{ request.get_masked_name }}</td>
+                                                    <td>{{ request.updated_at|date:"M d, Y" }}</td>
+                                                    <td>
+                                                        <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> No requests requiring additional information in your assigned categories.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Requests -->
+            {% if pending_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Pending Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for request in pending_requests %}
+                        <a href="{% url 'blockchain:request_detail' request.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Request #{{ request.id }}</h6>
+                                    <p class="mb-1 small text-muted">{{ request.get_type_display }}</p>
+                                </div>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- In Progress Requests -->
+            {% if in_progress_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">In Progress Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for request in in_progress_requests %}
+                        <a href="{% url 'blockchain:request_detail' request.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Request #{{ request.id }}</h6>
+                                    <p class="mb-1 small text-muted">{{ request.get_type_display }}</p>
+                                </div>
+                                <span class="badge bg-info">In Progress</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recent Document Requests -->
+            {% if recent_document_requests %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Document Requests</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for doc_request in recent_document_requests %}
+                        <a href="{% url 'blockchain:request_detail' doc_request.request.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ doc_request.title }}</h6>
+                                    <p class="mb-1 small text-muted">Request #{{ doc_request.request.id }}</p>
+                                </div>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recent Status Updates -->
+            {% if recent_status_updates %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Status Updates</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for update in recent_status_updates %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Request #{{ update.request.id }}</h6>
+                                    <p class="mb-1 small text-muted">
+                                        Status changed from {{ update.old_status }} to {{ update.new_status }}
+                                    </p>
+                                    {% if update.comments %}
+                                    <p class="mb-0 small">{{ update.comments }}</p>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">{{ update.created_at|date:"F j, Y, g:i a" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

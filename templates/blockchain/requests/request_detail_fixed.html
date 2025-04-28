@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% load blockchain_filters %}
+
+{% block title %}Request Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="fas fa-file-alt"></i> Request Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-{{ request.status|lower }} p-2">{{ request.get_status_display }}</span>
+                        {% if request.tx_hash %}
+                        <span class="blockchain-badge">
+                            <i class="fas fa-link"></i> On Blockchain
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <h4>Request Information</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Request ID</th>
+                            <td>{{ request.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Request Type</th>
+                            <td>{{ request.get_request_type_display }}</td>
+                        </tr>
+                        {% if request.category %}
+                        <tr>
+                            <th>Category</th>
+                            <td>
+                                <span class="badge bg-info">{{ request.category.name }}</span>
+                                {% if request.category.description %}
+                                <p class="small text-muted mt-1">{{ request.category.description }}</p>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>Description</th>
+                            <td>{{ request.description }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>{{ request.get_status_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Submitted Date</th>
+                            <td>{{ request.created_at|date:"F j, Y, g:i a" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Updated</th>
+                            <td>{{ request.updated_at|date:"F j, Y, g:i a" }}</td>
+                        </tr>
+                        {% if request.estimated_completion_date %}
+                        <tr>
+                            <th>Estimated Completion</th>
+                            <td>{{ request.estimated_completion_date|date:"F j, Y" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if request.pickup_date %}
+                        <tr>
+                            <th>Pickup Date</th>
+                            <td>{{ request.pickup_date|date:"F j, Y" }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                    
+                    <!-- Personal Information -->
+                    <h4 class="mt-4">Personal Information</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Full Name</th>
+                            <td>{{ request.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number</th>
+                            <td>{{ request.phone_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Address</th>
+                            <td>{{ request.address }}</td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Payment Information -->
+                    <h4 class="mt-4">Payment Information</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Payment Amount</th>
+                            <td>${{ request.payment_amount }}</td>
+                        </tr>
+                        <tr>
+                            <th>Payment Status</th>
+                            <td>{{ request.get_payment_status_display }}</td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Dynamic Fields -->
+                    {% if request.form_data %}
+                    <h4 class="mt-4">Form Data</h4>
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle"></i> This section shows all data submitted in the original request form.
+                    </div>
+                    
+                    <!-- Staff-only administrative data section -->
+                    {% if user.is_staff %}
+                    {% with meta=request.form_data|get_meta %}
+                    {% if meta %}
+                    <div class="card mb-3 border-secondary">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Administrative Form Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th width="30%">Submission Time</th>
+                                        <td>{{ meta.submit_time }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Client IP</th>
+                                        <td>{{ meta.ip_address }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>User Agent</th>
+                                        <td>{{ meta.user_agent }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <td>{{ meta.user_id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Username</th>
+                                        <td>{{ meta.username }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                    
+                    <!-- All form fields table -->
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="30%">Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, value in request.form_data.items %}
+                            {% if key != "_meta" and key != "_files" %}  <!-- Skip meta information -->
+                            <tr>
+                                <th>{{ key|format_field_name }}</th>
+                                <td>
+                                    {% if key|is_sensitive_field %}
+                                        <span class="text-danger">{{ key|format_field_value:value }}</span>
+                                    {% elif value|length > 100 %}
+                                        <div class="text-wrap">{{ value }}</div>
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    <!-- Files section -->
+                    {% with files=request.form_data|get_files %}
+                    {% if files %}
+                    <h4 class="mt-3">Uploaded Files</h4>
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>File Field</th>
+                                <th>File Information</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file_name, file_info in files.items %}
+                            <tr>
+                                <td><strong>{{ file_name|format_field_name }}</strong></td>
+                                <td>
+                                    <small>
+                                        Name: {{ file_info.name }}<br>
+                                        Size: {{ file_info.size }} bytes<br>
+                                        Type: {{ file_info.content_type }}
+                                    </small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <!-- Staff-only export button -->
+                    {% if user.is_staff %}
+                    <div class="d-flex justify-content-end mt-2 mb-3">
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                onclick="exportFormData({{ request.form_data|safe }}, 'form_data_request_{{ request.id }}.json')">
+                            <i class="fas fa-download"></i> Export Form Data
+                        </button>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right sidebar with actions -->
+        <div class="col-md-4">
+            <!-- ... Rest of the template remains the same ... -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function exportFormData(data, filename) {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", filename);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+</script>
+{% endblock %} 

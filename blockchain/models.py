@@ -8,6 +8,8 @@ import os
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+import time
+import random
 
 
 def get_document_upload_path(instance, filename):
@@ -121,7 +123,9 @@ class AdministrativeRequest(models.Model):
     def save(self, *args, **kwargs):
         if not self.user_hash:
             # Create a hash of user information for blockchain
-            user_info = f"{self.full_name}{self.phone_number}{self.address}"
+            current_time = str(time.time())
+            random_value = str(random.randint(1, 1000000))
+            user_info = f"{self.full_name}{self.phone_number}{self.address}{current_time}{random_value}"
             self.user_hash = hashlib.sha256(user_info.encode()).hexdigest()
         super().save(*args, **kwargs)
     
@@ -217,4 +221,42 @@ class DocumentRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.title} - {self.request}" 
+        return f"{self.title} - {self.request}"
+
+
+class AdministrativeRequestFile(models.Model):
+    """Model for storing files related to administrative requests."""
+    
+    request = models.ForeignKey(AdministrativeRequest, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to=get_document_upload_path)
+    file_name = models.CharField(max_length=255)
+    file_size = models.PositiveIntegerField()  # in bytes
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    upload_date = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f"{self.file_name} - {self.request}"
+    
+    def get_size_display(self):
+        """Return human-readable file size."""
+        size = self.file_size
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024 or unit == 'GB':
+                return f"{size:.2f} {unit}"
+            size /= 1024
+
+
+class Comment(models.Model):
+    """Model for storing comments on administrative requests."""
+    
+    request = models.ForeignKey(AdministrativeRequest, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.request}" 

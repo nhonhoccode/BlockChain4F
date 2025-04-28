@@ -43,6 +43,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Allow iframe embedding from same origin
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 ROOT_URLCONF = 'commune_blockchain.urls'
 
 TEMPLATES = [
@@ -101,6 +104,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'docs',  # Add docs directory to static files
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Document files
+DOCS_URL = '/docs/'
+DOCS_ROOT = BASE_DIR / 'docs'
 
 # Media files (user uploads)
 MEDIA_URL = '/media/'

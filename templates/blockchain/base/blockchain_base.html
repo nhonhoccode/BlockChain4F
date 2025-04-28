@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Blockchain Administration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .blockchain-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 2rem;
+        padding: 1rem 0;
+    }
+    
+    .blockchain-footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .blockchain-sidebar {
+        background-color: #f8f9fa;
+        border-right: 1px solid #e9ecef;
+        min-height: calc(100vh - 56px - 72px);
+        padding-top: 1rem;
+    }
+    
+    .blockchain-content {
+        padding: 1rem 0;
+    }
+</style>
+{% block module_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="blockchain-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>{% block blockchain_title %}Blockchain Administration{% endblock %}</h1>
+            <div class="breadcrumb">
+                <a href="{% url 'blockchain:index' %}">Home</a> /
+                {% block breadcrumb %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% block full_width %}
+        <div class="col-md-3 blockchain-sidebar">
+            {% block sidebar %}
+            <div class="list-group">
+                <a href="{% url 'blockchain:index' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="{% url 'blockchain:request_form' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-file-alt"></i> New Request
+                </a>
+                <a href="{% url 'blockchain:my_requests' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-list"></i> My Requests
+                </a>
+                <a href="{% url 'blockchain:track_request' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-search"></i> Track Request
+                </a>
+                {% if user.is_staff %}
+                <a href="{% url 'blockchain:admin_dashboard' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                </a>
+                {% endif %}
+                {% if user.profile.role == 'OFFICIAL' %}
+                <a href="{% url 'blockchain:official_dashboard' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user-tie"></i> Official Dashboard
+                </a>
+                {% endif %}
+            </div>
+            {% endblock %}
+        </div>
+        <div class="col-md-9 blockchain-content">
+            {% block blockchain_content %}{% endblock %}
+        </div>
+        {% endblock %}
+    </div>
+</div>
+
+<div class="blockchain-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <p>&copy; {% now "Y" %} Commune Blockchain Administration. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <p>Blockchain Transaction ID: <code>{{ blockchain_transaction_id|default:"Not available" }}</code></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% block blockchain_scripts %}{% endblock %}
+{% endblock %} 

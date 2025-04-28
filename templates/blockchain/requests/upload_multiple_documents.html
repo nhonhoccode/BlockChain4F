@@ -1,0 +1,460 @@
+{% extends 'blockchain/base.html' %}
+{% load static %}
+
+{% block title %}Upload Multiple Documents{% endblock %}
+
+{% block extra_css %}
+<style>
+  .upload-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .request-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  .upload-form-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  .form-label {
+    font-weight: 500;
+  }
+  .required-field::after {
+    content: "*";
+    color: #dc3545;
+    margin-left: 4px;
+  }
+  .document-item {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    position: relative;
+  }
+  .document-item.is-invalid {
+    border-color: #dc3545;
+  }
+  .remove-document {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .remove-document:hover {
+    color: #dc3545;
+  }
+  .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+  }
+  .file-input-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .file-input-button {
+    background-color: #fff;
+    border: 1px dashed #ced4da;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .file-input-button:hover {
+    background-color: #e9ecef;
+  }
+  .file-preview {
+    margin-top: 10px;
+    display: none;
+  }
+  .add-document-btn {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px dashed #6c757d;
+    background-color: #f8f9fa;
+    transition: all 0.3s;
+  }
+  .add-document-btn:hover {
+    background-color: #e9ecef;
+    border-color: #5a6268;
+  }
+  .progress-container {
+    height: 6px;
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    height: 100%;
+    background-color: #007bff;
+    border-radius: 3px;
+    transition: width 0.5s;
+  }
+  .blockchain-notice {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="upload-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3">Upload Multiple Documents</h1>
+      <a href="{% url 'blockchain:request_detail' request_obj.pk %}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Request
+      </a>
+    </div>
+    
+    <div class="request-info">
+      <h3 class="h5 mb-3">Request Information</h3>
+    <div class="row">
+        <div class="col-md-6">
+          <p class="mb-2"><strong>Request ID:</strong> #{{ request_obj.pk }}</p>
+          <p class="mb-2"><strong>Type:</strong> {{ request_obj.get_request_type_display }}</p>
+          <p class="mb-2"><strong>Category:</strong> {{ request_obj.category.name }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-2"><strong>Status:</strong> <span class="badge bg-{{ request_obj.get_status_badge_color }}">{{ request_obj.get_status_display }}</span></p>
+          <p class="mb-2"><strong>Submitted by:</strong> {{ request_obj.full_name }}</p>
+          <p class="mb-2"><strong>Submitted on:</strong> {{ request_obj.created_at|date:"F j, Y" }}</p>
+                </div>
+                                </div>
+                    </div>
+    
+    <div class="upload-form-container">
+      <h3 class="h5 mb-4">Upload Documents</h3>
+                    
+      <form id="multiDocumentForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+        <input type="hidden" name="document_count" id="documentCount" value="1">
+        
+        <div id="documents-container">
+          <!-- Document template will be cloned here -->
+                        </div>
+                        
+        <button type="button" id="addDocumentBtn" class="add-document-btn">
+          <i class="fas fa-plus-circle me-2"></i> Add Another Document
+        </button>
+        
+        <div class="progress-container">
+          <div class="progress-bar" id="uploadProgress" style="width: 0%"></div>
+                        </div>
+        <p class="text-center text-muted mb-3" id="uploadStatus">0 documents ready to upload</p>
+        
+        <div class="blockchain-notice">
+          <i class="fas fa-info-circle me-2"></i>
+          <small>All documents will be securely stored and their metadata will be recorded on the blockchain for verification purposes.</small>
+                        </div>
+                        
+        <div class="d-flex justify-content-end mt-4">
+          <a href="{% url 'blockchain:request_detail' request_obj.pk %}" class="btn btn-outline-secondary me-2">Cancel</a>
+          <button type="submit" id="submitBtn" class="btn btn-primary">
+            <i class="fas fa-upload me-1"></i> Upload All Documents
+                            </button>
+                        </div>
+                    </form>
+                </div>
+  </div>
+</div>
+
+<!-- Document template (hidden) -->
+<template id="document-template">
+  <div class="document-item" data-index="__INDEX__">
+    <button type="button" class="remove-document" title="Remove document">
+      <i class="fas fa-times"></i>
+    </button>
+    <h4 class="h6 mb-3">Document #__NUMBER__</h4>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label required-field">Document Title</label>
+        <input type="text" name="title___INDEX__" class="form-control" required>
+        <div class="invalid-feedback">Please enter a title for this document</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label required-field">Document Type</label>
+        <select name="document_type___INDEX__" class="form-select" required>
+          <option value="">Select document type</option>
+          {% for type_choice in document_types %}
+          <option value="{{ type_choice.0 }}">{{ type_choice.1 }}</option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">Please select a document type</div>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Description (Optional)</label>
+      <textarea name="description___INDEX__" class="form-control" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label required-field">Document File</label>
+      <div class="file-input-wrapper w-100">
+        <div class="file-input-button">
+          <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-primary"></i>
+          <p class="mb-1">Drag and drop a file here or click to browse</p>
+          <small class="text-muted">Supported formats: PDF, DOCX, JPG, PNG (Max 10MB)</small>
+          <input type="file" name="file___INDEX__" class="form-control document-file" required>
+        </div>
+      </div>
+      <div class="invalid-feedback">Please select a file to upload</div>
+      
+      <div class="file-preview mt-2">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-file-alt me-3 text-primary"></i>
+          <div>
+            <p class="mb-0 font-weight-bold file-name"></p>
+            <small class="text-muted file-size"></small>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger ms-auto remove-file">
+            <i class="fas fa-times"></i>
+          </button>
+            </div>
+        </div>
+    </div>
+</div>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    let documentCount = 0;
+    
+    // Add first document on page load
+    addNewDocument();
+    
+    // Add new document button click
+    $('#addDocumentBtn').on('click', function() {
+      addNewDocument();
+    });
+    
+    // Form submission
+    $('#multiDocumentForm').on('submit', function(e) {
+      e.preventDefault();
+      
+      if (validateForm()) {
+        // Simulate upload progress (in a real app, this would be a real upload)
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 5;
+          $('#uploadProgress').css('width', progress + '%');
+          
+          if (progress >= 100) {
+            clearInterval(interval);
+            // Actually submit the form after animation completes
+            setTimeout(() => {
+              this.submit();
+            }, 500);
+          }
+        }, 100);
+      }
+    });
+    
+    // Document container event delegation for dynamic elements
+    $('#documents-container').on('click', '.remove-document', function() {
+      if (documentCount > 1) {
+        $(this).closest('.document-item').remove();
+        documentCount--;
+        $('#documentCount').val(documentCount);
+        updateDocumentNumbers();
+        updateUploadStatus();
+      } else {
+        alert('You must have at least one document');
+      }
+    });
+    
+    $('#documents-container').on('change', '.document-file', function(e) {
+      const fileInput = $(this);
+      const filePreview = fileInput.closest('.mb-3').find('.file-preview');
+      const fileName = fileInput.closest('.mb-3').find('.file-name');
+      const fileSize = fileInput.closest('.mb-3').find('.file-size');
+      
+      if (fileInput[0].files && fileInput[0].files[0]) {
+        const file = fileInput[0].files[0];
+        fileName.text(file.name);
+        fileSize.text(formatFileSize(file.size));
+        filePreview.show();
+        
+        // Remove validation error if present
+        fileInput.removeClass('is-invalid');
+      } else {
+        filePreview.hide();
+      }
+      
+      updateUploadStatus();
+    });
+    
+    $('#documents-container').on('click', '.remove-file', function(e) {
+      const removeBtn = $(this);
+      const fileInput = removeBtn.closest('.mb-3').find('.document-file');
+      const filePreview = removeBtn.closest('.file-preview');
+      
+      fileInput.val('');
+      filePreview.hide();
+      updateUploadStatus();
+    });
+    
+    // Function to add a new document
+    function addNewDocument() {
+      documentCount++;
+      $('#documentCount').val(documentCount);
+      
+      // Clone template and update indices
+      const template = document.getElementById('document-template').innerHTML;
+      const documentHtml = template
+        .replace(/__INDEX__/g, documentCount)
+        .replace(/__NUMBER__/g, documentCount);
+      
+      $('#documents-container').append(documentHtml);
+      updateUploadStatus();
+    }
+    
+    // Update document numbers after removal
+    function updateDocumentNumbers() {
+      $('.document-item').each(function(index) {
+        $(this).find('h4').text('Document #' + (index + 1));
+      });
+    }
+    
+    // Form validation
+    function validateForm() {
+      let isValid = true;
+      
+      $('.document-item').each(function() {
+        const item = $(this);
+        const titleInput = item.find('input[name^="title"]');
+        const typeSelect = item.find('select[name^="document_type"]');
+        const fileInput = item.find('input[type="file"]');
+        
+        // Validate required fields
+        if (!titleInput.val()) {
+          titleInput.addClass('is-invalid');
+          isValid = false;
+        } else {
+          titleInput.removeClass('is-invalid');
+        }
+        
+        if (!typeSelect.val()) {
+          typeSelect.addClass('is-invalid');
+          isValid = false;
+        } else {
+          typeSelect.removeClass('is-invalid');
+        }
+        
+        if (fileInput[0].files.length === 0) {
+          fileInput.closest('.file-input-wrapper').addClass('is-invalid');
+          fileInput.closest('.mb-3').find('.invalid-feedback').show();
+          isValid = false;
+        } else {
+          fileInput.closest('.file-input-wrapper').removeClass('is-invalid');
+          fileInput.closest('.mb-3').find('.invalid-feedback').hide();
+        }
+      });
+      
+      return isValid;
+    }
+    
+    // Update the upload status text
+    function updateUploadStatus() {
+      const totalDocuments = $('.document-item').length;
+      const readyDocuments = $('.document-file').filter(function() {
+        return this.files && this.files.length > 0;
+      }).length;
+      
+      $('#uploadStatus').text(readyDocuments + ' of ' + totalDocuments + ' documents ready to upload');
+      
+      // Update progress bar
+      const progress = totalDocuments > 0 ? (readyDocuments / totalDocuments) * 100 : 0;
+      $('#uploadProgress').css('width', progress + '%');
+      
+      // Disable submit button if no files selected
+      if (readyDocuments === 0) {
+        $('#submitBtn').prop('disabled', true);
+      } else {
+        $('#submitBtn').prop('disabled', false);
+      }
+    }
+    
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Initialize drag and drop for the document items
+    function initDragDrop(documentItem) {
+      const dropArea = documentItem.find('.file-input-button');
+      
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea[0].addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea[0].addEventListener(eventName, highlight, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropArea[0].addEventListener(eventName, unhighlight, false);
+      });
+      
+      function highlight() {
+        dropArea.addClass('bg-light');
+      }
+      
+      function unhighlight() {
+        dropArea.removeClass('bg-light');
+      }
+      
+      dropArea[0].addEventListener('drop', handleDrop, false);
+      
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length) {
+          const fileInput = dropArea.find('input[type="file"]')[0];
+          fileInput.files = files;
+          $(fileInput).trigger('change');
+        }
+      }
+    }
+    
+    // Initialize form elements
+    $('#documents-container').on('DOMNodeInserted', '.document-item', function() {
+      const documentItem = $(this);
+      
+      // Initialize drag and drop for the new document item
+      setTimeout(() => {
+        initDragDrop(documentItem);
+      }, 100);
+    });
+  });
+</script>
+{% endblock %} 

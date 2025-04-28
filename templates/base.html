@@ -65,6 +65,16 @@
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blockchain:procedures_overview' %}">
+                            <i class="fas fa-clipboard-list"></i> Procedures
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blockchain:request_list' %}">
+                            <i class="fas fa-globe"></i> Public Requests
+                        </a>
+                    </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'blockchain:request_form' %}">
@@ -173,10 +183,11 @@
                     <p>A transparent and secure system for managing administrative requests using blockchain technology.</p>
                 </div>
                 <div class="col-md-3">
-                    <h5>Quick Links</h5>
+                    <h5>Commune Services</h5>
                     <ul class="list-unstyled">
                         <li><a href="{% url 'blockchain:index' %}">Home</a></li>
-                        <li><a href="{% url 'blockchain:request_form' %}">New Request</a></li>
+                        <li><a href="{% url 'blockchain:procedures_overview' %}">Administrative Procedures</a></li>
+                        <li><a href="{% url 'blockchain:request_list' %}">Public Requests</a></li>
                         <li><a href="{% url 'blockchain:track_request' %}">Track Request</a></li>
                     </ul>
                 </div>

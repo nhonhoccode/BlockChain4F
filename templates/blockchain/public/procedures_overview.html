@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load blockchain_filters %}
+
+{% block title %}Administrative Procedures Overview{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-clipboard-list"></i> Administrative Procedures Overview</h1>
+            <p class="lead">A comprehensive list of all administrative procedures available in the commune with required documents and processing times.</p>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ total_procedures }}</h3>
+                    <p class="mb-0">Total Procedures</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-th-list"></i> Quick Navigation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for category, procedures in procedures_by_category.items %}
+                        <a href="#category-{{ category|slugify }}" class="btn btn-outline-primary">
+                            {{ category }} ({{ procedures|length }})
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            {% for category, procedures in procedures_by_category.items %}
+            <div id="category-{{ category|slugify }}" class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-folder"></i> {{ category }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for procedure in procedures %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">{{ procedure.name }}</h5>
+                                    <span class="badge bg-info">{{ request_counts|get_item:procedure.id }} Requests</span>
+                                </div>
+                                <div class="card-body">
+                                    <p>{{ procedure.description }}</p>
+                                    
+                                    <h6><i class="fas fa-file-alt text-warning"></i> Required Documents:</h6>
+                                    <ul class="mb-3">
+                                        {% for doc in procedure.required_documents %}
+                                        <li>{{ doc }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    
+                                    <p><strong><i class="fas fa-clock text-secondary"></i> Processing Time:</strong> {{ procedure.processing_time }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ procedure.form_url }}" class="btn btn-primary" target="_blank">
+                                        <i class="fas fa-external-link-alt"></i> View Form
+                                    </a>
+                                    <a href="{% url 'blockchain:request_form' %}?type={{ procedure.id }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-file-signature"></i> Submit Request
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#category-"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

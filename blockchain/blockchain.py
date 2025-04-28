@@ -13,7 +13,19 @@ from typing import Dict, List, Any, Optional
 from django.utils import timezone
 
 # File path for storing mock blockchain data
-MOCK_DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mock_blockchain_data.pkl')
+try:
+    # Use MEDIA_ROOT if available for better file storage
+    if hasattr(settings, 'MEDIA_ROOT'):
+        MOCK_DATA_DIR = os.path.join(settings.MEDIA_ROOT, 'blockchain', 'mock_data')
+        os.makedirs(MOCK_DATA_DIR, exist_ok=True)
+        MOCK_DATA_FILE = os.path.join(MOCK_DATA_DIR, 'mock_blockchain_data.pkl')
+        print(f"DEBUG - Using MEDIA_ROOT for blockchain data: {MOCK_DATA_FILE}")
+    else:
+        MOCK_DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mock_blockchain_data.pkl')
+        print(f"DEBUG - Using default path for blockchain data: {MOCK_DATA_FILE}")
+except Exception as e:
+    print(f"DEBUG - Error setting up MOCK_DATA_FILE path: {str(e)}")
+    MOCK_DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mock_blockchain_data.pkl')
 
 # Initialize empty mock requests dictionary
 _mock_requests = {}
@@ -49,16 +61,32 @@ def _load_mock_data():
 def _save_mock_data():
     """Save mock blockchain data to file"""
     try:
+        print(f"DEBUG - _save_mock_data called")
         data = {
             'requests': _mock_requests,
             'transaction_counter': _mock_transaction_counter,
             'officers': _mock_officers
         }
+        print(f"DEBUG - Preparing to save {len(_mock_requests)} requests to {MOCK_DATA_FILE}")
+        
+        # Check if parent directory exists and create if needed
+        dir_path = os.path.dirname(MOCK_DATA_FILE)
+        if not os.path.exists(dir_path):
+            print(f"DEBUG - Creating directory: {dir_path}")
+            os.makedirs(dir_path, exist_ok=True)
+        
+        # Ensure we have permission to write to the file
+        print(f"DEBUG - Opening file for writing: {MOCK_DATA_FILE}")
         with open(MOCK_DATA_FILE, 'wb') as f:
+            print(f"DEBUG - Pickling data")
             pickle.dump(data, f)
-        print(f"Saved {len(_mock_requests)} requests to mock blockchain data")
+        print(f"DEBUG - Saved {len(_mock_requests)} requests to mock blockchain data")
+        return True
     except Exception as e:
-        print(f"Error saving mock blockchain data: {e}")
+        import traceback
+        print(f"DEBUG - Error saving mock blockchain data: {str(e)}")
+        print(f"DEBUG - Traceback: {traceback.format_exc()}")
+        return False  # Return False instead of raising exception
 
 # Load mock data when module is imported
 _load_mock_data()
@@ -66,18 +94,54 @@ _load_mock_data()
 def _generate_tx_hash():
     """Generate a mock transaction hash."""
     global _mock_transaction_counter
-    _mock_transaction_counter += 1
-    _save_mock_data()  # Save counter change
-    return hashlib.sha256(str(_mock_transaction_counter).encode()).hexdigest()
+    try:
+        print(f"DEBUG - _generate_tx_hash called, current counter: {_mock_transaction_counter}")
+        _mock_transaction_counter += 1
+        print(f"DEBUG - Incremented counter to: {_mock_transaction_counter}")
+        
+        # Try to save but don't fail if it doesn't work
+        save_result = _save_mock_data()
+        if not save_result:
+            print(f"DEBUG - Failed to save counter change, but continuing with hash generation")
+        
+        tx_hash = hashlib.sha256(str(_mock_transaction_counter).encode()).hexdigest()
+        print(f"DEBUG - Generated hash: {tx_hash}")
+        return tx_hash
+    except Exception as e:
+        print(f"DEBUG - Error generating tx hash: {str(e)}")
+        # Generate a fallback hash if there's an error
+        import random
+        fallback_hash = hashlib.sha256(str(random.randint(1, 1000000)).encode()).hexdigest()
+        print(f"DEBUG - Using fallback hash: {fallback_hash}")
+        return fallback_hash
 
 def create_request(user_id: str, request_type: str, description: str, payment_amount: float) -> Dict[str, Any]:
     """Create a new request on the blockchain"""
     try:
+        print(f"DEBUG - blockchain.create_request called with: user_id={user_id}, type={request_type}, payment={payment_amount}")
+        
+        # Validate inputs
+        if not user_id:
+            return {'error': 'user_id is required'}
+        
+        if not request_type:
+            return {'error': 'request_type is required'}
+        
+        # Handle payment amount
+        try:
+            payment_amount = float(payment_amount)
+            if payment_amount < 0:
+                return {'error': 'payment_amount must be a positive number'}
+        except (ValueError, TypeError):
+            return {'error': f'Invalid payment_amount: {payment_amount}. Must be a valid number.'}
+        
         # Generate a unique request ID based on timestamp
         request_id = int(time.time())
+        print(f"DEBUG - Generated request_id: {request_id}")
         
         # Hash the user ID for privacy
         hashed_user_id = hashlib.sha256(str(user_id).encode()).hexdigest()
+        print(f"DEBUG - Hashed user_id: {hashed_user_id}")
         
         # Create request data
         request_data = {
@@ -91,16 +155,30 @@ def create_request(user_id: str, request_type: str, description: str, payment_am
             'updated_at': int(time.time()),
             'status_history': [{'status': 'PENDING', 'timestamp': int(time.time())}]
         }
+        print(f"DEBUG - Created request_data object")
         
         # Store in mock requests dictionary
         _mock_requests[request_id] = request_data
-        _save_mock_data()
+        print(f"DEBUG - Stored request in _mock_requests")
         
+        try:
+            _save_mock_data()
+            print(f"DEBUG - Saved mock data successfully")
+        except Exception as save_error:
+            print(f"DEBUG - Error saving mock data: {str(save_error)}")
+            return {
+                'error': f"Failed to save blockchain data: {str(save_error)}"
+            }
+        
+        print(f"DEBUG - Returning success response with tx_hash")
         return {
             'request': request_data,
             'tx_hash': _generate_tx_hash()
         }
     except Exception as e:
+        print(f"DEBUG - Error in create_request: {str(e)}")
+        import traceback
+        print(f"DEBUG - Traceback: {traceback.format_exc()}")
         return {
             'error': str(e)
         }
