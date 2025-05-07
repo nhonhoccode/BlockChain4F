@@ -28,6 +28,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
 from .models import AdministrativeRequest, RequestStatusUpdate, RequestDocument, DocumentRequest, RequestCategory, AdministrativeRequestFile, Comment
 from .forms import (
@@ -64,8 +65,8 @@ def request_form(request):
     """View for submitting new administrative requests."""
     import json  # Import json module here to ensure it's available
     
-    # Initialize form variable for both GET and POST requests
-    form = None
+    # Initialize form variable
+    form = AdministrativeRequestForm()
     
     if request.method == 'POST':
         form = AdministrativeRequestForm(request.POST)
@@ -103,12 +104,9 @@ def request_form(request):
             except Exception as e:
                 messages.error(request, f'An error occurred while submitting your request: {str(e)}')
         else:
-            # Log form errors for debugging - fixed indentation
+            # Only display form errors if the form was submitted and is invalid
             error_fields = ', '.join(form.errors.keys())
             messages.error(request, f'Please correct the errors in these fields: {error_fields}')
-    else:
-        # Initialize the form for GET requests
-        form = AdministrativeRequestForm()
     
     # Load categories for dropdown
     categories = RequestCategory.objects.all()
@@ -1366,113 +1364,113 @@ def procedures_overview(request):
     # Define procedure details (this could be moved to a database model in the future)
     procedures = {
         'birth_certificate': {
-            'name': 'Birth Certificate Request',
-            'category': 'Civil Registration',
-            'description': 'Request for issuance of birth certificate for a newborn or replacement of existing certificate.',
+            'name': _('Birth Certificate Request'),
+            'category': _('Civil Registration'),
+            'description': _('Request for issuance of birth certificate for a newborn or replacement of existing certificate.'),
             'required_documents': [
-                'Hospital birth certificate',
-                'Parent ID documents',
-                'Marriage certificate of parents (if applicable)'
+                _('Hospital birth certificate'),
+                _('Parent ID documents'),
+                _('Marriage certificate of parents (if applicable)')
             ],
-            'processing_time': '3-5 business days',
+            'processing_time': _('3-5 business days'),
             'form_url': '/docs/civil_registration/birth_certificate_form.html'
         },
         'marriage_certificate': {
-            'name': 'Marriage Certificate Request',
-            'category': 'Civil Registration',
-            'description': 'Request for issuance of marriage certificate or replacement of existing certificate.',
+            'name': _('Marriage Certificate Request'),
+            'category': _('Civil Registration'),
+            'description': _('Request for issuance of marriage certificate or replacement of existing certificate.'),
             'required_documents': [
-                'ID documents of both spouses',
-                'Marriage ceremony evidence',
-                'Witness statements'
+                _('ID documents of both spouses'),
+                _('Marriage ceremony evidence'),
+                _('Witness statements')
             ],
-            'processing_time': '3-5 business days',
+            'processing_time': _('3-5 business days'),
             'form_url': '/docs/civil_registration/marriage_certificate_form.html'
         },
         'business_permit': {
-            'name': 'Business Permit Application',
-            'category': 'Business Licenses',
-            'description': 'Application for a new business permit for commercial operations.',
+            'name': _('Business Permit Application'),
+            'category': _('Business Licenses'),
+            'description': _('Application for a new business permit for commercial operations.'),
             'required_documents': [
-                'Business registration',
-                'Tax identification',
-                'Location permit',
-                'Fire safety certificate'
+                _('Business registration'),
+                _('Tax identification'),
+                _('Location permit'),
+                _('Fire safety certificate')
             ],
-            'processing_time': '7-10 business days',
+            'processing_time': _('7-10 business days'),
             'form_url': '/docs/business_licenses/business_permit_form.html'
         },
         'license_renewal': {
-            'name': 'License Renewal Application',
-            'category': 'Business Licenses',
-            'description': 'Application to renew an existing business license or permit.',
+            'name': _('License Renewal Application'),
+            'category': _('Business Licenses'),
+            'description': _('Application to renew an existing business license or permit.'),
             'required_documents': [
-                'Existing license document',
-                'Tax clearance certificate',
-                'Updated business information'
+                _('Existing license document'),
+                _('Tax clearance certificate'),
+                _('Updated business information')
             ],
-            'processing_time': '5-7 business days',
+            'processing_time': _('5-7 business days'),
             'form_url': '/docs/business_licenses/license_renewal_form.html'
         },
         'land_title': {
-            'name': 'Land Title Application',
-            'category': 'Land and Property',
-            'description': 'Application for land title registration or transfer.',
+            'name': _('Land Title Application'),
+            'category': _('Land and Property'),
+            'description': _('Application for land title registration or transfer.'),
             'required_documents': [
-                'Proof of ownership',
-                'Land survey document',
-                'Tax declaration',
-                'ID documents'
+                _('Proof of ownership'),
+                _('Land survey document'),
+                _('Tax declaration'),
+                _('ID documents')
             ],
-            'processing_time': '14-30 business days',
+            'processing_time': _('14-30 business days'),
             'form_url': '/docs/land_and_property/land_title_form.html'
         },
         'property_transfer': {
-            'name': 'Property Transfer Request',
-            'category': 'Land and Property',
-            'description': 'Request to transfer property ownership from one entity to another.',
+            'name': _('Property Transfer Request'),
+            'category': _('Land and Property'),
+            'description': _('Request to transfer property ownership from one entity to another.'),
             'required_documents': [
-                'Deed of sale',
-                'Tax clearance',
-                'ID documents of both parties',
-                'Existing title'
+                _('Deed of sale'),
+                _('Tax clearance'),
+                _('ID documents of both parties'),
+                _('Existing title')
             ],
-            'processing_time': '14-21 business days',
+            'processing_time': _('14-21 business days'),
             'form_url': '/docs/land_and_property/property_transfer_form.html'
         },
         'residence_certificate': {
-            'name': 'Residence Certificate Request',
-            'category': 'Identity Documents',
-            'description': 'Request for certification of residency in the commune.',
+            'name': _('Residence Certificate Request'),
+            'category': _('Identity Documents'),
+            'description': _('Request for certification of residency in the commune.'),
             'required_documents': [
-                'Proof of address',
-                'ID document',
-                'Photo'
+                _('Proof of address'),
+                _('ID document'),
+                _('Photo')
             ],
-            'processing_time': '1-3 business days',
+            'processing_time': _('1-3 business days'),
             'form_url': '/docs/identity_documents/residence_certificate_form.html'
         },
         'tax_clearance': {
-            'name': 'Tax Clearance Certificate',
-            'category': 'Tax and Fees',
-            'description': 'Request for certification that all taxes have been paid.',
+            'name': _('Tax Clearance Certificate'),
+            'category': _('Tax and Fees'),
+            'description': _('Request for certification that all taxes have been paid.'),
             'required_documents': [
-                'Tax payment receipts',
-                'ID document',
-                'Property information (if applicable)'
+                _('Tax payment receipts'),
+                _('ID document'),
+                _('Property information (if applicable)')
             ],
-            'processing_time': '3-5 business days',
+            'processing_time': _('3-5 business days'),
             'form_url': '/docs/tax_and_fees/tax_clearance_form.html'
         },
         'general_application': {
-            'name': 'General Application Form',
-            'category': 'Other Services',
-            'description': 'General purpose application for services not covered by specific forms.',
+            'name': _('General Application Form'),
+            'category': _('Other Services'),
+            'description': _('General purpose application for services not covered by specific forms.'),
             'required_documents': [
-                'ID document',
-                'Supporting documents as applicable to request'
+                _('ID document'),
+                _('Supporting documents as applicable to request')
             ],
-            'processing_time': 'Varies based on request type',
+            'processing_time': _('Varies based on request type'),
             'form_url': '/docs/other_services/general_application_form.html'
         }
     }

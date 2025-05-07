@@ -1,0 +1,823 @@
+# Vietnamese translation file.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-07 09:45+0000\n"
+"PO-Revision-Date: 2025-05-07 09:45+0000\n"
+"Last-Translator: \n"
+"Language-Team: Vietnamese\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: templates/base.html
+msgid "Commune Blockchain"
+msgstr "Blockchain Xã"
+
+#: templates/base.html
+msgid "Home"
+msgstr "Trang chủ"
+
+#: templates/base.html
+msgid "Procedures"
+msgstr "Thủ tục"
+
+#: templates/base.html
+msgid "Public Requests"
+msgstr "Yêu cầu công khai"
+
+#: templates/base.html
+msgid "New Request"
+msgstr "Yêu cầu mới"
+
+#: templates/base.html
+msgid "My Requests"
+msgstr "Yêu cầu của tôi"
+
+#: templates/base.html
+msgid "Admin Dashboard"
+msgstr "Bảng điều khiển quản trị viên"
+
+#: templates/base.html
+msgid "Official Dashboard"
+msgstr "Bảng điều khiển cán bộ"
+
+#: templates/base.html
+msgid "Chairman"
+msgstr "Chủ tịch"
+
+#: templates/base.html
+msgid "Official"
+msgstr "Cán bộ"
+
+#: templates/base.html
+msgid "Citizen"
+msgstr "Công dân"
+
+#: templates/base.html
+msgid "Profile"
+msgstr "Hồ sơ"
+
+#: templates/base.html
+msgid "Pending Approvals"
+msgstr "Phê duyệt đang chờ xử lý"
+
+#: templates/base.html
+msgid "Logout"
+msgstr "Đăng xuất"
+
+#: templates/base.html
+msgid "Login"
+msgstr "Đăng nhập"
+
+#: templates/base.html
+msgid "Register"
+msgstr "Đăng ký"
+
+#: templates/base.html
+msgid "English"
+msgstr "Tiếng Anh"
+
+#: templates/base.html
+msgid "Vietnamese"
+msgstr "Tiếng Việt"
+
+#: templates/base.html
+msgid "A transparent and secure system for managing administrative requests using blockchain technology."
+msgstr "Hệ thống minh bạch và an toàn để quản lý các yêu cầu hành chính sử dụng công nghệ blockchain."
+
+#: templates/base.html
+msgid "Commune Services"
+msgstr "Dịch vụ xã"
+
+#: templates/base.html
+msgid "Administrative Procedures"
+msgstr "Thủ tục hành chính"
+
+#: templates/base.html
+msgid "Track Request"
+msgstr "Theo dõi yêu cầu"
+
+#: templates/base.html
+msgid "Contact"
+msgstr "Liên hệ"
+
+#: templates/base.html
+msgid "Commune Administration"
+msgstr "Quản lý xã"
+
+#: templates/base.html
+msgid "123 Main Street"
+msgstr "123 Đường Chính"
+
+#: templates/base.html
+msgid "City, State 12345"
+msgstr "Thành phố, Tiểu bang 12345"
+
+#: templates/base.html
+msgid "Commune Blockchain. All rights reserved."
+msgstr "Blockchain Xã. Tất cả các quyền được bảo lưu."
+
+#: templates/blockchain/public/index.html
+msgid "Blockchain Administration Portal"
+msgstr "Cổng Quản Lý Blockchain"
+
+#: templates/blockchain/public/index.html
+msgid "Welcome to the Blockchain Administrative System"
+msgstr "Chào mừng đến với Hệ thống Quản lý Blockchain"
+
+#: templates/blockchain/public/index.html
+msgid "This system provides secure and transparent management of administrative procedures through blockchain technology."
+msgstr "Hệ thống này cung cấp quản lý an toàn và minh bạch cho các thủ tục hành chính thông qua công nghệ blockchain."
+
+#: templates/blockchain/public/index.html
+msgid "Track your requests, submit new applications, and access all commune services from a single platform."
+msgstr "Theo dõi yêu cầu của bạn, gửi đơn mới và truy cập tất cả dịch vụ xã từ một nền tảng duy nhất."
+
+#: templates/blockchain/public/index.html
+msgid "Submit a new administrative request for processing."
+msgstr "Gửi một yêu cầu hành chính mới để xử lý."
+
+#: templates/blockchain/public/index.html
+msgid "Start New Request"
+msgstr "Bắt đầu yêu cầu mới"
+
+#: templates/blockchain/public/index.html
+msgid "Request ID"
+msgstr "Mã yêu cầu"
+
+#: templates/blockchain/public/index.html
+msgid "Enter your request ID"
+msgstr "Nhập mã yêu cầu của bạn"
+
+#: templates/blockchain/public/index.html
+msgid "View and manage all your submitted requests."
+msgstr "Xem và quản lý tất cả các yêu cầu đã gửi của bạn."
+
+#: templates/blockchain/public/index.html
+msgid "View My Requests"
+msgstr "Xem yêu cầu của tôi"
+
+#: templates/blockchain/public/index.html
+msgid "Featured Administrative Services"
+msgstr "Dịch vụ hành chính nổi bật"
+
+#: templates/blockchain/public/index.html
+msgid "Civil Registration"
+msgstr "Đăng ký hộ tịch"
+
+#: templates/blockchain/public/index.html
+msgid "Birth certificates, marriage certificates, and other civil documents."
+msgstr "Giấy khai sinh, giấy đăng ký kết hôn và các giấy tờ hộ tịch khác."
+
+#: templates/blockchain/public/index.html
+msgid "Birth Certificate"
+msgstr "Giấy khai sinh"
+
+#: templates/blockchain/public/index.html
+msgid "Marriage Certificate"
+msgstr "Giấy đăng ký kết hôn"
+
+#: templates/blockchain/public/index.html
+msgid "Business Licenses"
+msgstr "Giấy phép kinh doanh"
+
+#: templates/blockchain/public/index.html
+msgid "Apply for business permits and license renewals."
+msgstr "Đăng ký giấy phép kinh doanh và gia hạn giấy phép."
+
+#: templates/blockchain/public/index.html
+msgid "Business Permit"
+msgstr "Giấy phép kinh doanh"
+
+#: templates/blockchain/public/index.html
+msgid "Property Services"
+msgstr "Dịch vụ bất động sản"
+
+#: templates/blockchain/public/index.html
+msgid "Land title registration and property transfers."
+msgstr "Đăng ký quyền sử dụng đất và chuyển nhượng bất động sản."
+
+#: templates/blockchain/public/index.html
+msgid "Land Title"
+msgstr "Quyền sử dụng đất"
+
+#: templates/blockchain/public/index.html
+msgid "Other Services"
+msgstr "Dịch vụ khác"
+
+#: templates/blockchain/public/index.html
+msgid "General applications and other administrative procedures."
+msgstr "Đơn đăng ký chung và các thủ tục hành chính khác."
+
+#: templates/blockchain/public/index.html
+msgid "General Application"
+msgstr "Đơn đăng ký chung"
+
+#: templates/blockchain/public/index.html
+msgid "About Blockchain Authentication"
+msgstr "Về xác thực Blockchain"
+
+#: templates/blockchain/public/index.html
+msgid "All administrative requests in this system are securely registered on the blockchain, providing transparency, immutability, and integrity for your administrative procedures."
+msgstr "Tất cả các yêu cầu hành chính trong hệ thống này được đăng ký an toàn trên blockchain, cung cấp tính minh bạch, không thay đổi và toàn vẹn cho các thủ tục hành chính của bạn."
+
+#: templates/blockchain/public/index.html
+msgid "Each request is assigned a unique blockchain transaction ID that can be verified at any time, ensuring that the information cannot be altered or tampered with after submission."
+msgstr "Mỗi yêu cầu được gán một ID giao dịch blockchain duy nhất có thể được xác minh bất kỳ lúc nào, đảm bảo rằng thông tin không thể bị thay đổi hoặc giả mạo sau khi gửi."
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Pending"
+msgstr "Đang chờ xử lý"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "In Review"
+msgstr "Đang xem xét"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Additional Info"
+msgstr "Thông tin bổ sung"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Additional Info Needed"
+msgstr "Cần thông tin bổ sung"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Approved"
+msgstr "Đã phê duyệt"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Rejected"
+msgstr "Từ chối"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Pending Requests"
+msgstr "Yêu cầu đang chờ xử lý"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "In Review Requests"
+msgstr "Yêu cầu đang xem xét"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Additional Information Required"
+msgstr "Yêu cầu thông tin bổ sung"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Approved Requests"
+msgstr "Yêu cầu đã phê duyệt"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Rejected Requests"
+msgstr "Yêu cầu bị từ chối"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "ID"
+msgstr "ID"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Full Name"
+msgstr "Họ và tên"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Request Type"
+msgstr "Loại yêu cầu"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Submission Date"
+msgstr "Ngày nộp"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "Actions"
+msgstr "Thao tác"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "View"
+msgstr "Xem"
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "No pending requests."
+msgstr "Không có yêu cầu đang chờ xử lý."
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "No requests in review."
+msgstr "Không có yêu cầu đang xem xét."
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "No requests require additional information."
+msgstr "Không có yêu cầu cần thông tin bổ sung."
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "No approved requests."
+msgstr "Không có yêu cầu được phê duyệt."
+
+#: templates/blockchain/admin/admin_dashboard.html
+msgid "No rejected requests."
+msgstr "Không có yêu cầu bị từ chối."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Request Details"
+msgstr "Chi tiết yêu cầu"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Review the details and status of this administrative request."
+msgstr "Xem chi tiết và trạng thái của yêu cầu hành chính này."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Back to My Requests"
+msgstr "Quay lại yêu cầu của tôi"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Restricted Access:"
+msgstr "Truy cập hạn chế:"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "You're viewing limited information about this request. Full details are only visible to the requestor, commune president, and authorized officials."
+msgstr "Bạn đang xem thông tin hạn chế về yêu cầu này. Chi tiết đầy đủ chỉ hiển thị cho người yêu cầu, chủ tịch xã và các cán bộ được ủy quyền."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Detailed form data is only visible to the form creator, commune president, and officials authorized specifically for this category."
+msgstr "Dữ liệu biểu mẫu chi tiết chỉ hiển thị cho người tạo, chủ tịch xã và các cán bộ được ủy quyền cụ thể cho danh mục này."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Additional form data is restricted"
+msgstr "Dữ liệu biểu mẫu bổ sung bị hạn chế"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Full applicant information is only available to authorized users."
+msgstr "Thông tin đầy đủ về người nộp đơn chỉ có sẵn cho người dùng được ủy quyền."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "No files attached to this request."
+msgstr "Không có tệp đính kèm cho yêu cầu này."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "You only have access to files uploaded by the request owner. Files uploaded by officials are restricted."
+msgstr "Bạn chỉ có quyền truy cập vào các tệp được tải lên bởi chủ sở hữu yêu cầu. Các tệp được tải lên bởi cán bộ bị hạn chế."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Upload Document"
+msgstr "Tải lên tài liệu"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Upload Multiple Documents"
+msgstr "Tải lên nhiều tài liệu"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "No comments yet."
+msgstr "Chưa có bình luận nào."
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Add Comment"
+msgstr "Thêm bình luận"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Select new status"
+msgstr "Chọn trạng thái mới"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Comments for status update"
+msgstr "Bình luận cập nhật trạng thái"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Update Status"
+msgstr "Cập nhật trạng thái"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Document Title"
+msgstr "Tiêu đề tài liệu"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Document Description"
+msgstr "Mô tả tài liệu"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Request Document"
+msgstr "Yêu cầu tài liệu"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Choose an officer"
+msgstr "Chọn một cán bộ"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Assign"
+msgstr "Phân công"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Comment restricted"
+msgstr "Bình luận bị hạn chế"
+
+#: templates/blockchain/requests/request_detail.html
+msgid "Request Created"
+msgstr "Yêu cầu đã được tạo"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Date Submitted"
+msgstr "Ngày nộp"
+
+#: templates/blockchain/requests/request_list.html
+msgid "View Details"
+msgstr "Xem chi tiết"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Administrative Procedure Requests"
+msgstr "Yêu cầu thủ tục hành chính"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Search by ID, description or name"
+msgstr "Tìm kiếm theo ID, mô tả hoặc tên"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Search"
+msgstr "Tìm kiếm"
+
+#: templates/blockchain/requests/request_list.html
+msgid "All Statuses"
+msgstr "Tất cả trạng thái"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Clear Filters"
+msgstr "Xóa bộ lọc"
+
+#: templates/blockchain/requests/request_list.html
+msgid "You are viewing the public request list. Personal information is masked for privacy reasons."
+msgstr "Bạn đang xem danh sách yêu cầu công khai. Thông tin cá nhân được ẩn vì lý do bảo mật."
+
+#: templates/blockchain/requests/request_list.html
+msgid "to see more details."
+msgstr "để xem thêm chi tiết."
+
+#: templates/blockchain/requests/request_list.html
+msgid "Type"
+msgstr "Loại"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Applicant"
+msgstr "Người yêu cầu"
+
+#: templates/blockchain/requests/request_list.html
+msgid "Status"
+msgstr "Trạng thái"
+
+#: templates/blockchain/requests/request_list.html
+msgid "No requests found matching your criteria."
+msgstr "Không tìm thấy yêu cầu nào phù hợp với tiêu chí của bạn."
+
+#: templates/blockchain/requests/my_requests.html
+msgid "Submit New Request"
+msgstr "Gửi yêu cầu mới"
+
+#: templates/blockchain/requests/my_requests.html
+msgid "Back to Home"
+msgstr "Trở về trang chủ"
+
+#: templates/blockchain/requests/my_requests.html
+msgid "You haven't submitted any requests yet."
+msgstr "Bạn chưa gửi yêu cầu nào."
+
+#: templates/accounts/profile.html
+msgid "My Profile"
+msgstr "Hồ sơ của tôi"
+
+#: templates/accounts/profile.html
+msgid "Your account is pending approval from the commune chairman. You will be notified once your account is approved."
+msgstr "Tài khoản của bạn đang chờ phê duyệt từ chủ tịch xã. Bạn sẽ được thông báo khi tài khoản của bạn được phê duyệt."
+
+#: templates/accounts/profile.html
+msgid "Member since:"
+msgstr "Thành viên từ:"
+
+#: templates/accounts/profile.html
+msgid "Chairman Actions"
+msgstr "Thao tác của chủ tịch"
+
+#: templates/accounts/profile.html
+msgid "Manage Pending Approvals"
+msgstr "Quản lý phê duyệt đang chờ xử lý"
+
+#: templates/accounts/profile.html
+msgid "Account Information"
+msgstr "Thông tin tài khoản"
+
+#: templates/accounts/profile.html
+msgid "Username:"
+msgstr "Tên người dùng:"
+
+#: templates/accounts/profile.html
+msgid "Full Name:"
+msgstr "Họ và tên:"
+
+#: templates/accounts/profile.html
+msgid "Email:"
+msgstr "Email:"
+
+#: templates/accounts/profile.html
+msgid "Last Login:"
+msgstr "Đăng nhập lần cuối:"
+
+#: templates/accounts/profile.html
+msgid "Personal Information"
+msgstr "Thông tin cá nhân"
+
+#: templates/accounts/profile.html
+msgid "Phone Number:"
+msgstr "Số điện thoại:"
+
+#: templates/accounts/profile.html
+msgid "Displayed to others as:"
+msgstr "Hiển thị cho người khác là:"
+
+#: templates/accounts/profile.html
+msgid "Citizen ID:"
+msgstr "Số CMND/CCCD:"
+
+#: templates/accounts/profile.html
+msgid "Address:"
+msgstr "Địa chỉ:"
+
+#: templates/accounts/profile.html
+msgid "Organization Information"
+msgstr "Thông tin tổ chức"
+
+#: templates/accounts/profile.html
+msgid "Organization Name:"
+msgstr "Tên tổ chức:"
+
+#: templates/accounts/profile.html
+msgid "Business License:"
+msgstr "Giấy phép kinh doanh:"
+
+# Procedures Overview Page Template
+msgid "Administrative Procedures Overview"
+msgstr "Tổng Quan Thủ Tục Hành Chính"
+
+msgid "A comprehensive list of all administrative procedures available in the commune with required documents and processing times."
+msgstr "Danh sách đầy đủ tất cả các thủ tục hành chính có sẵn tại xã kèm theo các tài liệu yêu cầu và thời gian xử lý."
+
+msgid "Total Procedures"
+msgstr "Tổng Số Thủ Tục"
+
+msgid "Quick Navigation"
+msgstr "Điều Hướng Nhanh"
+
+msgid "Requests"
+msgstr "Yêu Cầu"
+
+msgid "Required Documents:"
+msgstr "Tài Liệu Yêu Cầu:"
+
+msgid "Processing Time:"
+msgstr "Thời Gian Xử Lý:"
+
+msgid "View Form"
+msgstr "Xem Biểu Mẫu"
+
+msgid "Submit Request"
+msgstr "Gửi Yêu Cầu"
+
+# Procedure Categories
+msgid "Civil Registration"
+msgstr "Đăng Ký Hộ Tịch"
+
+msgid "Business Licenses"
+msgstr "Giấy Phép Kinh Doanh"
+
+msgid "Land and Property"
+msgstr "Đất Đai và Tài Sản"
+
+msgid "Identity Documents"
+msgstr "Giấy Tờ Tùy Thân"
+
+msgid "Tax and Fees"
+msgstr "Thuế và Phí"
+
+msgid "Other Services"
+msgstr "Dịch Vụ Khác"
+
+# Procedure Names
+msgid "Birth Certificate Request"
+msgstr "Yêu Cầu Giấy Khai Sinh"
+
+msgid "Marriage Certificate Request"
+msgstr "Yêu Cầu Giấy Đăng Ký Kết Hôn"
+
+msgid "Business Permit Application"
+msgstr "Đơn Xin Giấy Phép Kinh Doanh"
+
+msgid "License Renewal Application"
+msgstr "Đơn Xin Gia Hạn Giấy Phép"
+
+msgid "Land Title Application"
+msgstr "Đơn Xin Cấp Giấy Chứng Nhận Quyền Sử Dụng Đất"
+
+msgid "Property Transfer Request"
+msgstr "Yêu Cầu Chuyển Nhượng Tài Sản"
+
+msgid "Residence Certificate Request"
+msgstr "Yêu Cầu Giấy Chứng Nhận Cư Trú"
+
+msgid "Tax Clearance Certificate"
+msgstr "Giấy Xác Nhận Đã Nộp Thuế"
+
+msgid "General Application Form"
+msgstr "Đơn Đăng Ký Chung"
+
+# Procedure Descriptions
+msgid "Request for issuance of birth certificate for a newborn or replacement of existing certificate."
+msgstr "Yêu cầu cấp giấy khai sinh cho trẻ sơ sinh hoặc thay thế giấy khai sinh hiện có."
+
+msgid "Request for issuance of marriage certificate or replacement of existing certificate."
+msgstr "Yêu cầu cấp giấy đăng ký kết hôn hoặc thay thế giấy đăng ký hiện có."
+
+msgid "Application for a new business permit for commercial operations."
+msgstr "Đơn xin cấp giấy phép kinh doanh mới cho hoạt động thương mại."
+
+msgid "Application to renew an existing business license or permit."
+msgstr "Đơn xin gia hạn giấy phép kinh doanh hiện có."
+
+msgid "Application for land title registration or transfer."
+msgstr "Đơn xin đăng ký quyền sử dụng đất hoặc chuyển nhượng."
+
+msgid "Request to transfer property ownership from one entity to another."
+msgstr "Yêu cầu chuyển quyền sở hữu tài sản từ chủ thể này sang chủ thể khác."
+
+msgid "Request for certification of residency in the commune."
+msgstr "Yêu cầu xác nhận cư trú trong xã."
+
+msgid "Request for certification that all taxes have been paid."
+msgstr "Yêu cầu xác nhận đã nộp đủ thuế."
+
+msgid "General purpose application for services not covered by specific forms."
+msgstr "Đơn đăng ký chung cho các dịch vụ không thuộc các biểu mẫu cụ thể."
+
+# Required Documents
+msgid "Hospital birth certificate"
+msgstr "Giấy chứng sinh từ bệnh viện"
+
+msgid "Parent ID documents"
+msgstr "Giấy tờ tùy thân của cha mẹ"
+
+msgid "Marriage certificate of parents (if applicable)"
+msgstr "Giấy đăng ký kết hôn của cha mẹ (nếu có)"
+
+msgid "ID documents of both spouses"
+msgstr "Giấy tờ tùy thân của cả hai vợ chồng"
+
+msgid "Marriage ceremony evidence"
+msgstr "Bằng chứng về lễ cưới"
+
+msgid "Witness statements"
+msgstr "Lời khai của nhân chứng"
+
+msgid "Business registration"
+msgstr "Đăng ký kinh doanh"
+
+msgid "Tax identification"
+msgstr "Mã số thuế"
+
+msgid "Location permit"
+msgstr "Giấy phép địa điểm"
+
+msgid "Fire safety certificate"
+msgstr "Giấy chứng nhận an toàn phòng cháy"
+
+msgid "Existing license document"
+msgstr "Giấy phép hiện có"
+
+msgid "Tax clearance certificate"
+msgstr "Giấy xác nhận đã nộp thuế"
+
+msgid "Updated business information"
+msgstr "Thông tin kinh doanh cập nhật"
+
+msgid "Proof of ownership"
+msgstr "Bằng chứng sở hữu"
+
+msgid "Land survey document"
+msgstr "Tài liệu khảo sát đất"
+
+msgid "Tax declaration"
+msgstr "Tờ khai thuế"
+
+msgid "ID documents"
+msgstr "Giấy tờ tùy thân"
+
+msgid "Deed of sale"
+msgstr "Hợp đồng mua bán"
+
+msgid "Tax clearance"
+msgstr "Xác nhận đã nộp thuế"
+
+msgid "ID documents of both parties"
+msgstr "Giấy tờ tùy thân của cả hai bên"
+
+msgid "Existing title"
+msgstr "Giấy chứng nhận quyền sở hữu hiện có"
+
+msgid "Proof of address"
+msgstr "Bằng chứng địa chỉ cư trú"
+
+msgid "Photo"
+msgstr "Ảnh"
+
+msgid "Tax payment receipts"
+msgstr "Biên lai nộp thuế"
+
+msgid "Property information (if applicable)"
+msgstr "Thông tin tài sản (nếu có)"
+
+msgid "ID document"
+msgstr "Giấy tờ tùy thân"
+
+msgid "Supporting documents as applicable to request"
+msgstr "Các tài liệu hỗ trợ liên quan đến yêu cầu"
+
+# Processing Times
+msgid "3-5 business days"
+msgstr "3-5 ngày làm việc"
+
+msgid "5-7 business days"
+msgstr "5-7 ngày làm việc"
+
+msgid "7-10 business days"
+msgstr "7-10 ngày làm việc"
+
+msgid "14-21 business days"
+msgstr "14-21 ngày làm việc"
+
+msgid "14-30 business days"
+msgstr "14-30 ngày làm việc"
+
+msgid "1-3 business days"
+msgstr "1-3 ngày làm việc"
+
+msgid "Varies based on request type"
+msgstr "Thay đổi tùy theo loại yêu cầu"
+
+# Request Form Template
+msgid "Submit New Administrative Request"
+msgstr "Gửi Yêu Cầu Hành Chính Mới"
+
+msgid "Important Information"
+msgstr "Thông Tin Quan Trọng"
+
+msgid "Your request will be securely registered on the blockchain, ensuring transparency and integrity of your administrative procedure. You will receive a unique transaction ID for tracking purposes."
+msgstr "Yêu cầu của bạn sẽ được đăng ký an toàn trên blockchain, đảm bảo tính minh bạch và toàn vẹn của thủ tục hành chính. Bạn sẽ nhận được một ID giao dịch duy nhất để theo dõi."
+
+msgid "Request Details"
+msgstr "Chi Tiết Yêu Cầu"
+
+msgid "Request Category"
+msgstr "Loại Danh Mục"
+
+msgid "Select Category"
+msgstr "Chọn Danh Mục"
+
+msgid "-- Select a category --"
+msgstr "-- Chọn một danh mục --"
+
+msgid "Select the appropriate category for your administrative request."
+msgstr "Chọn danh mục phù hợp cho yêu cầu hành chính của bạn."
+
+msgid "-- First select a category --"
+msgstr "-- Trước tiên hãy chọn một danh mục --"
+
+msgid "Personal Information"
+msgstr "Thông Tin Cá Nhân"
+
+msgid "Full Name"
+msgstr "Họ và Tên"
+
+msgid "Phone Number"
+msgstr "Số Điện Thoại"
+
+msgid "Address"
+msgstr "Địa Chỉ"
+
+msgid "Description"
+msgstr "Mô Tả"
+
+msgid "Provide a detailed description of your request. Include any relevant information that might help process your request efficiently."
+msgstr "Cung cấp mô tả chi tiết về yêu cầu của bạn. Bao gồm bất kỳ thông tin liên quan nào có thể giúp xử lý yêu cầu của bạn một cách hiệu quả."
+
+msgid "Payment Information"
+msgstr "Thông Tin Thanh Toán"
+
+msgid "Payment Amount"
+msgstr "Số Tiền Thanh Toán"
+
+msgid "The payment amount will be determined based on your request type. You can leave this as 0 if you're unsure."
+msgstr "Số tiền thanh toán sẽ được xác định dựa trên loại yêu cầu của bạn. Bạn có thể để là 0 nếu không chắc chắn."
+
+msgid "Back"
+msgstr "Quay Lại"
+
+msgid "Submit Request"
+msgstr "Gửi Yêu Cầu"
+
+# Currency symbol
+msgid "$"
+msgstr "₫" 

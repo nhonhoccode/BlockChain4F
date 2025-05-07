@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Blockchain Administration Portal{% endblock %}
+{% block title %}{% trans "Blockchain Administration Portal" %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="jumbotron bg-light p-4 mb-4 rounded">
-        <h1 class="display-4">Welcome to the Blockchain Administrative System</h1>
+        <h1 class="display-4">{% trans "Welcome to the Blockchain Administrative System" %}</h1>
         <p class="lead">
-            This system provides secure and transparent management of administrative procedures through blockchain technology.
+            {% trans "This system provides secure and transparent management of administrative procedures through blockchain technology." %}
         </p>
         <hr class="my-4">
         <p>
-            Track your requests, submit new applications, and access all commune services from a single platform.
+            {% trans "Track your requests, submit new applications, and access all commune services from a single platform." %}
         </p>
     </div>
 
@@ -20,11 +21,11 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> New Request</h5>
+                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> {% trans "New Request" %}</h5>
                 </div>
                 <div class="card-body d-flex flex-column">
-                    <p>Submit a new administrative request for processing.</p>
-                    <a href="{% url 'blockchain:request_form' %}" class="btn btn-primary mt-auto">Start New Request</a>
+                    <p>{% trans "Submit a new administrative request for processing." %}</p>
+                    <a href="{% url 'blockchain:request_form' %}" class="btn btn-primary mt-auto">{% trans "Start New Request" %}</a>
                 </div>
             </div>
         </div>
@@ -32,16 +33,16 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-search"></i> Track Request</h5>
+                    <h5 class="mb-0"><i class="fas fa-search"></i> {% trans "Track Request" %}</h5>
                 </div>
                 <div class="card-body">
                     <form action="{% url 'blockchain:track_request' %}" method="post">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="tracking_id" class="form-label">Request ID</label>
-                            <input type="text" class="form-control" id="tracking_id" name="tracking_id" placeholder="Enter your request ID">
+                            <label for="tracking_id" class="form-label">{% trans "Request ID" %}</label>
+                            <input type="text" class="form-control" id="tracking_id" name="tracking_id" placeholder="{% trans "Enter your request ID" %}">
                         </div>
-                        <button type="submit" class="btn btn-info">Track Request</button>
+                        <button type="submit" class="btn btn-info">{% trans "Track Request" %}</button>
                     </form>
                 </div>
             </div>
@@ -50,11 +51,11 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-list"></i> My Requests</h5>
+                    <h5 class="mb-0"><i class="fas fa-list"></i> {% trans "My Requests" %}</h5>
                 </div>
                 <div class="card-body d-flex flex-column">
-                    <p>View and manage all your submitted requests.</p>
-                    <a href="{% url 'blockchain:my_requests' %}" class="btn btn-success mt-auto">View My Requests</a>
+                    <p>{% trans "View and manage all your submitted requests." %}</p>
+                    <a href="{% url 'blockchain:my_requests' %}" class="btn btn-success mt-auto">{% trans "View My Requests" %}</a>
                 </div>
             </div>
         </div>
@@ -63,18 +64,18 @@
     <!-- Featured Services -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="mb-4">Featured Administrative Services</h2>
+            <h2 class="mb-4">{% trans "Featured Administrative Services" %}</h2>
         </div>
         
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-id-card text-primary"></i> Civil Registration</h5>
+                    <h5 class="mb-0"><i class="fas fa-id-card text-primary"></i> {% trans "Civil Registration" %}</h5>
                 </div>
                 <div class="card-body">
-                    <p>Birth certificates, marriage certificates, and other civil documents.</p>
-                    <a href="/docs/civil_registration/birth_certificate_form.html" class="btn btn-outline-primary btn-sm">Birth Certificate</a>
-                    <a href="/docs/civil_registration/marriage_certificate_form.html" class="btn btn-outline-primary btn-sm mt-2">Marriage Certificate</a>
+                    <p>{% trans "Birth certificates, marriage certificates, and other civil documents." %}</p>
+                    <a href="/docs/civil_registration/birth_certificate_form.html" class="btn btn-outline-primary btn-sm">{% trans "Birth Certificate" %}</a>
+                    <a href="/docs/civil_registration/marriage_certificate_form.html" class="btn btn-outline-primary btn-sm mt-2">{% trans "Marriage Certificate" %}</a>
                 </div>
             </div>
         </div>
@@ -82,11 +83,11 @@
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-store text-primary"></i> Business Licenses</h5>
+                    <h5 class="mb-0"><i class="fas fa-store text-primary"></i> {% trans "Business Licenses" %}</h5>
                 </div>
                 <div class="card-body">
-                    <p>Apply for business permits and license renewals.</p>
-                    <a href="/docs/business_licenses/business_permit_form.html" class="btn btn-outline-primary btn-sm">Business Permit</a>
+                    <p>{% trans "Apply for business permits and license renewals." %}</p>
+                    <a href="/docs/business_licenses/business_permit_form.html" class="btn btn-outline-primary btn-sm">{% trans "Business Permit" %}</a>
                 </div>
             </div>
         </div>
@@ -94,11 +95,11 @@
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-home text-primary"></i> Property Services</h5>
+                    <h5 class="mb-0"><i class="fas fa-home text-primary"></i> {% trans "Property Services" %}</h5>
                 </div>
                 <div class="card-body">
-                    <p>Land title registration and property transfers.</p>
-                    <a href="/docs/land_and_property/land_title_form.html" class="btn btn-outline-primary btn-sm">Land Title</a>
+                    <p>{% trans "Land title registration and property transfers." %}</p>
+                    <a href="/docs/land_and_property/land_title_form.html" class="btn btn-outline-primary btn-sm">{% trans "Land Title" %}</a>
                 </div>
             </div>
         </div>
@@ -106,11 +107,11 @@
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-clipboard-list text-primary"></i> Other Services</h5>
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list text-primary"></i> {% trans "Other Services" %}</h5>
                 </div>
                 <div class="card-body">
-                    <p>General applications and other administrative procedures.</p>
-                    <a href="/docs/other_services/general_application_form.html" class="btn btn-outline-primary btn-sm">General Application</a>
+                    <p>{% trans "General applications and other administrative procedures." %}</p>
+                    <a href="/docs/other_services/general_application_form.html" class="btn btn-outline-primary btn-sm">{% trans "General Application" %}</a>
                 </div>
             </div>
         </div>
@@ -120,18 +121,16 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-shield-alt text-primary"></i> About Blockchain Authentication</h5>
+                    <h5 class="mb-0"><i class="fas fa-shield-alt text-primary"></i> {% trans "About Blockchain Authentication" %}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
                             <p>
-                                All administrative requests in this system are securely registered on the blockchain, 
-                                providing transparency, immutability, and integrity for your administrative procedures.
+                                {% trans "All administrative requests in this system are securely registered on the blockchain, providing transparency, immutability, and integrity for your administrative procedures." %}
                             </p>
                             <p>
-                                Each request is assigned a unique blockchain transaction ID that can be verified at any time, 
-                                ensuring that the information cannot be altered or tampered with after submission.
+                                {% trans "Each request is assigned a unique blockchain transaction ID that can be verified at any time, ensuring that the information cannot be altered or tampered with after submission." %}
                             </p>
                         </div>
                         <div class="col-md-4 text-center">

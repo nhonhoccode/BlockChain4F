@@ -1,323 +1,172 @@
-{% extends 'blockchain/base/blockchain_base.html' %}
-{% load static %}
+{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}New Administrative Request{% endblock %}
+{% block title %}{% trans "Submit New Request" %}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .card {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-        border: none;
-        border-radius: 0.5rem;
-    }
-    
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #ebeef4;
-        font-weight: 600;
-    }
-    
     .form-section {
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        background-color: #fff;
-    }
-    
-    .form-label {
-        font-weight: 500;
-    }
-    
-    .required-field::after {
-        content: '*';
-        color: #dc3545;
-        margin-left: 4px;
-    }
-    
-    .request-types {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .request-type-card {
+        margin-bottom: 2rem;
         border: 1px solid #dee2e6;
         border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .form-section-header {
+        background-color: #f8f9fa;
         padding: 1rem;
-        cursor: pointer;
-        width: 100%;
-        transition: all 0.3s ease;
-    }
-    
-    .request-type-card:hover {
-        border-color: #0d6efd;
-        transform: translateY(-3px);
-    }
-    
-    .request-type-card.selected {
-        border-color: #0d6efd;
-        background-color: #e7f1ff;
-    }
-    
-    .request-type-card .title {
+        border-bottom: 1px solid #dee2e6;
         font-weight: 600;
-        margin-bottom: 0.5rem;
     }
     
-    .request-type-card .description {
-        font-size: 0.875rem;
+    .required-field label:after {
+        content: " *";
+        color: red;
+    }
+    
+    #category-help, #description-help {
+        font-size: 0.85rem;
         color: #6c757d;
     }
     
-    .request-type-card .icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-        color: #0d6efd;
-    }
-    
-    .category-select {
+    .blockchain-info {
+        background-color: rgba(23, 162, 184, 0.1);
+        border-left: 4px solid #17a2b8;
+        padding: 1rem;
         margin-bottom: 1.5rem;
-    }
-    
-    .document-preview {
-        border: 1px solid #dee2e6;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        height: 100%;
-        min-height: 300px;
-        position: relative;
-    }
-    
-    .document-loading {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-    
-    .document-actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 0.5rem;
-    }
-    
-    .document-actions a {
-        margin-left: 0.5rem;
-    }
-    
-    .document-iframe {
-        width: 100%;
-        min-height: 400px;
-        border: none;
-    }
-    
-    .document-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 1rem;
         border-radius: 0.25rem;
-        margin-top: 1rem;
-        text-align: center;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <h1 class="h2 mb-4">Submit New Administrative Request</h1>
+<div class="container mt-4 mb-5">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-file-signature me-2"></i> {% trans "Submit New Administrative Request" %}</h2>
+        <a href="{% url 'blockchain:my_requests' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-list me-1"></i> {% trans "My Requests" %}
+        </a>
+    </div>
     
-    <div class="row">
-        <div class="col-lg-7">
-            <form method="POST" id="requestForm">
+    <!-- Blockchain Information -->
+    <div class="blockchain-info">
+        <h5><i class="fas fa-info-circle me-2"></i> {% trans "Important Information" %}</h5>
+        <p class="mb-0">{% trans "Your request will be securely registered on the blockchain, ensuring transparency and integrity of your administrative procedure. You will receive a unique transaction ID for tracking purposes." %}</p>
+    </div>
+    
+    <!-- Request Form -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> {% trans "Request Details" %}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" id="requestForm" enctype="multipart/form-data">
                 {% csrf_token %}
                 
-                <!-- Step 1: Select Request Type -->
-                <div class="card mb-4" id="step1">
-                    <div class="card-header">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
-                                <span>1</span>
-                            </div>
-                            <span>Select Request Type</span>
-                        </div>
+                <!-- Category Selection -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-folder me-2"></i> {% trans "Request Category" %}
                     </div>
-                    <div class="card-body">
-                        <div class="form-group mb-4">
-                            <label for="category" class="form-label required-field">Category</label>
-                            <select class="form-select" id="category" name="category" required>
-                                <option value="" selected disabled>Select a category</option>
+                    <div class="p-3">
+                        <div class="mb-3 required-field">
+                            <label for="category" class="form-label">{% trans "Select Category" %}</label>
+                            <select name="category" id="category" class="form-select" required>
+                                <option value="">{% trans "-- Select a category --" %}</option>
                                 {% for category in categories %}
                                 <option value="{{ category.id }}">{{ category.name }}</option>
                                 {% endfor %}
                             </select>
-                        </div>
-                        
-                        <div class="form-group" id="requestTypesContainer">
-                            <label class="form-label required-field">Request Type</label>
-                            <div class="request-types row">
-                                <p class="text-muted">Please select a category first to view available request types.</p>
+                            <div id="category-help" class="form-text">
+                                {% trans "Select the appropriate category for your administrative request." %}
                             </div>
                         </div>
                         
-                        <div class="d-grid mt-4">
-                            <button type="button" id="step1Next" class="btn btn-primary" disabled>Continue to Request Details</button>
+                        <div class="mb-3 required-field">
+                            <label for="request_type" class="form-label">{% trans "Request Type" %}</label>
+                            <select name="request_type" id="request_type" class="form-select" required>
+                                <option value="">{% trans "-- First select a category --" %}</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Step 2: Request Details -->
-                <div class="card mb-4" id="step2" style="display: none;">
-                    <div class="card-header">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
-                                <span>2</span>
-                            </div>
-                            <span>Request Details</span>
-                        </div>
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-user me-2"></i> {% trans "Personal Information" %}
                     </div>
-                    <div class="card-body">
-                        <div class="form-group mb-3">
-                            <label for="full_name" class="form-label required-field">Full Name</label>
+                    <div class="p-3">
+                        <div class="mb-3 required-field">
+                            <label for="full_name" class="form-label">{% trans "Full Name" %}</label>
                             <input type="text" class="form-control" id="full_name" name="full_name" required>
                         </div>
                         
-                        <div class="form-group mb-3">
-                            <label for="phone_number" class="form-label required-field">Phone Number</label>
+                        <div class="mb-3 required-field">
+                            <label for="phone_number" class="form-label">{% trans "Phone Number" %}</label>
                             <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
                         </div>
                         
-                        <div class="form-group mb-3">
-                            <label for="address" class="form-label required-field">Address</label>
-                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="description" class="form-label required-field">Request Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="payment_amount" class="form-label required-field">Payment Amount</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="payment_amount" name="payment_amount" step="0.01" min="0" required>
-                            </div>
-                        </div>
-                        
-                        <!-- Dynamic fields container -->
-                        <div id="dynamicFields"></div>
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" id="step2Back" class="btn btn-secondary">Back</button>
-                            <button type="button" id="step2Next" class="btn btn-primary">Review Request</button>
+                        <div class="mb-3 required-field">
+                            <label for="address" class="form-label">{% trans "Address" %}</label>
+                            <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Step 3: Review and Submit -->
-                <div class="card mb-4" id="step3" style="display: none;">
-                    <div class="card-header">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
-                                <span>3</span>
-                            </div>
-                            <span>Review and Submit</span>
-                        </div>
+                <!-- Request Details -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-info-circle me-2"></i> {% trans "Request Details" %}
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-info mb-4">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Please review your request details below before submitting. All form data will be recorded as part of your request.
-                        </div>
-                        
-                        <div class="review-section mb-3">
-                            <h5>Request Information</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Category:</strong> <span id="review-category"></span></p>
-                                    <p><strong>Request Type:</strong> <span id="review-request-type"></span></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Payment Amount:</strong> $<span id="review-payment"></span></p>
-                                </div>
-                            </div>
-                            <p><strong>Description:</strong> <span id="review-description"></span></p>
-                        </div>
-                        
-                        <div class="review-section mb-3">
-                            <h5>Applicant Information</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Full Name:</strong> <span id="review-name"></span></p>
-                                    <p><strong>Phone Number:</strong> <span id="review-phone"></span></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Address:</strong> <span id="review-address"></span></p>
-                                </div>
+                    <div class="p-3">
+                        <div class="mb-3 required-field">
+                            <label for="description" class="form-label">{% trans "Description" %}</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                            <div id="description-help" class="form-text">
+                                {% trans "Provide a detailed description of your request. Include any relevant information that might help process your request efficiently." %}
                             </div>
                         </div>
                         
-                        <!-- Dynamic fields review -->
-                        <div class="review-section mb-3" id="review-dynamic-fields"></div>
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" id="step3Back" class="btn btn-secondary">Back</button>
-                            <button type="submit" class="btn btn-success">Submit Request</button>
+                        <!-- Dynamic Form Fields -->
+                        <div id="dynamic-fields">
+                            <!-- Additional fields will be loaded based on request type -->
                         </div>
                     </div>
                 </div>
+                
+                <!-- Payment Information -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-money-bill-wave me-2"></i> {% trans "Payment Information" %}
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-3">
+                            <label for="payment_amount" class="form-label">{% trans "Payment Amount" %}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">{% trans "$" %}</span>
+                                <input type="number" class="form-control" id="payment_amount" name="payment_amount" value="0.00" step="0.01" min="0">
+                            </div>
+                            <div class="form-text">
+                                {% trans "The payment amount will be determined based on your request type. You can leave this as 0 if you're unsure." %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="mt-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back();">
+                        <i class="fas fa-arrow-left me-1"></i> {% trans "Back" %}
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i> {% trans "Submit Request" %}
+                    </button>
+                </div>
+                
+                {{ form.errors }}
             </form>
-        </div>
-        
-        <div class="col-lg-5">
-            <div class="card sticky-top" style="top: 20px;">
-                <div class="card-header">
-                    <h5 class="mb-0">Document Preview</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="document-preview">
-                        <!-- Document title and actions -->
-                        <div id="document-title-section" style="display: none;">
-                            <h5 id="document-title" class="mb-3">Document Title</h5>
-                            <div class="document-actions mb-3">
-                                <a href="#" id="open-document" class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="fas fa-external-link-alt"></i> Open in New Tab
-                                </a>
-                                <a href="#" id="print-document" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-print"></i> Print
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <!-- Loading spinner -->
-                        <div id="document-loading" class="document-loading" style="display: none;">
-                            <div class="spinner-border text-primary mb-2" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p>Loading document, please wait...</p>
-                        </div>
-                        
-                        <!-- Document content -->
-                        <div id="document-container" style="display: none;">
-                            <iframe id="document-frame" class="document-iframe" src=""></iframe>
-                        </div>
-                        
-                        <!-- Error message -->
-                        <div id="document-error" class="document-error" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span id="error-message">Unable to load the document. Please try again.</span>
-                        </div>
-                        
-                        <!-- Initial message -->
-                        <div id="document-initial" class="text-center py-5">
-                            <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
-                            <p class="text-muted">Select a request type to preview the related document</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -325,287 +174,49 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const categorySelect = document.getElementById('category');
-        const requestTypesContainer = document.querySelector('.request-types');
-        const step1Next = document.getElementById('step1Next');
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const step2Back = document.getElementById('step2Back');
-        const step2Next = document.getElementById('step2Next');
-        const step3Back = document.getElementById('step3Back');
+    // When category selection changes, load request types for that category
+    document.getElementById('category').addEventListener('change', function() {
+        const categoryId = this.value;
+        const requestTypeSelect = document.getElementById('request_type');
         
-        // Document preview elements
-        const documentTitleSection = document.getElementById('document-title-section');
-        const documentTitle = document.getElementById('document-title');
-        const openDocument = document.getElementById('open-document');
-        const printDocument = document.getElementById('print-document');
-        const documentLoading = document.getElementById('document-loading');
-        const documentContainer = document.getElementById('document-container');
-        const documentFrame = document.getElementById('document-frame');
-        const documentError = document.getElementById('document-error');
-        const documentInitial = document.getElementById('document-initial');
-        const errorMessage = document.getElementById('error-message');
+        // Clear current options
+        requestTypeSelect.innerHTML = '<option value="">-- Select request type --</option>';
         
-        let selectedRequestType = null;
-        
-        // Handle category change
-        categorySelect.addEventListener('change', function() {
-            const categoryId = this.value;
-            fetchRequestTypes(categoryId);
-        });
+        if (!categoryId) {
+            return;
+        }
         
         // Fetch request types for the selected category
-        function fetchRequestTypes(categoryId) {
-            // Reset selection
-            selectedRequestType = null;
-            step1Next.disabled = true;
-            
-            // Show loading
-            requestTypesContainer.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading request types...</div>';
-            
-            // Fetch request types based on category
-            fetch(`/blockchain/api/request-types/?category=${categoryId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        requestTypesContainer.innerHTML = '<p class="text-muted">No request types available for this category.</p>';
-                        return;
-                    }
-                    
-                    requestTypesContainer.innerHTML = '';
-                    const row = document.createElement('div');
-                    row.className = 'row';
-                    
-                    data.forEach(requestType => {
-                        const col = document.createElement('div');
-                        col.className = 'col-md-6 mb-3';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'request-type-card';
-                        card.setAttribute('data-id', requestType.id);
-                        card.setAttribute('data-name', requestType.name);
-                        card.setAttribute('data-doc-path', requestType.document_path || '');
-                        
-                        card.innerHTML = `
-                            <div class="icon"><i class="fas fa-file-alt"></i></div>
-                            <div class="title">${requestType.name}</div>
-                            <div class="description">${requestType.description || 'No description available'}</div>
-                        `;
-                        
-                        card.addEventListener('click', function() {
-                            // Deselect all cards
-                            document.querySelectorAll('.request-type-card').forEach(c => {
-                                c.classList.remove('selected');
-                            });
-                            
-                            // Select this card
-                            this.classList.add('selected');
-                            
-                            // Update selected request type
-                            selectedRequestType = {
-                                id: this.getAttribute('data-id'),
-                                name: this.getAttribute('data-name'),
-                                documentPath: this.getAttribute('data-doc-path')
-                            };
-                            
-                            // Enable next button
-                            step1Next.disabled = false;
-                            
-                            // Load document
-                            loadDocument(selectedRequestType.documentPath, selectedRequestType.name);
-                        });
-                        
-                        col.appendChild(card);
-                        row.appendChild(col);
-                    });
-                    
-                    requestTypesContainer.appendChild(row);
-                })
-                .catch(error => {
-                    requestTypesContainer.innerHTML = '<p class="text-danger">Error loading request types. Please try again.</p>';
-                    console.error('Error:', error);
-                });
-        }
-        
-        // Load document in preview
-        function loadDocument(documentPath, title) {
-            // Hide initial message and error
-            documentInitial.style.display = 'none';
-            documentError.style.display = 'none';
-            
-            // If no document path
-            if (!documentPath) {
-                showDocumentError('No document available for this request type.');
-                return;
-            }
-            
-            // Show loading
-            documentLoading.style.display = 'flex';
-            documentContainer.style.display = 'none';
-            documentTitleSection.style.display = 'none';
-            
-            // Set document title
-            documentTitle.textContent = title + ' Form';
-            
-            // Set iframe source
-            const docUrl = `/docs/${documentPath}`;
-            documentFrame.src = docUrl;
-            
-            // Update open in new tab link
-            openDocument.href = docUrl;
-            printDocument.onclick = function(e) {
-                e.preventDefault();
-                const iframe = document.getElementById('document-frame');
-                iframe.contentWindow.print();
-            };
-            
-            // Handle iframe load event
-            documentFrame.onload = function() {
-                documentLoading.style.display = 'none';
-                documentTitleSection.style.display = 'block';
-                documentContainer.style.display = 'block';
-            };
-            
-            // Handle iframe error
-            documentFrame.onerror = function() {
-                showDocumentError('Failed to load the document. Please try again.');
-            };
-            
-            // Set a timeout in case the document doesn't load
-            setTimeout(function() {
-                if (documentLoading.style.display === 'flex') {
-                    showDocumentError('Document loading timed out. Please try again.');
-                }
-            }, 10000);
-        }
-        
-        // Show document error
-        function showDocumentError(message) {
-            documentLoading.style.display = 'none';
-            documentContainer.style.display = 'none';
-            documentTitleSection.style.display = 'none';
-            documentInitial.style.display = 'none';
-            documentError.style.display = 'block';
-            errorMessage.textContent = message;
-        }
-        
-        // Navigation between steps
-        step1Next.addEventListener('click', function() {
-            if (selectedRequestType) {
-                step1.style.display = 'none';
-                step2.style.display = 'block';
-                
-                // Add hidden input for request type
-                const requestTypeInput = document.createElement('input');
-                requestTypeInput.type = 'hidden';
-                requestTypeInput.name = 'request_type';
-                requestTypeInput.value = selectedRequestType.id;
-                document.getElementById('requestForm').appendChild(requestTypeInput);
-                
-                // Fetch and populate dynamic fields if needed
-                fetchDynamicFields(selectedRequestType.id);
-            }
-        });
-        
-        step2Back.addEventListener('click', function() {
-            step1.style.display = 'block';
-            step2.style.display = 'none';
-        });
-        
-        step2Next.addEventListener('click', function() {
-            // Validate step 2 fields
-            const requiredFields = step2.querySelectorAll('[required]');
-            let isValid = true;
-            
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    field.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-            
-            if (isValid) {
-                step2.style.display = 'none';
-                step3.style.display = 'block';
-                populateReviewData();
-            }
-        });
-        
-        step3Back.addEventListener('click', function() {
-            step2.style.display = 'block';
-            step3.style.display = 'none';
-        });
-        
-        // Fetch dynamic fields based on request type
-        function fetchDynamicFields(requestTypeId) {
-            const dynamicFieldsContainer = document.getElementById('dynamicFields');
-            dynamicFieldsContainer.innerHTML = '';
-            
-            // You would fetch dynamic fields from the server here if needed
-            // For now, we'll keep it simple
-        }
-        
-        // Populate review data
-        function populateReviewData() {
-            document.getElementById('review-category').textContent = 
-                categorySelect.options[categorySelect.selectedIndex].text;
-            document.getElementById('review-request-type').textContent = selectedRequestType.name;
-            document.getElementById('review-payment').textContent = 
-                document.getElementById('payment_amount').value;
-            document.getElementById('review-description').textContent = 
-                document.getElementById('description').value;
-            document.getElementById('review-name').textContent = 
-                document.getElementById('full_name').value;
-            document.getElementById('review-phone').textContent = 
-                document.getElementById('phone_number').value;
-            document.getElementById('review-address').textContent = 
-                document.getElementById('address').value;
-            
-            // Handle dynamic fields review if needed
-        }
-        
-        // Form submission
-        document.getElementById('requestForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
-            submitBtn.disabled = true;
-            
-            fetch('/blockchain/api/submit-request/', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+        fetch(`/blockchain/api/request-types/?category=${categoryId}`)
+            .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = '/blockchain/my-requests/?success=true';
-                } else {
-                    alert('Error: ' + data.message);
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
+                data.forEach(requestType => {
+                    const option = document.createElement('option');
+                    option.value = requestType.id;
+                    option.textContent = requestType.name;
+                    requestTypeSelect.appendChild(option);
+                });
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while submitting the request. Please try again.');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+                console.error('Error fetching request types:', error);
             });
-        });
+    });
+    
+    // When request type changes, load dynamic form fields
+    document.getElementById('request_type').addEventListener('change', function() {
+        const requestType = this.value;
+        const dynamicFields = document.getElementById('dynamic-fields');
+        
+        // Clear current fields
+        dynamicFields.innerHTML = '';
+        
+        // Here you would typically fetch form fields specific to the request type
+        // For simplicity, we're not implementing this part
+    });
+    
+    // Pre-fill form with user data if available
+    document.addEventListener('DOMContentLoaded', function() {
+        // You could pre-fill form fields with user data here if needed
     });
 </script>
 {% endblock %} 

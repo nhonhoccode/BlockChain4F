@@ -10,8 +10,14 @@ from django.views.generic import RedirectView
 import os
 from blockchain import views as blockchain_views
 from django.db.models import Q
+from django.conf.urls.i18n import i18n_patterns
+from django.utils.translation import gettext_lazy as _
+from commune_blockchain.views import set_language
 
 urlpatterns = [
+    # Language switcher view
+    path('set-language/', set_language, name='set_language'),
+    
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
     path('blockchain/', include('blockchain.urls')),

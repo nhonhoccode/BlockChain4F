@@ -1,4 +1,7 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Logged Out" %} - {% trans "Commune Blockchain" %}{% endblock %}
 
 {% block extra_head %}
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -10,13 +13,15 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h2 class="card-title mb-4">You have been logged out</h2>
-                    <p class="card-text">Thank you for using our service. Your session has been terminated.</p>
-                    <div class="mt-4">
-                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">Log in again</a>
-                    </div>
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% trans "Logged Out" %}</h4>
+                </div>
+                <div class="card-body">
+                    <p>{% trans "You have been successfully logged out." %}</p>
+                    <p>{% trans "Thank you for using our platform." %}</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary">{% trans "Log in again" %}</a>
+                    <a href="{% url 'blockchain:index' %}" class="btn btn-outline-secondary">{% trans "Return to Home" %}</a>
                 </div>
             </div>
         </div>

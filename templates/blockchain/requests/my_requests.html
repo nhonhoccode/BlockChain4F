@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}My Requests{% endblock %}
+{% block title %}{% trans "My Requests" %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -8,7 +9,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h3><i class="fas fa-clipboard-list"></i> My Requests</h3>
+                    <h3><i class="fas fa-clipboard-list"></i> {% trans "My Requests" %}</h3>
                 </div>
                 <div class="card-body">
                     {% if requests %}
@@ -16,12 +17,12 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Request Type</th>
-                                    <th>Status</th>
-                                    <th>Submission Date</th>
-                                    <th>Last Updated</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Request Type" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th>{% trans "Submission Date" %}</th>
+                                    <th>{% trans "Last Updated" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -38,7 +39,7 @@
                                     <td>{{ request.updated_at|date:"M d, Y" }}</td>
                                     <td>
                                         <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {% trans "View" %}
                                         </a>
                                     </td>
                                 </tr>
@@ -48,16 +49,16 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> You haven't submitted any requests yet.
+                        <i class="fas fa-info-circle"></i> {% trans "You haven't submitted any requests yet." %}
                     </div>
                     {% endif %}
                     
                     <div class="mt-4">
                         <a href="{% url 'blockchain:request_form' %}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Submit New Request
+                            <i class="fas fa-plus"></i> {% trans "Submit New Request" %}
                         </a>
                         <a href="{% url 'blockchain:index' %}" class="btn btn-secondary ms-2">
-                            <i class="fas fa-home"></i> Back to Home
+                            <i class="fas fa-home"></i> {% trans "Back to Home" %}
                         </a>
                     </div>
                 </div>

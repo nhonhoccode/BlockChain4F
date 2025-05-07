@@ -1,22 +1,22 @@
 from .models import UserProfile
+from django.db.models import Count, Q
 
 def pending_approvals_processor(request):
-    """Context processor to add pending approvals count for chairmen."""
-    context = {
-        'pending_approvals_count': 0
-    }
+    """Adds pending approvals count for site admins"""
+    context = {}
     
-    if request.user.is_authenticated:
-        try:
-            # Check if user is a chairman
-            if hasattr(request.user, 'profile') and request.user.profile.is_chairman():
-                # Count pending official approvals
-                context['pending_approvals_count'] = UserProfile.objects.filter(
-                    role='OFFICIAL',
-                    approval_status='PENDING'
-                ).count()
-        except:
-            # Handle case where profile doesn't exist
-            pass
+    if request.user.is_authenticated and request.user.is_staff:
+        pending_count = UserProfile.objects.filter(
+            approval_status='PENDING',
+            user__is_active=True
+        ).count()
+        context['pending_approvals_count'] = pending_count
     
-    return context 
+    return context
+
+def language_processor(request):
+    """Adds current language code to the context"""
+    from django.utils import translation
+    return {
+        'LANGUAGE_CODE': translation.get_language(),
+    } 

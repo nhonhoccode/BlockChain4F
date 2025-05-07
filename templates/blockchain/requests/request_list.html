@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% load blockchain_filters %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Administrative Procedure Requests</h2>
+    <h2>{% trans "Administrative Procedure Requests" %}</h2>
     
     <!-- Search and Filter -->
     <div class="card mb-4">
@@ -11,13 +12,13 @@
             <form method="get" class="row g-3">
                 <div class="col-md-6">
                     <div class="input-group">
-                        <input type="text" name="search" class="form-control" placeholder="Search by ID, description or name" value="{{ search_query }}">
-                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        <input type="text" name="search" class="form-control" placeholder="{% trans "Search by ID, description or name" %}" value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary" type="submit">{% trans "Search" %}</button>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <select name="status" class="form-select" onchange="this.form.submit()">
-                        <option value="ALL" {% if status_filter == 'ALL' %}selected{% endif %}>All Statuses</option>
+                        <option value="ALL" {% if status_filter == 'ALL' %}selected{% endif %}>{% trans "All Statuses" %}</option>
                         {% for status_value, status_label in status_choices %}
                             <option value="{{ status_value }}" {% if status_filter == status_value %}selected{% endif %}>{{ status_label }}</option>
                         {% endfor %}
@@ -25,7 +26,7 @@
                 </div>
                 {% if search_query or status_filter != 'ALL' %}
                 <div class="col-md-2">
-                    <a href="{% url 'blockchain:request_list' %}" class="btn btn-outline-secondary w-100">Clear Filters</a>
+                    <a href="{% url 'blockchain:request_list' %}" class="btn btn-outline-secondary w-100">{% trans "Clear Filters" %}</a>
                 </div>
                 {% endif %}
             </form>
@@ -35,8 +36,8 @@
     {% if not is_authenticated %}
     <div class="alert alert-info mb-4">
         <i class="fas fa-info-circle me-2"></i>
-        You are viewing the public request list. Personal information is masked for privacy reasons. 
-        <a href="{% url 'accounts:login' %}" class="alert-link">Login</a> to see more details.
+        {% trans "You are viewing the public request list. Personal information is masked for privacy reasons." %}
+        <a href="{% url 'accounts:login' %}" class="alert-link">{% trans "Login" %}</a> {% trans "to see more details." %}
     </div>
     {% endif %}
     
@@ -48,12 +49,12 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Date Submitted</th>
-                                <th>Type</th>
-                                <th>Applicant</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th>{% trans "ID" %}</th>
+                                <th>{% trans "Date Submitted" %}</th>
+                                <th>{% trans "Type" %}</th>
+                                <th>{% trans "Applicant" %}</th>
+                                <th>{% trans "Status" %}</th>
+                                <th>{% trans "Actions" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,7 +76,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-primary">{% trans "View Details" %}</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -139,7 +140,7 @@
                 {% endif %}
             {% else %}
                 <div class="alert alert-info">
-                    No requests found matching your criteria.
+                    {% trans "No requests found matching your criteria." %}
                 </div>
             {% endif %}
         </div>

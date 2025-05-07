@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load i18n %}
+{% load static %}
+{% load i18n_helpers %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Commune Blockchain{% endblock %}</title>
+    <title>{% block title %}{% trans "Commune Blockchain" %}{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     
     {% block extra_head %}{% endblock %}
     
@@ -14,7 +20,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Custom CSS -->
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
     {% block extra_css %}{% endblock %}
@@ -46,6 +51,18 @@
             right: -3px;
             font-size: 0.6em;
         }
+        
+        .language-selector {
+            margin-right: 10px;
+        }
+        
+        .language-selector .nav-link {
+            padding: 0.5rem 0.5rem;
+        }
+        
+        .language-flag {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +70,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{% url 'blockchain:index' %}">
-                <i class="fas fa-building"></i> Commune Blockchain
+                <i class="fas fa-building"></i> {% trans "Commune Blockchain" %}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -62,70 +79,94 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'blockchain:index' %}">
-                            <i class="fas fa-home"></i> Home
+                            <i class="fas fa-home"></i> {% trans "Home" %}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'blockchain:procedures_overview' %}">
-                            <i class="fas fa-clipboard-list"></i> Procedures
+                            <i class="fas fa-clipboard-list"></i> {% trans "Procedures" %}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'blockchain:request_list' %}">
-                            <i class="fas fa-globe"></i> Public Requests
+                            <i class="fas fa-globe"></i> {% trans "Public Requests" %}
                         </a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'blockchain:request_form' %}">
-                                <i class="fas fa-file-alt"></i> New Request
+                                <i class="fas fa-file-alt"></i> {% trans "New Request" %}
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'blockchain:my_requests' %}">
-                                <i class="fas fa-list"></i> My Requests
+                                <i class="fas fa-list"></i> {% trans "My Requests" %}
                             </a>
                         </li>
                         {% if user.is_staff %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'blockchain:admin_dashboard' %}">
-                                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                    <i class="fas fa-tachometer-alt"></i> {% trans "Admin Dashboard" %}
                                 </a>
                             </li>
                         {% endif %}
                         {% if user.profile.role == 'OFFICIAL' %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'blockchain:official_dashboard' %}">
-                                    <i class="fas fa-user-tie"></i> Official Dashboard
+                                    <i class="fas fa-user-tie"></i> {% trans "Official Dashboard" %}
                                 </a>
                             </li>
                         {% endif %}
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
+                    <!-- Language Selector with flags -->
+                    <li class="nav-item dropdown language-selector">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe"></i> 
+                            {% if LANGUAGE_CODE == 'vi' %}
+                                <span class="language-flag">🇻🇳</span> {% trans "Vietnamese" %}
+                            {% else %}
+                                <span class="language-flag">🇺🇸</span> {% trans "English" %}
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            <li>
+                                <a class="dropdown-item {% if LANGUAGE_CODE == 'en' %}active{% endif %}" href="{% url 'set_language' %}?lang=en&next={{ request.path|urlencode }}">
+                                    <span class="language-flag">🇺🇸</span> {% trans "English" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {% if LANGUAGE_CODE == 'vi' %}active{% endif %}" href="{% url 'set_language' %}?lang=vi&next={{ request.path|urlencode }}">
+                                    <span class="language-flag">🇻🇳</span> {% trans "Vietnamese" %}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user"></i> 
                                 {{ user.get_full_name|default:user.username }}
                                 {% if user.is_staff %}
-                                    <span class="badge bg-warning text-dark">Chairman</span>
+                                    <span class="badge bg-warning text-dark">{% trans "Chairman" %}</span>
                                 {% elif user.profile.role == 'OFFICIAL' %}
-                                    <span class="badge bg-info">Official</span>
+                                    <span class="badge bg-info">{% trans "Official" %}</span>
                                 {% else %}
-                                    <span class="badge bg-secondary">Citizen</span>
+                                    <span class="badge bg-secondary">{% trans "Citizen" %}</span>
                                 {% endif %}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
                                     <a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                                        <i class="fas fa-id-card"></i> Profile
+                                        <i class="fas fa-id-card"></i> {% trans "Profile" %}
                                     </a>
                                 </li>
                                 {% if user.is_staff %}
                                     <li>
                                         <a class="dropdown-item" href="{% url 'accounts:pending_approvals' %}">
-                                            <i class="fas fa-user-check"></i> Pending Approvals
+                                            <i class="fas fa-user-check"></i> {% trans "Pending Approvals" %}
                                         </a>
                                     </li>
                                 {% endif %}
@@ -134,7 +175,7 @@
                                     <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
                                         {% csrf_token %}
                                         <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                            <i class="fas fa-sign-out-alt"></i> {% trans "Logout" %}
                                         </button>
                                     </form>
                                 </li>
@@ -143,12 +184,12 @@
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'accounts:login' %}">
-                                <i class="fas fa-sign-in-alt"></i> Login
+                                <i class="fas fa-sign-in-alt"></i> {% trans "Login" %}
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'accounts:register' %}">
-                                <i class="fas fa-user-plus"></i> Register
+                                <i class="fas fa-user-plus"></i> {% trans "Register" %}
                             </a>
                         </li>
                     {% endif %}
@@ -179,24 +220,24 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>Commune Blockchain</h5>
-                    <p>A transparent and secure system for managing administrative requests using blockchain technology.</p>
+                    <h5>{% trans "Commune Blockchain" %}</h5>
+                    <p>{% trans "A transparent and secure system for managing administrative requests using blockchain technology." %}</p>
                 </div>
                 <div class="col-md-3">
-                    <h5>Commune Services</h5>
+                    <h5>{% trans "Commune Services" %}</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'blockchain:index' %}">Home</a></li>
-                        <li><a href="{% url 'blockchain:procedures_overview' %}">Administrative Procedures</a></li>
-                        <li><a href="{% url 'blockchain:request_list' %}">Public Requests</a></li>
-                        <li><a href="{% url 'blockchain:track_request' %}">Track Request</a></li>
+                        <li><a href="{% url 'blockchain:index' %}">{% trans "Home" %}</a></li>
+                        <li><a href="{% url 'blockchain:procedures_overview' %}">{% trans "Administrative Procedures" %}</a></li>
+                        <li><a href="{% url 'blockchain:request_list' %}">{% trans "Public Requests" %}</a></li>
+                        <li><a href="{% url 'blockchain:track_request' %}">{% trans "Track Request" %}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h5>Contact</h5>
+                    <h5>{% trans "Contact" %}</h5>
                     <address>
-                        <strong>Commune Administration</strong><br>
-                        123 Main Street<br>
-                        City, State 12345<br>
+                        <strong>{% trans "Commune Administration" %}</strong><br>
+                        {% trans "123 Main Street" %}<br>
+                        {% trans "City, State 12345" %}<br>
                         <i class="fas fa-phone"></i> (123) 456-7890<br>
                         <i class="fas fa-envelope"></i> info@commune-blockchain.example
                     </address>
@@ -204,7 +245,7 @@
             </div>
             <hr>
             <div class="text-center">
-                <p>&copy; {% now "Y" %} Commune Blockchain. All rights reserved.</p>
+                <p>&copy; {% now "Y" %} {% trans "Commune Blockchain. All rights reserved." %}</p>
             </div>
         </div>
     </footer>

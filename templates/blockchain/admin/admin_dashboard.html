@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}{% trans "Admin Dashboard" %}{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-5">
-    <h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+    <h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> {% trans "Admin Dashboard" %}</h1>
     
     <div class="row mb-4">
         <div class="col-md">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Pending Requests</h5>
+                    <h5 class="card-title">{% trans "Pending Requests" %}</h5>
                     <h2 class="card-text">{{ pending_requests.count }}</h2>
                 </div>
             </div>
@@ -18,7 +19,7 @@
         <div class="col-md">
             <div class="card bg-info text-white">
                 <div class="card-body">
-                    <h5 class="card-title">In Review</h5>
+                    <h5 class="card-title">{% trans "In Review" %}</h5>
                     <h2 class="card-text">{{ in_review_requests.count }}</h2>
                 </div>
             </div>
@@ -26,7 +27,7 @@
         <div class="col-md">
             <div class="card bg-warning text-dark">
                 <div class="card-body">
-                    <h5 class="card-title">Additional Info Needed</h5>
+                    <h5 class="card-title">{% trans "Additional Info Needed" %}</h5>
                     <h2 class="card-text">{{ additional_info_requests.count }}</h2>
                 </div>
             </div>
@@ -34,7 +35,7 @@
         <div class="col-md">
             <div class="card bg-success text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Approved</h5>
+                    <h5 class="card-title">{% trans "Approved" %}</h5>
                     <h2 class="card-text">{{ approved_requests.count }}</h2>
                 </div>
             </div>
@@ -42,7 +43,7 @@
         <div class="col-md">
             <div class="card bg-danger text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Rejected</h5>
+                    <h5 class="card-title">{% trans "Rejected" %}</h5>
                     <h2 class="card-text">{{ rejected_requests.count }}</h2>
                 </div>
             </div>
@@ -53,27 +54,27 @@
     <ul class="nav nav-tabs" id="requestTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
-                Pending <span class="badge bg-primary">{{ pending_requests.count }}</span>
+                {% trans "Pending" %} <span class="badge bg-primary">{{ pending_requests.count }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="in-review-tab" data-bs-toggle="tab" data-bs-target="#in-review" type="button" role="tab">
-                In Review <span class="badge bg-info">{{ in_review_requests.count }}</span>
+                {% trans "In Review" %} <span class="badge bg-info">{{ in_review_requests.count }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="additional-info-tab" data-bs-toggle="tab" data-bs-target="#additional-info" type="button" role="tab">
-                Additional Info <span class="badge bg-warning">{{ additional_info_requests.count }}</span>
+                {% trans "Additional Info" %} <span class="badge bg-warning">{{ additional_info_requests.count }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
-                Approved <span class="badge bg-success">{{ approved_requests.count }}</span>
+                {% trans "Approved" %} <span class="badge bg-success">{{ approved_requests.count }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab">
-                Rejected <span class="badge bg-danger">{{ rejected_requests.count }}</span>
+                {% trans "Rejected" %} <span class="badge bg-danger">{{ rejected_requests.count }}</span>
             </button>
         </li>
     </ul>
@@ -84,7 +85,7 @@
         <div class="tab-pane fade show active" id="pending" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4><i class="fas fa-clock"></i> Pending Requests</h4>
+                    <h4><i class="fas fa-clock"></i> {% trans "Pending Requests" %}</h4>
                 </div>
                 <div class="card-body">
                     {% if pending_requests %}
@@ -92,11 +93,11 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Full Name</th>
-                                    <th>Request Type</th>
-                                    <th>Submission Date</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Full Name" %}</th>
+                                    <th>{% trans "Request Type" %}</th>
+                                    <th>{% trans "Submission Date" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -108,7 +109,7 @@
                                     <td>{{ request.created_at|date:"M d, Y" }}</td>
                                     <td>
                                         <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {% trans "View" %}
                                         </a>
                                     </td>
                                 </tr>
@@ -118,7 +119,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No pending requests.
+                        <i class="fas fa-info-circle"></i> {% trans "No pending requests." %}
                     </div>
                     {% endif %}
                 </div>
@@ -129,7 +130,7 @@
         <div class="tab-pane fade" id="in-review" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-info text-white">
-                    <h4><i class="fas fa-search"></i> In Review Requests</h4>
+                    <h4><i class="fas fa-search"></i> {% trans "In Review Requests" %}</h4>
                 </div>
                 <div class="card-body">
                     {% if in_review_requests %}
@@ -137,11 +138,11 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Full Name</th>
-                                    <th>Request Type</th>
-                                    <th>Submission Date</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Full Name" %}</th>
+                                    <th>{% trans "Request Type" %}</th>
+                                    <th>{% trans "Submission Date" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -153,7 +154,7 @@
                                     <td>{{ request.created_at|date:"M d, Y" }}</td>
                                     <td>
                                         <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {% trans "View" %}
                                         </a>
                                     </td>
                                 </tr>
@@ -163,7 +164,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No requests in review.
+                        <i class="fas fa-info-circle"></i> {% trans "No requests in review." %}
                     </div>
                     {% endif %}
                 </div>
@@ -174,7 +175,7 @@
         <div class="tab-pane fade" id="additional-info" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-warning text-dark">
-                    <h4><i class="fas fa-exclamation-circle"></i> Additional Information Required</h4>
+                    <h4><i class="fas fa-exclamation-circle"></i> {% trans "Additional Information Required" %}</h4>
                 </div>
                 <div class="card-body">
                     {% if additional_info_requests %}
@@ -182,11 +183,11 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Full Name</th>
-                                    <th>Request Type</th>
-                                    <th>Submission Date</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Full Name" %}</th>
+                                    <th>{% trans "Request Type" %}</th>
+                                    <th>{% trans "Submission Date" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -198,7 +199,7 @@
                                     <td>{{ request.created_at|date:"M d, Y" }}</td>
                                     <td>
                                         <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {% trans "View" %}
                                         </a>
                                     </td>
                                 </tr>
@@ -208,7 +209,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No requests require additional information.
+                        <i class="fas fa-info-circle"></i> {% trans "No requests require additional information." %}
                     </div>
                     {% endif %}
                 </div>
@@ -219,7 +220,7 @@
         <div class="tab-pane fade" id="approved" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-success text-white">
-                    <h4><i class="fas fa-check-circle"></i> Approved Requests</h4>
+                    <h4><i class="fas fa-check-circle"></i> {% trans "Approved Requests" %}</h4>
                 </div>
                 <div class="card-body">
                     {% if approved_requests %}
@@ -227,11 +228,11 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Full Name</th>
-                                    <th>Request Type</th>
-                                    <th>Submission Date</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Full Name" %}</th>
+                                    <th>{% trans "Request Type" %}</th>
+                                    <th>{% trans "Submission Date" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -243,7 +244,7 @@
                                     <td>{{ request.created_at|date:"M d, Y" }}</td>
                                     <td>
                                         <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {% trans "View" %}
                                         </a>
                                     </td>
                                 </tr>
@@ -253,7 +254,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No approved requests.
+                        <i class="fas fa-info-circle"></i> {% trans "No approved requests." %}
                     </div>
                     {% endif %}
                 </div>
@@ -264,7 +265,7 @@
         <div class="tab-pane fade" id="rejected" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-danger text-white">
-                    <h4><i class="fas fa-times-circle"></i> Rejected Requests</h4>
+                    <h4><i class="fas fa-times-circle"></i> {% trans "Rejected Requests" %}</h4>
                 </div>
                 <div class="card-body">
                     {% if rejected_requests %}
@@ -272,11 +273,11 @@
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Full Name</th>
-                                    <th>Request Type</th>
-                                    <th>Submission Date</th>
-                                    <th>Actions</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Full Name" %}</th>
+                                    <th>{% trans "Request Type" %}</th>
+                                    <th>{% trans "Submission Date" %}</th>
+                                    <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -288,7 +289,7 @@
                                     <td>{{ request.created_at|date:"M d, Y" }}</td>
                                     <td>
                                         <a href="{% url 'blockchain:request_detail' request.id %}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="fas fa-eye"></i> {% trans "View" %}
                                         </a>
                                     </td>
                                 </tr>
@@ -298,7 +299,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No rejected requests.
+                        <i class="fas fa-info-circle"></i> {% trans "No rejected requests." %}
                     </div>
                     {% endif %}
                 </div>

@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 {% load blockchain_filters %}
+{% load i18n %}
 
-{% block title %}Request Details: {{ request.id }}{% endblock %}
+{% block title %}{% trans "Request Details" %}: {{ request.id }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1><i class="fas fa-clipboard-check"></i> Request Details</h1>
-            <p class="lead">Review the details and status of this administrative request.</p>
+            <h1><i class="fas fa-clipboard-check"></i> {% trans "Request Details" %}</h1>
+            <p class="lead">{% trans "Review the details and status of this administrative request." %}</p>
         </div>
         <div class="col-md-4 text-end">
             <a href="{% url 'blockchain:my_requests' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Back to My Requests
+                <i class="fas fa-arrow-left"></i> {% trans "Back to My Requests" %}
             </a>
         </div>
     </div>
@@ -20,7 +21,7 @@
     {% if not can_see_full_details %}
     <div class="alert alert-warning mb-4">
         <i class="fas fa-lock me-2"></i>
-        <strong>Restricted Access:</strong> You're viewing limited information about this request. Full details are only visible to the requestor, commune president, and authorized officials.
+        <strong>{% trans "Restricted Access:" %}</strong> {% trans "You're viewing limited information about this request. Full details are only visible to the requestor, commune president, and authorized officials." %}
     </div>
     {% endif %}
 
@@ -141,7 +142,7 @@
                     <!-- Structured view of form data -->
                     <div id="structuredView">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                    <table class="table table-bordered">
                                 <thead class="table-light">
                                     <tr>
                                         <th width="30%">Field</th>
@@ -152,7 +153,7 @@
                                     <!-- Group 1: Basic Request Information -->
                                     <tr class="table-secondary">
                                         <th colspan="2" class="text-center">Request Information</th>
-                                    </tr>
+                        </tr>
                                     {% for key, value in request.form_data.items %}
                                         {% if key != "_meta" and key != "_files" %}
                                             {% if key|startswith:"request_" or key == "category" or key == "description" %}
@@ -167,7 +168,7 @@
                                     <!-- Group 2: Personal Information -->
                                     <tr class="table-secondary">
                                         <th colspan="2" class="text-center">Personal Information</th>
-                                    </tr>
+                        </tr>
                                     {% for key, value in request.form_data.items %}
                                         {% if key != "_meta" and key != "_files" %}
                                             {% if key|startswith:"name" or key|startswith:"birth" or key|startswith:"dob" or key == "full_name" or key == "gender" or key == "age" %}
@@ -178,17 +179,17 @@
                                                         <span class="text-danger">{{ key|format_field_value:value }}</span>
                                                     {% else %}
                                                         {{ value }}
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                     
                                     <!-- Group 3: Contact Information -->
                                     <tr class="table-secondary">
                                         <th colspan="2" class="text-center">Contact Information</th>
-                                    </tr>
+                        </tr>
                                     {% for key, value in request.form_data.items %}
                                         {% if key != "_meta" and key != "_files" %}
                                             {% if key|startswith:"phone" or key|startswith:"email" or key|startswith:"address" or key|startswith:"contact" %}
@@ -201,7 +202,7 @@
                                                         {{ value }}
                                                     {% endif %}
                                                 </td>
-                                            </tr>
+                        </tr>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
@@ -209,7 +210,7 @@
                                     <!-- Group 4: Payment Information -->
                                     <tr class="table-secondary">
                                         <th colspan="2" class="text-center">Payment Information</th>
-                                    </tr>
+                        </tr>
                                     {% for key, value in request.form_data.items %}
                                         {% if key != "_meta" and key != "_files" %}
                                             {% if key|startswith:"payment" or key|contains:"fee" or key|contains:"cost" or key|contains:"amount" %}
@@ -226,8 +227,8 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 </td>
-                                            </tr>
-                                            {% endif %}
+                        </tr>
+                        {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                     
@@ -253,15 +254,15 @@
                                                         {{ value }}
                                                     {% endif %}
                                                 </td>
-                                            </tr>
-                                            {% endif %}
+                        </tr>
+                        {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                     
                                     <!-- Group 6: All Other Fields (non-categorized) -->
                                     <tr class="table-secondary">
                                         <th colspan="2" class="text-center">Additional Fields</th>
-                                    </tr>
+                        </tr>
                                     {% with categorized_fields='' %}
                                         {% for key, value in request.form_data.items %}
                                             {% if key != "_meta" and key != "_files" %}
@@ -285,7 +286,7 @@
                                                             {{ value }}
                                                         {% endif %}
                                                     </td>
-                                                </tr>
+                        </tr>
                                                 {% endif %}
                                             {% endif %}
                                         {% endfor %}
@@ -295,8 +296,8 @@
                                     {% if request.form_data|get_meta %}
                                     <tr class="table-secondary">
                                         <th colspan="2" class="text-center">Metadata</th>
-                                    </tr>
-                                    <tr>
+                        </tr>
+                        <tr>
                                         <td colspan="2">
                                             <div class="small text-muted bg-light p-2 rounded">
                                                 <strong>Submission Time:</strong> {{ request.form_data|get_meta|get_item:'submit_time'|default:"N/A" }}<br>
@@ -309,10 +310,10 @@
                                                 {% endif %}
                                             </div>
                                         </td>
-                                    </tr>
+                        </tr>
                                     {% endif %}
                                 </tbody>
-                            </table>
+                    </table>
                         </div>
                     </div>
                     
@@ -386,7 +387,7 @@
                     {% else %}
                     <div class="alert alert-warning">
                         <i class="fas fa-lock me-2"></i>
-                        <strong>Restricted Access:</strong> Detailed form data is only visible to the form creator, commune president, and officials authorized specifically for this category.
+                        <strong>{% trans "Restricted Access:" %}</strong> {% trans "Detailed form data is only visible to the form creator, commune president, and officials authorized specifically for this category." %}
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered">
@@ -407,7 +408,7 @@
                                 {% endfor %}
                                 <tr>
                                     <td colspan="2" class="text-center text-muted">
-                                        Additional form data is restricted
+                                        {% trans "Additional form data is restricted" %}
                                     </td>
                                 </tr>
                             </tbody>
@@ -430,7 +431,7 @@
                     </div>
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i> 
-                        Full applicant information is only available to authorized users.
+                        {% trans "Full applicant information is only available to authorized users." %}
                     </div>
                 </div>
             </div>
@@ -472,14 +473,14 @@
                         </table>
                     </div>
                     {% else %}
-                    <p class="text-muted mb-0">No files attached to this request.</p>
+                    <p class="text-muted mb-0">{% trans "No files attached to this request." %}</p>
                     {% endif %}
                     
                     <!-- Back button -->
                     {% if not can_see_full_details %}
                     <div class="alert alert-warning mt-3">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        You only have access to files uploaded by the request owner. Files uploaded by officials are restricted.
+                        {% trans "You only have access to files uploaded by the request owner. Files uploaded by officials are restricted." %}
                     </div>
                     {% endif %}
                     
@@ -487,16 +488,16 @@
                     {% if is_requestor or is_authorized_official %}
                     <div class="mt-3">
                         <a href="{% url 'blockchain:upload_document' request.id %}" class="btn btn-primary">
-                            <i class="fas fa-file-upload"></i> Upload Document
+                            <i class="fas fa-file-upload"></i> {% trans "Upload Document" %}
                         </a>
                         <a href="{% url 'blockchain:upload_multiple_documents' request.id %}" class="btn btn-outline-primary">
-                            <i class="fas fa-file-upload"></i> Upload Multiple Documents
+                            <i class="fas fa-file-upload"></i> {% trans "Upload Multiple Documents" %}
                         </a>
-                    </div>
-                    {% endif %}
+                            </div>
+                            {% endif %}
                 </div>
-            </div>
-
+                        </div>
+                        
             <!-- Comments Section -->
             <div class="card mb-4">
                 <div class="card-header bg-secondary text-white">
@@ -513,23 +514,23 @@
                             </div>
                             <div class="mt-2">{{ comment.content }}</div>
                         </div>
-                        {% endfor %}
-                    </div>
+                                {% endfor %}
+                            </div>
                     {% else %}
-                    <p class="text-muted">No comments yet.</p>
+                    <p class="text-muted">{% trans "No comments yet." %}</p>
                     {% endif %}
                     
                     {% if can_see_full_details and comment_form %}
                     <div class="mt-3">
                         <form method="POST">
-                            {% csrf_token %}
+                                            {% csrf_token %}
                             <div class="form-group">
                                 {{ comment_form.content }}
                             </div>
                             <button type="submit" class="btn btn-primary mt-2">
-                                <i class="fas fa-paper-plane"></i> Add Comment
-                            </button>
-                        </form>
+                                <i class="fas fa-paper-plane"></i> {% trans "Add Comment" %}
+                                            </button>
+                                        </form>
                     </div>
                     {% endif %}
                 </div>
@@ -539,18 +540,18 @@
         <div class="col-md-4">
             <!-- Request Actions -->
             {% if is_authorized_official or is_president %}
-            <div class="card mb-4">
-                <div class="card-header bg-warning text-dark">
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0"><i class="fas fa-tasks"></i> Official Actions</h5>
-                </div>
-                <div class="card-body">
+                    </div>
+                    <div class="card-body">
                     <!-- Status Update Form -->
                     <h6>Update Status:</h6>
                     <form method="POST" action="{% url 'blockchain:update_status' request.id %}">
-                        {% csrf_token %}
+                            {% csrf_token %}
                         <div class="form-group mb-3">
                             <select name="new_status" class="form-select mb-2" required>
-                                <option value="" selected disabled>Select new status</option>
+                                <option value="" selected disabled>{% trans "Select new status" %}</option>
                                 {% for status_code, status_name in request.STATUS_CHOICES %}
                                 {% if status_code != request.status %}
                                 <option value="{{ status_code }}">{{ status_name }}</option>
@@ -559,33 +560,33 @@
                             </select>
                         </div>
                         <div class="form-group mb-3">
-                            <textarea name="comments" class="form-control" rows="3" placeholder="Comments for status update" required></textarea>
-                        </div>
+                            <textarea name="comments" class="form-control" rows="3" placeholder="{% trans "Comments for status update" %}" required></textarea>
+                            </div>
                         <button type="submit" class="btn btn-warning w-100 mb-3">
-                            <i class="fas fa-sync-alt"></i> Update Status
-                        </button>
-                    </form>
+                            <i class="fas fa-sync-alt"></i> {% trans "Update Status" %}
+                            </button>
+                        </form>
                     
                     <!-- Document Request -->
                     <h6 class="mt-4">Request Additional Document:</h6>
                     <form method="POST" action="{% url 'blockchain:request_document' request.id %}">
                         {% csrf_token %}
                         <div class="form-group mb-3">
-                            <input type="text" name="title" class="form-control mb-2" placeholder="Document Title" required>
+                            <input type="text" name="title" class="form-control mb-2" placeholder="{% trans "Document Title" %}" required>
                         </div>
                         <div class="form-group mb-3">
-                            <textarea name="description" class="form-control" rows="3" placeholder="Document Description" required></textarea>
+                            <textarea name="description" class="form-control" rows="3" placeholder="{% trans "Document Description" %}" required></textarea>
                         </div>
                         <div class="form-group mb-3">
                             <label>Due Date (Optional):</label>
                             <input type="date" name="due_date" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-info w-100">
-                            <i class="fas fa-file-medical"></i> Request Document
+                            <i class="fas fa-file-medical"></i> {% trans "Request Document" %}
                         </button>
                     </form>
+                    </div>
                 </div>
-            </div>
             {% endif %}
             
             {% if is_president and request.status == 'PENDING' and not request.assigned_to %}
@@ -600,18 +601,18 @@
                         <div class="form-group mb-3">
                             <label>Select Officer:</label>
                             <select name="officer" class="form-select mb-2" required>
-                                <option value="" selected disabled>Choose an officer</option>
+                                <option value="" selected disabled>{% trans "Choose an officer" %}</option>
                                 {% for officer in available_officers %}
                                 <option value="{{ officer.id }}">{{ officer.get_full_name|default:officer.username }}</option>
                                 {% endfor %}
                             </select>
-                        </div>
+                            </div>
                         <div class="form-group mb-3">
                             <label>Estimated Completion Date:</label>
                             <input type="date" name="estimated_completion_date" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-user-check"></i> Assign
+                            <i class="fas fa-user-check"></i> {% trans "Assign" %}
                         </button>
                     </form>
                 </div>
@@ -642,33 +643,33 @@
                                                 <i class="fas fa-user"></i> {{ update.updated_by.get_full_name|default:update.updated_by.username }}
                                             </small>
                                         </p>
-                                    </div>
+                    </div>
                                     {% if update.comments and can_see_full_details %}
                                     <div class="timeline-body">
                                         <p>{{ update.comments }}</p>
-                                    </div>
+                </div>
                                     {% elif update.comments %}
                                     <div class="timeline-body">
-                                        <p><em>Comment restricted</em></p>
-                                    </div>
-                                    {% endif %}
-                                </div>
+                                        <p><em>{% trans "Comment restricted" %}</em></p>
+            </div>
+            {% endif %}
+                </div>
                             </li>
                             {% empty %}
                             <li class="timeline-item">
                                 <div class="timeline-badge bg-secondary">
                                     <i class="fas fa-info"></i>
-                                </div>
+                    </div>
                                 <div class="timeline-panel">
                                     <div class="timeline-heading">
-                                        <h6 class="timeline-title">Request Created</h6>
+                                        <h6 class="timeline-title">{% trans "Request Created" %}</h6>
                                         <p>
                                             <small class="text-muted">
                                                 <i class="fas fa-clock"></i> {{ request.created_at|date:"M d, Y H:i" }}
                                             </small>
                                         </p>
-                                    </div>
-                                </div>
+                </div>
+            </div>
                             </li>
                             {% endfor %}
                         </ul>
