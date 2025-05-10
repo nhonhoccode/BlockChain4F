@@ -33,4 +33,18 @@ MOCK_DATA_DIR = 'tests/data'
 
 # Test timeouts
 DEFAULT_TIMEOUT = 5  # seconds
-BLOCKCHAIN_TIMEOUT = 10  # seconds 
+BLOCKCHAIN_TIMEOUT = 10  # seconds
+
+# Email testing
+EMAIL_TEST_CONFIG = {
+    'USE_FILE_BACKEND': True,
+    'TEST_RECIPIENTS': ['test@example.com', 'admin@example.com'],
+    'IGNORE_EMAILS': ['no-reply@example.com']
+}
+
+# Performance testing thresholds
+PERFORMANCE_THRESHOLDS = {
+    'API_RESPONSE_TIME': 0.5,  # seconds
+    'PAGE_LOAD_TIME': 1.0,     # seconds
+    'DATABASE_QUERY_TIME': 0.2 # seconds
+} 
