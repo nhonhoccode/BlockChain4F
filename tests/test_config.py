@@ -1,0 +1,36 @@
+"""
+Configuration settings for test environment.
+"""
+
+# Test database configuration
+TEST_DATABASE = {
+    'NAME': 'test_db',
+    'USER': 'test_user',
+    'PASSWORD': 'test_password',
+    'HOST': 'localhost',
+    'PORT': '5432',
+}
+
+# Blockchain testing settings
+BLOCKCHAIN_TEST_SETTINGS = {
+    'PROVIDER_URL': 'http://localhost:8545',
+    'ACCOUNTS': [
+        '0x0000000000000000000000000000000000000001',
+        '0x0000000000000000000000000000000000000002',
+        '0x0000000000000000000000000000000000000003',
+    ],
+    'PRIVATE_KEYS': [
+        '0x1111111111111111111111111111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333333333333333333333333333',
+    ],
+    'CHAIN_ID': 1337,
+    'GAS_LIMIT': 6721975,
+}
+
+# Mock data paths
+MOCK_DATA_DIR = 'tests/data'
+
+# Test timeouts
+DEFAULT_TIMEOUT = 5  # seconds
+BLOCKCHAIN_TIMEOUT = 10  # seconds 
