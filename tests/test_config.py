@@ -31,8 +31,8 @@ BLOCKCHAIN_TEST_SETTINGS = {
 # Mock data paths
 MOCK_DATA_DIR = 'tests/data'
 
-# Test timeouts
-DEFAULT_TIMEOUT = 5  # seconds
+# Test timeouts - critical for performance optimization
+DEFAULT_TIMEOUT = 3  # seconds - optimized from 5 for faster tests
 BLOCKCHAIN_TIMEOUT = 10  # seconds
 
 # Email testing
