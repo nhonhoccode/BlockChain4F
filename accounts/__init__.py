@@ -1,3 +1,0 @@
-"""
-Accounts app initialization
-""" 

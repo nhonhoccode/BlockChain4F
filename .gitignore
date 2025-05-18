@@ -3,8 +3,14 @@
 **/venv/
 **/.env
 **/.DS_Store
+
+# React
 node_modules/
 build/
+.env
+*.log
+
+# Django
 __pycache__/
 *.pyc
 *.sqlite3

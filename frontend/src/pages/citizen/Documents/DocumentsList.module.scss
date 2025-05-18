@@ -1,0 +1,234 @@
+@import '../../../assets/styles/variables';
+@import '../../../assets/styles/mixins';
+
+.documentsContainer {
+  animation: fadeIn 0.5s ease-in-out;
+  
+  .pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    h1 {
+      font-weight: 700;
+      color: var(--color-primary-dark, #1565c0);
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background-color: var(--color-primary, #1976d2);
+        border-radius: 2px;
+      }
+    }
+    
+    .addButton {
+      background: linear-gradient(45deg, #1976d2, #2196f3);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0.5px;
+      
+      &:hover {
+        background: linear-gradient(45deg, #1565c0, #1976d2);
+        box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+      }
+    }
+  }
+  
+  .filterContainer {
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .searchField {
+      .searchIcon {
+        color: var(--color-text-secondary, #757575);
+      }
+    }
+    
+    .filterSelect {
+      .filterIcon {
+        color: var(--color-text-secondary, #757575);
+        font-size: 1.25rem;
+      }
+    }
+  }
+  
+  .emptyState {
+    padding: 3rem;
+    text-align: center;
+    border-radius: 12px;
+    background-color: #fff;
+    
+    .emptyIcon {
+      font-size: 5rem;
+      color: var(--color-text-disabled, #bdbdbd);
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .emptyTitle {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--color-text-secondary, #757575);
+    }
+    
+    .emptyText {
+      color: var(--color-text-secondary, #757575);
+    }
+  }
+  
+  .documentCard {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    .cardHeader {
+      padding: 1rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      
+      &.primary {
+        background: linear-gradient(135deg, #1976d2, #42a5f5);
+      }
+      
+      &.secondary {
+        background: linear-gradient(135deg, #9c27b0, #ba68c8);
+      }
+      
+      &.info {
+        background: linear-gradient(135deg, #0288d1, #29b6f6);
+      }
+      
+      &.success {
+        background: linear-gradient(135deg, #388e3c, #66bb6a);
+      }
+      
+      &.warning {
+        background: linear-gradient(135deg, #f57c00, #ffb74d);
+      }
+      
+      &.error {
+        background: linear-gradient(135deg, #d32f2f, #ef5350);
+      }
+      
+      .headerIcon {
+        font-size: 1.5rem;
+      }
+      
+      .headerText {
+        font-weight: 500;
+        font-size: 1rem;
+      }
+    }
+    
+    .cardContent {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+      
+      .documentTitle {
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 1rem;
+        color: var(--color-text-primary, #212121);
+      }
+      
+      .infoSection {
+        margin-bottom: 1rem;
+        
+        .infoLabel {
+          font-size: 0.75rem;
+          color: var(--color-text-secondary, #757575);
+          margin-bottom: 0.25rem;
+        }
+        
+        .infoValue {
+          font-size: 0.875rem;
+          color: var(--color-text-primary, #212121);
+        }
+      }
+      
+      .dateSection {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .statusSection {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .statusChip {
+          font-size: 0.75rem;
+        }
+        
+        .blockchainChip {
+          font-size: 0.75rem;
+          background-color: rgba(25, 118, 210, 0.08);
+        }
+      }
+    }
+    
+    .cardActions {
+      display: flex;
+      justify-content: space-around;
+      padding: 0.75rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      
+      .actionButton {
+        font-size: 0.8125rem;
+        color: var(--color-primary, #1976d2);
+        
+        &:hover {
+          background-color: rgba(25, 118, 210, 0.04);
+        }
+        
+        .actionIcon {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

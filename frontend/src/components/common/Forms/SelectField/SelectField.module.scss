@@ -1,0 +1,67 @@
+@import '../../../../assets/styles/_variables.scss';
+@import '../../../../assets/styles/mixins.scss';
+
+.selectField {
+  margin-bottom: 1rem;
+  font-family: $font-family;
+
+  // Tùy chỉnh style cho các chip trong multiple select
+  :global(.MuiChip-root) {
+    background-color: lighten($primary-color, 40%);
+    color: darken($primary-color, 10%);
+    font-size: 0.85rem;
+
+    &:global(.MuiChip-sizeSmall) {
+      height: 22px;
+    }
+  }
+
+  // Tùy chỉnh style cho dropdown
+  :global(.MuiSelect-select) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 20px;
+  }
+
+  // Tùy chỉnh label
+  :global(.MuiFormLabel-root) {
+    font-family: $font-family;
+    color: $gray-700;
+    
+    &.Mui-focused {
+      color: $primary-color;
+    }
+  }
+
+  // Tùy chỉnh màu sắc khi focus
+  :global(.MuiOutlinedInput-root.Mui-focused) {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $primary-color;
+    }
+  }
+
+  // Tùy chỉnh màu sắc khi hover
+  :global(.MuiOutlinedInput-root:hover) {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: lighten($primary-color, 10%);
+    }
+  }
+
+  // Tùy chỉnh cho trường bị lỗi
+  :global(.Mui-error) {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $error-color;
+    }
+  }
+  
+  // Helper text
+  :global(.MuiFormHelperText-root) {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    
+    &.Mui-error {
+      color: $error-color;
+    }
+  }
+}

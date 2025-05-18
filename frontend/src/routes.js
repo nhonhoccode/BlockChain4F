@@ -1,0 +1,108 @@
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import withAuthGuard from './utils/withAuthGuard.js';
+
+// Layouts
+import MainLayout from './layouts/MainLayout';
+import AuthLayout from './layouts/AuthLayout';
+import CitizenLayout from './layouts/CitizenLayout';
+import OfficerLayout from './layouts/OfficerLayout';
+import ChairmanLayout from './layouts/ChairmanLayout';
+
+// Public Pages
+import HomePage from './pages/public/Home';
+import DocumentVerifyPage from './pages/public/DocumentVerify';
+import AboutPage from './pages/public/About';
+import ContactPage from './pages/public/Contact';
+import NotFoundPage from './pages/public/NotFound';
+
+// Auth Pages
+import LoginPage from './pages/auth/Login';
+import RegisterPage from './pages/auth/Register';
+import OfficerRegisterPage from './pages/auth/OfficerRegister';
+import ResetPasswordPage from './pages/auth/ResetPassword';
+import GoogleCallback from './pages/auth/GoogleCallback/GoogleCallback';
+
+// Citizen Pages
+import CitizenDashboard from './pages/citizen/Dashboard';
+
+// Officer Pages
+import OfficerDashboard from './pages/officer/Dashboard';
+
+// Chairman Pages
+import ChairmanDashboard from './pages/admin/chairman/Dashboard';
+
+// Apply withAuthGuard to components
+const ProtectedCitizenDashboard = withAuthGuard(CitizenDashboard, { requiredRole: 'citizen' });
+const ProtectedOfficerDashboard = withAuthGuard(OfficerDashboard, { requiredRole: 'officer' });
+const ProtectedChairmanDashboard = withAuthGuard(ChairmanDashboard, { requiredRole: 'chairman' });
+
+// Define routes
+const routes = [
+  // Public routes with MainLayout
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: "document-verify", element: <DocumentVerifyPage /> },
+      { path: "about", element: <AboutPage /> },
+      { path: "contact", element: <ContactPage /> },
+    ]
+  },
+  
+  // Authentication routes
+  {
+    path: "auth",
+    element: <AuthLayout />,
+    children: [
+      { path: "login", element: <LoginPage /> },
+      { path: "register", element: <RegisterPage /> },
+      { path: "officer-register", element: <OfficerRegisterPage /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
+      { path: "google-callback", element: <GoogleCallback /> },
+      { path: "google/callback", element: <GoogleCallback /> },
+    ]
+  },
+  
+  // Citizen routes - protected with auth guard
+  {
+    path: "citizen",
+    element: <CitizenLayout />,
+    children: [
+      { path: "dashboard", element: <ProtectedCitizenDashboard /> },
+      // { path: "*", element: <Navigate to="/citizen/dashboard" replace /> }
+    ]
+  },
+  
+  // Officer routes - protected with auth guard
+  {
+    path: "officer",
+    element: <OfficerLayout />,
+    children: [
+      { path: "dashboard", element: <ProtectedOfficerDashboard /> },
+      // { path: "*", element: <Navigate to="/officer/dashboard" replace /> }
+    ]
+  },
+  
+  // Chairman routes - protected with auth guard
+  {
+    path: "chairman",
+    element: <ChairmanLayout />,
+    children: [
+      { path: "dashboard", element: <ProtectedChairmanDashboard /> },
+      // { path: "*", element: <Navigate to="/chairman/dashboard" replace /> }
+    ]
+  },
+  
+  // Not found - catch-all route
+  {
+    path: "*",
+    element: <MainLayout />,
+    children: [
+      { path: "*", element: <NotFoundPage /> }
+    ]
+  }
+];
+
+export default routes; 

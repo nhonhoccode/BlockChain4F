@@ -1,0 +1,79 @@
+@import '../../../../assets/styles/_variables.scss';
+@import '../../../../assets/styles/mixins.scss';
+
+.officerManagement {
+  width: 100%;
+  margin-bottom: 2rem;
+  
+  .tableContainer {
+    overflow: hidden;
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-1);
+    
+    // Header của bảng
+    th {
+      background-color: var(--color-primary-50);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary-700);
+      white-space: nowrap;
+    }
+    
+    // Hàng trong bảng
+    tr {
+      &:hover {
+        background-color: var(--color-primary-50);
+        cursor: pointer;
+      }
+    }
+    
+    // Cell trong bảng
+    td, th {
+      padding: 0.75rem 1rem;
+      font-size: var(--font-size-sm);
+      
+      &:first-child {
+        padding-left: 1.5rem;
+      }
+      
+      &:last-child {
+        padding-right: 1.5rem;
+      }
+    }
+    
+    // Cell chứa các action button
+    td:last-child {
+      width: 160px;
+    }
+  }
+  
+  // Style cho phân trang
+  :global(.MuiTablePagination-root) {
+    border-top: 1px solid var(--color-grey-200);
+    
+    :global(.MuiTablePagination-selectLabel),
+    :global(.MuiTablePagination-displayedRows) {
+      margin: 0;
+    }
+  }
+}
+
+// Responsive styling
+@media (max-width: 768px) {
+  .officerManagement {
+    .tableContainer {
+      overflow-x: auto;
+      
+      td, th {
+        padding: 0.5rem;
+        
+        &:first-child {
+          padding-left: 0.75rem;
+        }
+        
+        &:last-child {
+          padding-right: 0.75rem;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+.notFound {
+  &__paper {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  &__iconContainer {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__icon {
+    font-size: 80px;
+    color: #f44336;
+    animation: pulse 1.5s infinite;
+  }
+
+  &__title {
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #333;
+  }
+
+  &__message {
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto 24px;
+  }
+
+  &__actions {
+    margin-top: 32px;
+  }
+
+  &__homeButton {
+    padding: 12px 24px;
+    font-weight: 600;
+    
+    &:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s;
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+} 

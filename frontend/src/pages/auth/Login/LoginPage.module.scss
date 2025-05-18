@@ -1,0 +1,231 @@
+@import '../../../assets/styles/_variables.scss';
+@import '../../../assets/styles/mixins.scss';
+
+.container {
+  padding-top: 48px;
+  padding-bottom: 48px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.paperContainer {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.logoIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #1976d2;
+}
+
+.pageTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.pageSubtitle {
+  color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.tabsContainer {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.roleHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  .roleIconContainer {
+    padding: 8px;
+    background-color: #1976d2;
+    border-radius: 50%;
+    color: white;
+    margin-right: 16px;
+    
+    &.officer {
+      background-color: #4caf50;
+    }
+    
+    &.chairman {
+      background-color: #9c27b0;
+    }
+  }
+  
+  .roleTitle {
+    font-weight: 600;
+  }
+}
+
+.loginContainer {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.loginPaper {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.logoSection {
+  margin-bottom: 2rem;
+}
+
+.loginForm {
+  margin-top: 1.5rem;
+}
+
+.roleSelect {
+  margin-bottom: 0.5rem;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+}
+
+.textField, .passwordField {
+  margin-bottom: 1rem;
+  
+  input {
+    padding: 0.75rem 0.5rem 0.75rem 0.5rem;
+  }
+  
+  &:focus-within {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: $primary-color;
+    }
+  }
+}
+
+.chairmanAlert {
+  background-color: rgba($info-color, 0.08);
+  border-radius: $border-radius;
+  
+  &:hover {
+    background-color: rgba($info-color, 0.12);
+  }
+}
+
+.loginButton {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background-color: $primary-color;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%);
+    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.forgotPasswordLink, .registerLink {
+  color: $primary-color;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: darken($primary-color, 15%);
+    text-decoration: underline;
+  }
+}
+
+.demoButton {
+  border-color: $primary-color;
+  color: $primary-color;
+  
+  &:hover {
+    background-color: rgba($primary-color, 0.08);
+    border-color: darken($primary-color, 10%);
+  }
+}
+
+.demoCredentials {
+  margin-top: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  
+  .demoTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .demoGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .demoRoleTitle {
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+  
+  .demoCredentialLine {
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 2px;
+  }
+}
+
+.divider {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.homeButton {
+  margin-top: 8px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .loginContainer {
+    padding: 1rem;
+  }
+  
+  .loginButton {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+  }
+  
+  .paperContainer {
+    padding: 24px 16px;
+  }
+  
+  .rememberAndForgot {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .forgotPassword {
+      margin-top: 8px;
+    }
+  }
+}

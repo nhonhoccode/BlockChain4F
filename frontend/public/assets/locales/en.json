@@ -1,0 +1,95 @@
+{
+  "app": {
+    "name": "Commune Administrative Management",
+    "description": "Web application for commune administrative management based on Blockchain model"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "confirmDelete": "Are you sure you want to delete?",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "invalidPhone": "Invalid phone number",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequirements": "Password must be at least 8 characters and include uppercase, lowercase, and numbers"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "newPassword": "New Password",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginNow": "Login Now",
+    "registerNow": "Register Now",
+    "rememberMe": "Remember Me",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phoneNumber": "Phone Number",
+    "address": "Address",
+    "citizenID": "Citizen ID",
+    "dateOfBirth": "Date of Birth",
+    "role": {
+      "citizen": "Citizen",
+      "officer": "Commune Officer",
+      "chairman": "Commune Chairman"
+    }
+  },
+  "citizen": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "requests": "Requests",
+    "newRequest": "New Request",
+    "myRequests": "My Requests",
+    "documents": "Documents",
+    "feedback": "Feedback",
+    "notifications": "Notifications"
+  },
+  "officer": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "requestManagement": "Request Management",
+    "pendingRequests": "Pending Requests",
+    "processedRequests": "Processed Requests",
+    "citizenManagement": "Citizen Management",
+    "approvalStatus": "Approval Status",
+    "statistics": "Statistics"
+  },
+  "chairman": {
+    "dashboard": "Dashboard",
+    "officerApproval": "Officer Approval",
+    "pendingApprovals": "Pending Approvals",
+    "approvedOfficers": "Approved Officers",
+    "officerManagement": "Officer Management",
+    "importantDocuments": "Important Documents",
+    "reports": "Reports"
+  },
+  "public": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "documentVerify": "Document Verification"
+  }
+} 
