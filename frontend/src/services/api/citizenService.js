@@ -1,155 +1,206 @@
-import { API_ENDPOINTS, get, post, put } from '../../utils/api';
+import axios from 'axios';
 
-// API service cho công dân - không sử dụng mockdata
+// API base URL - có thể cấu hình dựa trên môi trường
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+
+// Tạo instance axios với cấu hình mặc định
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000, // 10 giây timeout
+});
+
+// Thêm interceptor cho request để thêm token xác thực
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Thêm interceptor cho response để xử lý lỗi thông dụng
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Xử lý các lỗi phổ biến (401, 403, 500, v.v.)
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Không được phép - chuyển hướng tới trang đăng nhập
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * Service cho API của công dân
+ */
 const citizenService = {
   /**
-   * Lấy dữ liệu dashboard của công dân
-   * @returns {Promise<Object>} Dữ liệu dashboard
+   * Lấy thống kê dashboard cho công dân
+   * @returns {Promise} Promise với dữ liệu thống kê dashboard
    */
-  getDashboardData: async () => {
-    try {
-      // Call real API
-      const response = await get(API_ENDPOINTS.CITIZEN.DASHBOARD);
-      console.log('Dashboard data from API:', response);
-      return response;
-    } catch (error) {
-      console.error('Error fetching citizen dashboard data:', error);
-      throw error; // Re-throw error to be handled by component
-    }
+  getDashboardStats: async () => {
+    const response = await apiClient.get('/citizen/dashboard/stats/');
+    return response.data;
   },
-  
+
   /**
-   * Lấy danh sách yêu cầu của công dân
-   * @param {Object} filters - Optional filter parameters
-   * @returns {Promise<Array>} Danh sách yêu cầu
-   */
-  getRequests: async (filters = {}) => {
-    try {
-      // Call real API
-      const response = await get(API_ENDPOINTS.CITIZEN.REQUESTS, filters);
-      return response;
-    } catch (error) {
-      console.error('Error fetching citizen requests:', error);
-      throw error; // Re-throw error to be handled by component
-    }
-  },
-  
-  /**
-   * Lấy chi tiết yêu cầu theo ID
-   * @param {string} requestId - ID của yêu cầu
-   * @returns {Promise<Object>} Thông tin chi tiết yêu cầu
-   */
-  getRequestDetail: async (requestId) => {
-    try {
-      const response = await get(API_ENDPOINTS.CITIZEN.REQUEST_DETAIL(requestId));
-      return response;
-    } catch (error) {
-      console.error(`Error fetching request detail for ID ${requestId}:`, error);
-      throw error; // Re-throw error to be handled by component
-    }
-  },
-  
-  /**
-   * Tạo yêu cầu mới
-   * @param {Object} requestData - Dữ liệu yêu cầu
-   * @returns {Promise<Object>} Kết quả tạo yêu cầu
-   */
-  createRequest: async (requestData) => {
-    try {
-      const response = await post(API_ENDPOINTS.CITIZEN.REQUESTS, requestData);
-      return response;
-    } catch (error) {
-      console.error('Error creating request:', error);
-      throw error;
-    }
-  },
-  
-  /**
-   * Hủy yêu cầu
-   * @param {string} requestId - ID của yêu cầu
-   * @returns {Promise<Object>} Kết quả hủy yêu cầu
-   */
-  cancelRequest: async (requestId) => {
-    try {
-      const response = await post(API_ENDPOINTS.CITIZEN.CANCEL_REQUEST(requestId));
-      return response;
-    } catch (error) {
-      console.error(`Error canceling request ID ${requestId}:`, error);
-      throw error;
-    }
-  },
-  
-  /**
-   * Lấy danh sách giấy tờ đã cấp
-   * @returns {Promise<Array>} Danh sách giấy tờ
-   */
-  getDocuments: async () => {
-    try {
-      const response = await get(API_ENDPOINTS.CITIZEN.DOCUMENTS);
-      return response;
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-      throw error; // Re-throw error to be handled by component
-    }
-  },
-  
-  /**
-   * Lấy chi tiết giấy tờ theo ID
-   * @param {string} documentId - ID của giấy tờ
-   * @returns {Promise<Object>} Thông tin chi tiết giấy tờ
-   */
-  getDocumentDetail: async (documentId) => {
-    try {
-      const response = await get(API_ENDPOINTS.CITIZEN.DOCUMENT_DETAIL(documentId));
-      return response;
-    } catch (error) {
-      console.error(`Error fetching document detail for ID ${documentId}:`, error);
-      throw error; // Re-throw error to be handled by component
-    }
-  },
-  
-  /**
-   * Lấy thông tin cá nhân của người dân
-   * @returns {Promise<Object>} Thông tin cá nhân
+   * Lấy thông tin hồ sơ công dân
+   * @returns {Promise} Promise với dữ liệu hồ sơ công dân
    */
   getProfile: async () => {
-    try {
-      const response = await get(API_ENDPOINTS.CITIZEN.PROFILE);
-      return response;
-    } catch (error) {
-      console.error('Error fetching citizen profile:', error);
-      throw error;
-    }
+    const response = await apiClient.get('/auth/user/');
+    return response.data;
   },
-  
+
   /**
-   * Cập nhật thông tin cá nhân
-   * @param {Object} profileData - Dữ liệu cá nhân
-   * @returns {Promise<Object>} Thông tin cá nhân đã cập nhật
+   * Cập nhật hồ sơ công dân
+   * @param {Object} profileData - Dữ liệu hồ sơ cần cập nhật
+   * @returns {Promise} Promise với dữ liệu hồ sơ đã cập nhật
    */
   updateProfile: async (profileData) => {
-    try {
-      const response = await put(API_ENDPOINTS.CITIZEN.PROFILE, profileData);
-      return response;
-    } catch (error) {
-      console.error('Error updating citizen profile:', error);
-      throw error;
+    const response = await apiClient.patch('/auth/user/', profileData);
+    return response.data;
+  },
+
+  /**
+   * Lấy yêu cầu của công dân với bộ lọc và phân trang
+   * @param {Object} options - Các tùy chọn như page, limit, search, status, sort, order
+   * @returns {Promise} Promise với danh sách yêu cầu đã phân trang
+   */
+  getRequests: async (options = {}) => {
+    const { page = 1, limit = 10, search = '', status, sort = 'requestDate', order = 'desc' } = options;
+    
+    // Convert to params object for API request
+    const params = {
+      page: page,
+      limit: limit,
+      search: search,
+      ordering: `${order === 'desc' ? '-' : ''}${sort}`
+    };
+    
+    // Add status filter if provided
+    if (status && status !== 'all') {
+      params.status = status;
     }
+    
+    try {
+      const response = await apiClient.get('/citizen/requests/', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+      // Return empty data structure to prevent UI errors
+      return {
+        results: [],
+        count: 0,
+        stats: {
+          all: 0,
+          pending: 0,
+          processing: 0,
+          completed: 0,
+          rejected: 0
+        }
+      };
+    }
+  },
+
+  /**
+   * Lấy chi tiết một yêu cầu cụ thể
+   * @param {string} requestId - ID của yêu cầu
+   * @returns {Promise} Promise với chi tiết yêu cầu
+   */
+  getRequestDetails: async (requestId) => {
+    const response = await apiClient.get(`/citizen/requests/${requestId}/`);
+    return response.data;
+  },
+
+  /**
+   * Tạo một yêu cầu mới
+   * @param {Object} requestData - Dữ liệu yêu cầu
+   * @returns {Promise} Promise với yêu cầu đã tạo
+   */
+  createRequest: async (requestData) => {
+    const response = await apiClient.post('/citizen/requests/', requestData);
+    return response.data;
+  },
+
+  /**
+   * Hủy một yêu cầu
+   * @param {string} requestId - ID của yêu cầu cần hủy
+   * @returns {Promise} Promise với yêu cầu đã cập nhật
+   */
+  cancelRequest: async (requestId) => {
+    const response = await apiClient.post(`/citizen/requests/${requestId}/cancel/`);
+    return response.data;
+  },
+
+  /**
+   * Lấy danh sách giấy tờ của công dân
+   * @param {number} page - Số trang (bắt đầu từ 1)
+   * @param {Object} filters - Các bộ lọc
+   * @param {Object} sort - Tùy chọn sắp xếp
+   * @returns {Promise} Promise với danh sách giấy tờ đã phân trang
+   */
+  getDocuments: async (page = 1, filters = {}, sort = {}) => {
+    const params = {
+      page,
+      ...filters,
+      ordering: sort.field ? `${sort.direction === 'desc' ? '-' : ''}${sort.field}` : '-created_at'
+    };
+    
+    const response = await apiClient.get('/citizen/documents/', { params });
+    return response.data;
+  },
+
+  /**
+   * Lấy chi tiết một giấy tờ
+   * @param {string} documentId - ID của giấy tờ
+   * @returns {Promise} Promise với chi tiết giấy tờ
+   */
+  getDocumentDetails: async (documentId) => {
+    const response = await apiClient.get(`/citizen/documents/${documentId}/`);
+    return response.data;
   },
   
   /**
-   * Gửi phản hồi 
+   * Tải xuống giấy tờ
+   * @param {string} documentId - ID của giấy tờ
+   * @returns {Promise} Promise với blob dữ liệu giấy tờ
+   */
+  downloadDocument: async (documentId) => {
+    const response = await apiClient.get(`/citizen/documents/${documentId}/download/`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
+  
+  /**
+   * Xác thực giấy tờ trên blockchain
+   * @param {string} documentId - ID của giấy tờ
+   * @returns {Promise} Promise với thông tin xác thực
+   */
+  verifyDocument: async (documentId) => {
+    const response = await apiClient.get(`/citizen/documents/${documentId}/verify/`);
+    return response.data;
+  },
+
+  /**
+   * Gửi phản hồi
    * @param {Object} feedbackData - Dữ liệu phản hồi
-   * @returns {Promise<Object>} Kết quả gửi phản hồi
+   * @returns {Promise} Promise với xác nhận phản hồi
    */
   submitFeedback: async (feedbackData) => {
-    try {
-      const response = await post(API_ENDPOINTS.CITIZEN.FEEDBACK, feedbackData);
-      return response;
-    } catch (error) {
-      console.error('Error submitting feedback:', error);
-      throw error;
-    }
+    const response = await apiClient.post('/citizen/feedback/', feedbackData);
+    return response.data;
   }
 };
 

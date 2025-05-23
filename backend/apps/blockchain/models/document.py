@@ -32,10 +32,10 @@ class Document(models.Model):
     document_number = models.CharField(_('Số giấy tờ'), max_length=50, blank=True, null=True)
     content = models.TextField(_('Nội dung'), blank=True, null=True)
     
-    issued_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents', verbose_name=_('Công dân'))
+    issued_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blockchain_documents', verbose_name=_('Công dân'))
     issued_by = models.CharField(_('Cơ quan cấp'), max_length=255, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_documents', verbose_name=_('Người tạo'))
-    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_documents', verbose_name=_('Người phê duyệt'))
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='blockchain_approved_documents', verbose_name=_('Người phê duyệt'))
     
     issue_date = models.DateField(_('Ngày cấp'), blank=True, null=True)
     expiry_date = models.DateField(_('Ngày hết hạn'), blank=True, null=True)

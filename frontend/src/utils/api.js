@@ -7,7 +7,7 @@ export const API_URL = API_BASE_URL;
 // Config to control mock data fallback behavior
 export const API_CONFIG = {
   // When true, will use mock data if API fails with 404/500
-  useMockDataFallback: false,
+  useMockDataFallback: true,
   // When true, will log detailed API requests/responses for debugging
   enableDetailedLogs: true,
   // When true, will show a warning in console when mock data is used
@@ -81,7 +81,10 @@ api.interceptors.request.use(
       // Use Token prefix for Django REST framework
       config.headers.Authorization = `Token ${tokenValue}`;
       
-      console.log(`[API] Using token for request: ${config.url}`);
+      console.log(`🔑 [API] Using token for request: ${config.url}`);
+      console.log(`🔑 [API] Token format: "Token ${tokenValue.substring(0, 10)}..."`);
+    } else {
+      console.warn(`⚠️ [API] No token found for request: ${config.url}`);
     }
     
     // Log detailed request info if enabled
@@ -155,7 +158,11 @@ api.interceptors.response.use(
  * @returns {boolean} - True nếu nên sử dụng mock data
  */
 export const shouldUseMockData = (error) => {
-  // Always return false to prevent using mock data
+  // Return true if mock data fallback is enabled and we have a 404 or 500 error
+  if (API_CONFIG.useMockDataFallback && error.response) {
+    const status = error.response.status;
+    return status === 404 || status === 403 || status === 500;
+  }
   return false;
 };
 

@@ -1,19 +1,29 @@
+# Node.js (React)
 **/node_modules/
+**/build/
+**/dist/
+**/.env.local
+**/.env.development
+**/.env.production
+/node_modules/
+# Django / Python
 **/__pycache__/
+**/*.py[cod]
+**/db.sqlite3
+**/media/
+**/staticfiles/
 **/venv/
 **/.env
+**/.vscode/
+**/.idea/
+**/migrations/
+
+# macOS
 **/.DS_Store
 
-# React
-node_modules/
-build/
-.env
-*.log
+# Logs
+**/*.log
 
-# Django
-__pycache__/
-*.pyc
-*.sqlite3
-media/
-env/
-*.env
+# System
+*.swp
+*.swo

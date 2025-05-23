@@ -3,54 +3,50 @@ from rest_framework import permissions
 
 class IsChairman(permissions.BasePermission):
     """
-    Permission check for chairman role or admin (is_staff)
+    Permission to allow only chairmen to access a view
     """
-    message = "Only chairman or admin can perform this action."
-    
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (request.user.is_chairman or request.user.is_staff)
+        return request.user and request.user.is_authenticated and request.user.role == 'chairman'
 
 
 class IsOfficer(permissions.BasePermission):
     """
-    Permission check for officer role.
+    Permission to allow only officers to access a view
     """
-    message = "Only officers can perform this action."
-    
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.is_officer
+        return request.user and request.user.is_authenticated and request.user.role == 'officer'
 
 
 class IsCitizen(permissions.BasePermission):
     """
-    Permission check for citizen role.
+    Permission to allow only citizens to access a view
     """
-    message = "Only citizens can perform this action."
-    
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.is_citizen
+        return request.user and request.user.is_authenticated and request.user.role == 'citizen'
 
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     """
-    Permission check for object ownership.
-    The user must be the owner of the object or an admin.
+    Permission to allow owners or admins to access an object
     """
-    message = "You must be the owner of this object or an admin."
-    
     def has_object_permission(self, request, view, obj):
-        # Check if user is admin, chairman, or the owner
-        if request.user.is_staff or request.user.is_chairman:
+        # Check if user is admin
+        if request.user.is_staff or request.user.is_superuser:
             return True
-        
-        # Check if the object has a 'user' attribute (owner)
+            
+        # Check if object has a user or owner field
         if hasattr(obj, 'user'):
             return obj.user == request.user
-        
-        # Check if the object is the user
-        if hasattr(obj, 'id') and request.user.id == obj.id:
-            return True
-        
+        elif hasattr(obj, 'owner'):
+            return obj.owner == request.user
+        elif hasattr(obj, 'citizen'):
+            return obj.citizen == request.user
+        elif hasattr(obj, 'requestor'):
+            return obj.requestor == request.user
+        elif hasattr(obj, 'submitter'):
+            return obj.submitter == request.user
+            
+        # Default deny if no ownership field found
         return False
 
 

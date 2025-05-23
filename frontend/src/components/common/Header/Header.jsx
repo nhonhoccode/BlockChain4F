@@ -38,7 +38,8 @@ import {
   Event as EventIcon,
   Home as HomeIcon,
   Ballot as BallotIcon,
-  List as ListIcon
+  List as ListIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import styles from './Header.module.scss';
 import authService from '../../../services/api/authService';
@@ -155,11 +156,11 @@ const Header = ({ toggleSidebar, toggleTheme, isDarkMode }) => {
     
     switch (userRole) {
       case 'citizen':
-        return '/citizen/dashboard';
+        return '/citizen';
       case 'officer':
-        return '/officer/dashboard';
+        return '/officer';
       case 'chairman':
-        return '/chairman/dashboard';
+        return 'admin/chairman';
       default:
         return '/';
     }
@@ -470,7 +471,7 @@ const Header = ({ toggleSidebar, toggleTheme, isDarkMode }) => {
                     >
                       <Avatar 
                         alt={userInfo?.name || 'User'} 
-                        src="/images/avatars/default_avatar.jpg"
+                        src="../../../../public/images/avatar/citizen.png"
                         className={styles.avatar}
                         sx={{ 
                           width: 38, 
@@ -650,7 +651,39 @@ const Header = ({ toggleSidebar, toggleTheme, isDarkMode }) => {
                 }} />
               </ListItemIcon>
               <ListItemText 
-                primary="Giấy tờ đã được cấp" 
+                primary="Giấy tờ của tôi" 
+                primaryTypographyProps={{ sx: { letterSpacing: '0.3px', fontWeight: 500 } }}
+              />
+            </MenuItem>
+            
+            <Divider sx={{ my: 1 }} />
+            
+            <MenuItem 
+              component={RouterLink} 
+              to="/procedures" 
+              onClick={handleCloseServicesMenu}
+              className={styles.menuItem}
+              sx={{ 
+                borderRadius: 1, 
+                my: 0.5, 
+                px: 2,
+                py: 1.2,
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.08)'
+                }
+              }}
+            >
+              <ListItemIcon>
+                <AssignmentIcon fontSize="small" className={styles.menuItemIcon} sx={{ 
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  minWidth: '36px',
+                  '&:hover': {
+                    color: '#1976d2'
+                  }
+                }} />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Thủ tục hành chính" 
                 primaryTypographyProps={{ sx: { letterSpacing: '0.3px', fontWeight: 500 } }}
               />
             </MenuItem>

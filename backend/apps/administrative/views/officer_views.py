@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count
 from django.utils import timezone
 
-from ..models import Request, Document, Attachment, DocumentType, Approval
+from ..models import AdminRequest, Document, Attachment, DocumentType, Approval
 from ..serializers import (
     RequestListSerializer, RequestDetailSerializer, OfficerRequestUpdateSerializer,
     DocumentSerializer, DocumentListSerializer, DocumentDetailSerializer,
@@ -33,17 +33,17 @@ class OfficerRequestListView(generics.ListAPIView):
         # Lọc theo loại yêu cầu
         if request_type == 'assigned':
             # Các yêu cầu đã được giao cho cán bộ này
-            queryset = Request.objects.filter(assigned_officer=user)
+            queryset = AdminRequest.objects.filter(assigned_officer=user)
         elif request_type == 'pending':
             # Các yêu cầu chưa được giao cho ai và ở trạng thái submitted
-            queryset = Request.objects.filter(assigned_officer__isnull=True, status='submitted')
+            queryset = AdminRequest.objects.filter(assigned_officer__isnull=True, status='submitted')
         elif request_type == 'all':
             # Tất cả yêu cầu cán bộ xã có thể xem
-            queryset = Request.objects.filter(
+            queryset = AdminRequest.objects.filter(
                 Q(assigned_officer=user) | Q(assigned_officer__isnull=True)
             )
         else:
-            queryset = Request.objects.filter(assigned_officer=user)
+            queryset = AdminRequest.objects.filter(assigned_officer=user)
         
         # Lọc theo trạng thái
         status_param = self.request.query_params.get('status')
@@ -74,7 +74,7 @@ class OfficerRequestDetailView(generics.RetrieveAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        return Request.objects.filter(
+        return AdminRequest.objects.filter(
             Q(assigned_officer=user) | Q(assigned_officer__isnull=True)
         )
 
@@ -86,7 +86,7 @@ class OfficerRequestUpdateView(generics.UpdateAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        return Request.objects.filter(
+        return AdminRequest.objects.filter(
             Q(assigned_officer=user) | Q(assigned_officer__isnull=True)
         )
 
@@ -150,7 +150,7 @@ class OfficerDocumentListView(generics.ListAPIView):
 def update_request_status(request, pk):
     """API cập nhật trạng thái yêu cầu"""
     req_obj = get_object_or_404(
-        Request,
+        AdminRequest,
         Q(assigned_officer=request.user) | Q(assigned_officer__isnull=True),
         pk=pk
     )
@@ -172,7 +172,7 @@ def update_request_status(request, pk):
 @permission_classes([IsAuthenticated, IsOfficer])
 def assign_self_to_request(request, pk):
     """API cán bộ xã tự gán mình vào xử lý yêu cầu"""
-    req_obj = get_object_or_404(Request, pk=pk, assigned_officer__isnull=True)
+    req_obj = get_object_or_404(AdminRequest, pk=pk, assigned_officer__isnull=True)
     
     # Tự gán cán bộ xã hiện tại vào yêu cầu
     req_obj.assigned_officer = request.user
@@ -212,33 +212,33 @@ def request_statistics(request):
     user = request.user
     
     # Đếm số lượng yêu cầu theo trạng thái
-    assigned_stats = Request.objects.filter(assigned_officer=user) \
+    assigned_stats = AdminRequest.objects.filter(assigned_officer=user) \
         .values('status') \
         .annotate(count=Count('status')) \
         .order_by('status')
     
     # Đếm số lượng yêu cầu chưa được gán
-    unassigned_count = Request.objects.filter(
+    unassigned_count = AdminRequest.objects.filter(
         assigned_officer__isnull=True, 
         status='submitted'
     ).count()
     
     # Đếm số lượng yêu cầu quá hạn
     today = timezone.now().date()
-    overdue_count = Request.objects.filter(
+    overdue_count = AdminRequest.objects.filter(
         assigned_officer=user,
         due_date__lt=today,
         status__in=['submitted', 'in_review', 'approved', 'processing']
     ).count()
     
     # Tổng số yêu cầu đã hoàn thành
-    completed_count = Request.objects.filter(
+    completed_count = AdminRequest.objects.filter(
         assigned_officer=user,
         status='completed'
     ).count()
     
     # Thống kê theo loại giấy tờ
-    document_type_stats = Request.objects.filter(assigned_officer=user) \
+    document_type_stats = AdminRequest.objects.filter(assigned_officer=user) \
         .values('document_type__name') \
         .annotate(count=Count('document_type')) \
         .order_by('-count')

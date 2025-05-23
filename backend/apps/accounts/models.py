@@ -35,12 +35,19 @@ class Profile(models.Model):
     Model hồ sơ người dùng mở rộng từ User model mặc định
     Chứa thông tin chi tiết về người dùng
     """
+    GENDER_CHOICES = (
+        ('male', 'Nam'),
+        ('female', 'Nữ'),
+        ('other', 'Khác'),
+    )
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name='profiles')
     
     # Thông tin cá nhân
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='male', blank=True, null=True, verbose_name="Giới tính")
     id_number = models.CharField(max_length=20, blank=True, null=True, unique=True, verbose_name="Số CMND/CCCD")
     id_issue_date = models.DateField(blank=True, null=True, verbose_name="Ngày cấp")
     id_issue_place = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nơi cấp")

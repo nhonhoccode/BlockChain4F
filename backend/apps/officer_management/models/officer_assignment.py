@@ -48,7 +48,7 @@ class OfficerAssignment(models.Model):
     
     # Liên kết đến các công việc khác
     parent_assignment = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='subtasks', verbose_name="Nhiệm vụ cha")
-    related_request = models.ForeignKey('administrative.Request', on_delete=models.SET_NULL, null=True, blank=True, related_name='officer_assignments', verbose_name="Yêu cầu liên quan")
+    related_request = models.ForeignKey('administrative.AdminRequest', on_delete=models.SET_NULL, null=True, blank=True, related_name='officer_assignments', verbose_name="Yêu cầu liên quan")
     
     # Dấu thời gian
     updated_at = models.DateTimeField(auto_now=True)

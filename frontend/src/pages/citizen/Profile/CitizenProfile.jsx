@@ -24,28 +24,14 @@ import {
   Phone as PhoneIcon,
   Email as EmailIcon,
   Home as HomeIcon,
-  VerifiedUser as VerifiedUserIcon,
-  Security as SecurityIcon
+  VerifiedUser as VerifiedIcon,
+  Security as SecurityIcon,
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../../contexts/AuthContext';
-import { api } from '../../../utils/api';
-
-// Dữ liệu mẫu
-const FALLBACK_DATA = {
-  id: 'citizen-123',
-  firstName: 'Nguyễn',
-  lastName: 'Văn A',
-  email: 'nguyenvana@example.com',
-  phone: '0912345678',
-  address: 'Số 123, Đường Lê Lợi, Quận Hoàn Kiếm, Hà Nội',
-  identityNumber: '001099012345',
-  dateOfBirth: '1990-01-15',
-  gender: 'Nam',
-  nationality: 'Việt Nam',
-  isVerified: true,
-  createdAt: '2022-05-10T08:30:00Z',
-  updatedAt: '2023-01-20T15:45:00Z'
-};
+import { get, put } from '../../../utils/api';
+import { useLocation, useNavigate } from 'react-router-dom';
+import officerService from '../../../services/api/officerService';
 
 const CitizenProfile = () => {
   const theme = useTheme();
@@ -63,63 +49,66 @@ const CitizenProfile = () => {
     phone: '',
     address: ''
   });
-
+  
+  // Get citizenId from URL query parameters
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const citizenId = queryParams.get('id');
+  const isViewingOtherCitizen = !!citizenId;
+  
   // Fetch profile data
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await api.get('/api/v1/citizen/profile/');
+        setLoading(true);
+        setError(null);
+        console.log('🔍 Fetching profile data from API...');
         
-        if (response.data) {
-          setProfileData(response.data);
+        let response;
+        
+        if (isViewingOtherCitizen) {
+          // If viewing another citizen's profile as an officer
+          console.log(`Fetching citizen profile with ID: ${citizenId}`);
+          response = await officerService.getCitizenDetail(citizenId);
+        } else {
+          // If viewing own profile as a citizen
+          response = await get('/api/v1/citizen/profile/');
+        }
+        
+        console.log('✅ Profile data received:', response);
+        
+        if (response) {
+          // Handle different response formats
+          const data = response.data || response;
+          
+          setProfileData(data);
           setFormData({
-            firstName: response.data.firstName || '',
-            lastName: response.data.lastName || '',
-            email: response.data.email || '',
-            phone: response.data.phone || '',
-            address: response.data.address || ''
+            firstName: data.first_name || data.firstName || '',
+            lastName: data.last_name || data.lastName || '',
+            email: data.email || (data.user_details ? data.user_details.email : '') || '',
+            phone: data.phone_number || data.phone || '',
+            address: data.address || ''
           });
         } else {
           throw new Error('Invalid data format');
         }
       } catch (err) {
-        console.error('Error fetching profile data:', err);
-        setError('Không thể kết nối đến máy chủ. Đang hiển thị dữ liệu mẫu.');
-        
-        // Use fallback data
-        setProfileData(FALLBACK_DATA);
-        setFormData({
-          firstName: FALLBACK_DATA.firstName || '',
-          lastName: FALLBACK_DATA.lastName || '',
-          email: FALLBACK_DATA.email || '',
-          phone: FALLBACK_DATA.phone || '',
-          address: FALLBACK_DATA.address || ''
-        });
+        console.error('❌ Error fetching profile data:', err);
+        if (err.response?.status === 401) {
+          setError('Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        } else if (err.response?.status === 404) {
+          setError('Không tìm thấy thông tin cá nhân. API endpoint không tồn tại.');
+        } else {
+          setError(`Không thể tải thông tin cá nhân: ${err.message || 'Lỗi không xác định'}`);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    // Set timeout to use fallback data if API takes too long
-    const timeoutId = setTimeout(() => {
-      if (loading) {
-        setProfileData(FALLBACK_DATA);
-        setFormData({
-          firstName: FALLBACK_DATA.firstName || '',
-          lastName: FALLBACK_DATA.lastName || '',
-          email: FALLBACK_DATA.email || '',
-          phone: FALLBACK_DATA.phone || '',
-          address: FALLBACK_DATA.address || ''
-        });
-        setLoading(false);
-        setError('Tải dữ liệu quá thời gian. Đang hiển thị dữ liệu mẫu.');
-      }
-    }, 3000);
-
     fetchProfileData();
-    
-    return () => clearTimeout(timeoutId);
-  }, []);
+  }, [citizenId, isViewingOtherCitizen]);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -137,9 +126,9 @@ const CitizenProfile = () => {
     setError(null);
     
     try {
-      const response = await api.put('/api/v1/citizen/profile/', formData);
+      const response = await put('/api/v1/citizen/profile/', formData);
       
-      if (response.data) {
+      if (response) {
         setProfileData({
           ...profileData,
           ...formData,
@@ -162,10 +151,10 @@ const CitizenProfile = () => {
       
       // Revert form data to current profile data
       setFormData({
-        firstName: profileData.firstName || '',
-        lastName: profileData.lastName || '',
-        email: profileData.email || '',
-        phone: profileData.phone || '',
+        firstName: profileData.firstName || profileData.first_name || '',
+        lastName: profileData.lastName || profileData.last_name || '',
+        email: profileData.email || (profileData.user_details ? profileData.user_details.email : '') || '',
+        phone: profileData.phone || profileData.phone_number || '',
         address: profileData.address || ''
       });
     } finally {
@@ -175,14 +164,21 @@ const CitizenProfile = () => {
 
   // Cancel edit mode
   const handleCancel = () => {
-    setFormData({
-      firstName: profileData.firstName || '',
-      lastName: profileData.lastName || '',
-      email: profileData.email || '',
-      phone: profileData.phone || '',
-      address: profileData.address || ''
-    });
+    if (profileData) {
+      setFormData({
+        firstName: profileData.firstName || profileData.first_name || '',
+        lastName: profileData.lastName || profileData.last_name || '',
+        email: profileData.email || (profileData.user_details ? profileData.user_details.email : '') || '',
+        phone: profileData.phone || profileData.phone_number || '',
+        address: profileData.address || ''
+      });
+    }
     setEditMode(false);
+  };
+  
+  // Handle back button
+  const handleBack = () => {
+    navigate(-1);
   };
 
   // Format date helper
@@ -190,12 +186,16 @@ const CitizenProfile = () => {
     if (!dateString) return 'Không xác định';
     try {
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Không xác định';
+      }
       return new Intl.DateTimeFormat('vi-VN', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
       }).format(date);
     } catch (error) {
+      console.error('Date formatting error:', error);
       return 'Không xác định';
     }
   };
@@ -208,14 +208,58 @@ const CitizenProfile = () => {
     );
   }
 
+  // Verificar se profileData existe antes de renderizar o componente
+  if (!profileData) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">
+          Không thể tải thông tin cá nhân. Vui lòng thử lại sau.
+        </Alert>
+      </Box>
+    );
+  }
+
+  // Get name from different possible formats
+  const firstName = profileData.firstName || profileData.first_name || '';
+  const lastName = profileData.lastName || profileData.last_name || '';
+  const fullName = `${firstName} ${lastName}`;
+  
+  // Get other fields from different possible formats
+  const email = profileData.email || (profileData.user_details ? profileData.user_details.email : '') || '';
+  const phone = profileData.phone || profileData.phone_number || '';
+  const address = profileData.address || '';
+  const gender = profileData.gender || '';
+  const dateOfBirth = profileData.dateOfBirth || profileData.date_of_birth || '';
+  const idCardNumber = profileData.identityNumber || profileData.id_card_number || '';
+  const idCardIssueDate = profileData.id_card_issue_date || '';
+  const idCardIssuePlace = profileData.id_card_issue_place || '';
+  const createdAt = profileData.createdAt || profileData.created_at || '';
+  const updatedAt = profileData.updatedAt || profileData.updated_at || '';
+  const isVerified = profileData.isVerified || false;
+  const ward = profileData.ward || '';
+  const district = profileData.district || '';
+  const province = profileData.province || profileData.city || '';
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Tiêu đề trang */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-          Thông tin cá nhân
-        </Typography>
-        {!editMode && (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {isViewingOtherCitizen && (
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBackIcon />}
+              onClick={handleBack}
+              sx={{ mr: 2 }}
+            >
+              Quay lại
+            </Button>
+          )}
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+            {isViewingOtherCitizen ? `Hồ sơ: ${fullName}` : 'Thông tin cá nhân'}
+          </Typography>
+        </Box>
+        {!editMode && profileData && !isViewingOtherCitizen && (
           <Button
             variant="contained"
             color="primary"
@@ -262,23 +306,23 @@ const CitizenProfile = () => {
               color: theme.palette.primary.main
             }}
           >
-            {profileData.firstName?.charAt(0) || 'C'}
+            {firstName ? firstName.charAt(0) : 'C'}
           </Avatar>
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-              {`${profileData.firstName || ''} ${profileData.lastName || ''}`}
+              {fullName}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
               <Chip
-                icon={<VerifiedUserIcon />}
-                label={profileData.isVerified ? 'Đã xác thực' : 'Chưa xác thực'}
-                color={profileData.isVerified ? 'success' : 'warning'}
+                icon={<VerifiedIcon />}
+                label={isVerified ? 'Đã xác thực' : 'Chưa xác thực'}
+                color={isVerified ? 'success' : 'warning'}
                 size="small"
                 sx={{ mr: 1, color: 'white', borderColor: 'white' }}
                 variant="outlined"
               />
               <Typography variant="body2">
-                ID: {profileData.id}
+                ID: {profileData.id || 'N/A'}
               </Typography>
             </Box>
           </Box>
@@ -378,15 +422,15 @@ const CitizenProfile = () => {
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Họ và tên</Typography>
-                        <Typography variant="body1">{`${profileData.firstName || ''} ${profileData.lastName || ''}`}</Typography>
+                        <Typography variant="body1">{fullName}</Typography>
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Ngày sinh</Typography>
-                        <Typography variant="body1">{formatDate(profileData.dateOfBirth)}</Typography>
+                        <Typography variant="body1">{formatDate(dateOfBirth)}</Typography>
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Giới tính</Typography>
-                        <Typography variant="body1">{profileData.gender || 'Không xác định'}</Typography>
+                        <Typography variant="body1">{gender || 'Không xác định'}</Typography>
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Quốc tịch</Typography>
@@ -408,21 +452,23 @@ const CitizenProfile = () => {
                         <EmailIcon sx={{ mr: 1, color: theme.palette.text.secondary }} />
                         <Box>
                           <Typography variant="body2" color="text.secondary">Email</Typography>
-                          <Typography variant="body1">{profileData.email || 'Chưa cập nhật'}</Typography>
+                          <Typography variant="body1">{email || 'Chưa cập nhật'}</Typography>
                         </Box>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <PhoneIcon sx={{ mr: 1, color: theme.palette.text.secondary }} />
                         <Box>
                           <Typography variant="body2" color="text.secondary">Số điện thoại</Typography>
-                          <Typography variant="body1">{profileData.phone || 'Chưa cập nhật'}</Typography>
+                          <Typography variant="body1">{phone || 'Chưa cập nhật'}</Typography>
                         </Box>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <HomeIcon sx={{ mr: 1, color: theme.palette.text.secondary }} />
                         <Box>
                           <Typography variant="body2" color="text.secondary">Địa chỉ</Typography>
-                          <Typography variant="body1">{profileData.address || 'Chưa cập nhật'}</Typography>
+                          <Typography variant="body1">
+                            {address ? `${address}, ${ward}, ${district}, ${province}` : 'Chưa cập nhật'}
+                          </Typography>
                         </Box>
                       </Box>
                     </Box>
@@ -439,24 +485,32 @@ const CitizenProfile = () => {
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Số CMND/CCCD</Typography>
-                        <Typography variant="body1">{profileData.identityNumber || 'Chưa cập nhật'}</Typography>
+                        <Typography variant="body1">{idCardNumber || 'Chưa cập nhật'}</Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">Ngày cấp</Typography>
+                        <Typography variant="body1">{formatDate(idCardIssueDate)}</Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">Nơi cấp</Typography>
+                        <Typography variant="body1">{idCardIssuePlace || 'Chưa cập nhật'}</Typography>
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Trạng thái xác thực</Typography>
                         <Chip
-                          icon={<VerifiedUserIcon />}
-                          label={profileData.isVerified ? 'Đã xác thực' : 'Chưa xác thực'}
-                          color={profileData.isVerified ? 'success' : 'warning'}
+                          icon={<VerifiedIcon />}
+                          label={isVerified ? 'Đã xác thực' : 'Chưa xác thực'}
+                          color={isVerified ? 'success' : 'warning'}
                           size="small"
                         />
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Ngày tạo tài khoản</Typography>
-                        <Typography variant="body1">{formatDate(profileData.createdAt)}</Typography>
+                        <Typography variant="body1">{formatDate(createdAt)}</Typography>
                       </Box>
                       <Box>
                         <Typography variant="body2" color="text.secondary">Cập nhật lần cuối</Typography>
-                        <Typography variant="body1">{formatDate(profileData.updatedAt)}</Typography>
+                        <Typography variant="body1">{formatDate(updatedAt)}</Typography>
                       </Box>
                     </Box>
                   </CardContent>
@@ -467,16 +521,18 @@ const CitizenProfile = () => {
         </Box>
       </Paper>
 
-      {/* Nút thay đổi mật khẩu */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-        <Button
-          variant="outlined"
-          color="primary"
-          startIcon={<SecurityIcon />}
-        >
-          Thay đổi mật khẩu
-        </Button>
-      </Box>
+      {/* Nút thay đổi mật khẩu - chỉ hiển thị khi xem hồ sơ cá nhân */}
+      {!isViewingOtherCitizen && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<SecurityIcon />}
+          >
+            Thay đổi mật khẩu
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

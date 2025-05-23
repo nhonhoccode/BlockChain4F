@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.utils import timezone
 
-from ..models import Request, Document, Attachment
+from ..models import AdminRequest, Document, Attachment
 from ..serializers import (
     RequestListSerializer, RequestDetailSerializer, CitizenRequestCreateSerializer,
     SubmitRequestSerializer, DocumentListSerializer, DocumentDetailSerializer,
@@ -27,7 +27,7 @@ class CitizenRequestListView(generics.ListAPIView):
     def get_queryset(self):
         """Lấy danh sách yêu cầu của công dân hiện tại"""
         user = self.request.user
-        queryset = Request.objects.filter(requestor=user)
+        queryset = AdminRequest.objects.filter(requestor=user)
         
         # Lọc theo trạng thái
         status = self.request.query_params.get('status')
@@ -59,7 +59,7 @@ class CitizenRequestDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         """Chỉ lấy yêu cầu của công dân hiện tại"""
         user = self.request.user
-        return Request.objects.filter(requestor=user)
+        return AdminRequest.objects.filter(requestor=user)
 
 
 class CitizenDocumentListView(generics.ListAPIView):
@@ -114,7 +114,7 @@ class CitizenDocumentDetailView(generics.RetrieveAPIView):
 @permission_classes([IsAuthenticated, IsCitizen])
 def submit_request(request, pk):
     """API nộp yêu cầu (chuyển từ draft sang submitted)"""
-    req_obj = get_object_or_404(Request, pk=pk, requestor=request.user)
+    req_obj = get_object_or_404(AdminRequest, pk=pk, requestor=request.user)
     
     if req_obj.status != 'draft':
         return Response(
@@ -133,7 +133,7 @@ def submit_request(request, pk):
 @permission_classes([IsAuthenticated, IsCitizen])
 def add_attachment_to_request(request, pk):
     """API thêm tài liệu đính kèm cho yêu cầu"""
-    req_obj = get_object_or_404(Request, pk=pk, requestor=request.user)
+    req_obj = get_object_or_404(AdminRequest, pk=pk, requestor=request.user)
     
     serializer = AttachmentUploadSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
@@ -146,7 +146,7 @@ def add_attachment_to_request(request, pk):
 @permission_classes([IsAuthenticated, IsCitizen])
 def request_attachments(request, pk):
     """API lấy danh sách tài liệu đính kèm của yêu cầu"""
-    req_obj = get_object_or_404(Request, pk=pk, requestor=request.user)
+    req_obj = get_object_or_404(AdminRequest, pk=pk, requestor=request.user)
     attachments = req_obj.attachments.all()
     
     serializer = AttachmentListSerializer(attachments, many=True, context={'request': request})
@@ -157,7 +157,7 @@ def request_attachments(request, pk):
 @permission_classes([IsAuthenticated, IsCitizen])
 def cancel_request(request, pk):
     """API hủy yêu cầu"""
-    req_obj = get_object_or_404(Request, pk=pk, requestor=request.user)
+    req_obj = get_object_or_404(AdminRequest, pk=pk, requestor=request.user)
     
     if req_obj.status in ['completed', 'cancelled', 'rejected']:
         return Response(

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Drawer,
@@ -15,21 +15,26 @@ import {
   Avatar,
   Menu,
   MenuItem,
+  Tooltip,
+  useMediaQuery,
   useTheme,
-  useMediaQuery
+  CssBaseline
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
+  Assignment as AssignmentIcon,
+  BarChart as BarChartIcon,
   Person as PersonIcon,
-  AssignmentInd as AssignmentIcon,
   People as PeopleIcon,
-  Poll as StatsIcon,
-  Notifications as NotificationIcon,
   ExitToApp as LogoutIcon,
-  Badge as OfficerIcon
+  AccountCircle as AccountCircleIcon,
+  Settings as SettingsIcon,
+  Notifications as NotificationsIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
+import styles from './OfficerLayout.module.scss';
 
 const drawerWidth = 240;
 
@@ -37,180 +42,321 @@ const drawerWidth = 240;
  * OfficerLayout Component - Layout for officer users
  */
 const OfficerLayout = () => {
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { t } = useTranslation();
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
+  // State for drawer and menu
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   
+  // Reset mobile drawer state when screen size changes
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileOpen(false);
+    }
+  }, [isMobile]);
+  
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    console.log('Toggle drawer from', mobileOpen, 'to', !mobileOpen);
+    setMobileOpen(prevState => !prevState);
   };
   
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
   
-  const handleProfileMenuClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
   };
   
   const handleLogout = async () => {
-    handleProfileMenuClose();
-    await logout();
-    navigate('/auth/login');
+    try {
+      await logout();
+      navigate('/auth/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
   
-  // Menu items for officer
+  const handleNavigate = (path) => {
+    navigate(path);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+  
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/officer/dashboard' },
-    { text: 'Process Requests', icon: <AssignmentIcon />, path: '/officer/process-request' },
-    { text: 'Citizen Management', icon: <PeopleIcon />, path: '/officer/citizen-management' },
-    { text: 'Profile', icon: <PersonIcon />, path: '/officer/profile' },
-    { text: 'Approval Status', icon: <OfficerIcon />, path: '/officer/approval-status' },
-    { text: 'Statistics', icon: <StatsIcon />, path: '/officer/statistics' },
+    {
+      text: t('officer.menu.dashboard', 'Bảng điều khiển'),
+      icon: <DashboardIcon />,
+      path: '/officer'
+    },
+    {
+      text: t('officer.menu.pendingRequests', 'Yêu cầu chờ xử lý'),
+      icon: <AssignmentIcon />,
+      path: '/officer/requests/pending'
+    },
+    {
+      text: t('officer.menu.citizenManagement', 'Quản lý công dân'),
+      icon: <PeopleIcon />,
+      path: '/officer/citizens'
+    },
+    {
+      text: t('officer.menu.profile', 'Thông tin cá nhân'),
+      icon: <PersonIcon />,
+      path: '/officer/profile'
+    },
+    {
+      text: t('officer.menu.statistics', 'Thống kê'),
+      icon: <BarChartIcon />,
+      path: '/officer/statistics'
+    }
   ];
   
+  const isActive = (path) => {
+    // Check if the current path starts with the menu item path
+    // This helps with nested routes
+    return location.pathname === path || 
+           (path !== '/officer' && location.pathname.startsWith(path));
+  };
+  
+  // Get user display name
+  const getUserDisplayName = () => {
+    // Try to get fresh data from localStorage first
+    try {
+      const authUserString = localStorage.getItem('authUser');
+      if (authUserString) {
+        const authUser = JSON.parse(authUserString);
+        if (authUser.first_name || authUser.last_name) {
+          return `${authUser.first_name || ''} ${authUser.last_name || ''}`.trim();
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing authUser from localStorage:', e);
+    }
+    
+    // Fall back to context data
+    if (currentUser) {
+      if (currentUser.first_name || currentUser.last_name) {
+        return `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim();
+      }
+      return currentUser.email || 'Cán bộ';
+    }
+    
+    return 'Cán bộ';
+  };
+  
+  // Drawer content
   const drawer = (
     <>
-      <Toolbar sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'flex-start',
-        padding: 2,
-        bgcolor: 'success.dark'
-      }}>
-        <Typography variant="h6" noWrap component="div" color="white" fontWeight="bold">
-          Officer Portal
+      <Toolbar />
+      <Box className={styles.userInfo}>
+        <Avatar
+          src={currentUser?.photoURL}
+          alt={getUserDisplayName()}
+          className={styles.avatar}
+        >
+          {!currentUser?.photoURL && <AccountCircleIcon sx={{ fontSize: 40 }} />}
+        </Avatar>
+        
+        <Typography variant="subtitle1" className={styles.userName}>
+          {getUserDisplayName()}
         </Typography>
-        <Typography variant="body2" color="white" sx={{ opacity: 0.8 }}>
-          Blockchain Administrative System
+        
+        <Typography variant="body2" className={styles.userRole}>
+          {t('officer.role', 'Cán bộ xã')}
         </Typography>
-      </Toolbar>
+      </Box>
+      
       <Divider />
-      <List>
+      
+      {/* Menu Items */}
+      <List sx={{ padding: '8px 0' }}>
         {menuItems.map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
-            onClick={() => {
-              navigate(item.path);
-              if (isMobile) setMobileOpen(false);
-            }}
+          <ListItem
+            button
+            key={item.text}
+            onClick={() => handleNavigate(item.path)}
+            className={`${styles.menuItem} ${isActive(item.path) ? styles.selected : ''}`}
           >
-            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemIcon className={styles.menuItemIcon}>
+              {item.icon}
+            </ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
       </List>
+      
+      <Box sx={{ flexGrow: 1 }} />
+      
+      <Divider />
+      
+      {/* Footer */}
+      <Box className={styles.footer}>
+        <ListItem button onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary={t('common.logout', 'Đăng xuất')} />
+        </ListItem>
+      </Box>
     </>
   );
   
-  const profileMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
-      onClose={handleProfileMenuClose}
-      keepMounted
-    >
-      <MenuItem onClick={() => {
-        handleProfileMenuClose();
-        navigate('/officer/profile');
-      }}>
-        <PersonIcon fontSize="small" sx={{ mr: 1 }} />
-        My Profile
-      </MenuItem>
-      <Divider />
-      <MenuItem onClick={handleLogout}>
-        <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
-        Logout
-      </MenuItem>
-    </Menu>
-  );
-  
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <AppBar
-        position="fixed"
+    <Box className={styles.layout}>
+      <CssBaseline />
+      {/* App Bar */}
+      <AppBar 
+        position="fixed" 
+        className={styles.appBar}
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'success.dark' // Green color to distinguish officer layout
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
         }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Officer Dashboard
-          </Typography>
-          <IconButton color="inherit">
-            <NotificationIcon />
-          </IconButton>
-          <IconButton 
-            edge="end" 
-            color="inherit" 
-            onClick={handleProfileMenuOpen}
-          >
-            <Avatar 
-              alt={currentUser?.name || 'Officer'} 
-              src="/static/images/avatar/citizen.png" 
-              sx={{ width: 32, height: 32, bgcolor: 'success.light' }}
+        <Toolbar sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Hamburger menu button - only visible on mobile */}
+            <IconButton
+              color="inherit"
+              aria-label="toggle drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              className={styles.menuButton}
+              sx={{ display: { md: 'none' } }}
             >
-              {currentUser?.name?.[0] || 'O'}
-            </Avatar>
-          </IconButton>
+              <MenuIcon />
+            </IconButton>
+            
+            <Typography variant="h6" noWrap component="div" className={styles.title}>
+              {t('officer.title', 'Hệ thống quản lý hành chính')}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title={t('common.notifications', 'Thông báo')}>
+              <IconButton color="inherit" size="medium">
+                <NotificationsIcon />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title={t('common.settings', 'Cài đặt')}>
+              <IconButton color="inherit" size="medium">
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            
+            <Tooltip title={t('common.profile', 'Thông tin cá nhân')}>
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="account of current user"
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                size="medium"
+              >
+                <Avatar
+                  src={currentUser?.photoURL}
+                  alt={getUserDisplayName()}
+                  sx={{ width: 32, height: 32, border: '2px solid rgba(255, 255, 255, 0.8)' }}
+                >
+                  {!currentUser?.photoURL && <AccountCircleIcon />}
+                </Avatar>
+              </IconButton>
+            </Tooltip>
+            
+            <Menu
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => {
+                handleMenuClose();
+                navigate('/officer/profile');
+              }}>
+                <ListItemIcon>
+                  <PersonIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary={t('common.profile', 'Thông tin cá nhân')} />
+              </MenuItem>
+              
+              <Divider />
+              
+              <MenuItem onClick={() => {
+                handleMenuClose();
+                handleLogout();
+              }}>
+                <ListItemIcon>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary={t('common.logout', 'Đăng xuất')} />
+              </MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
       </AppBar>
-      {profileMenu}
       
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-      >
+      {/* Navigation */}
+      <nav className={`${styles.drawer} ${mobileOpen ? styles.drawerOpen : ''}`}>
+        {/* Mobile Drawer - Only visible on mobile devices */}
         <Drawer
+          container={window.document.body}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better mobile performance
+            keepMounted: true, // Better open performance on mobile
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: 'block', md: 'none' },
+          }}
+          classes={{
+            paper: styles.drawerPaper
           }}
         >
           {drawer}
         </Drawer>
+        
+        {/* Desktop Drawer - Always visible on desktop */}
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: 'none', md: 'block' },
+          }}
+          classes={{
+            paper: styles.drawerPaper
           }}
           open
         >
           {drawer}
         </Drawer>
-      </Box>
+      </nav>
       
+      {/* Main Content */}
       <Box
         component="main"
+        className={styles.content}
         sx={{
-          flexGrow: 1,
-          p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          mt: '64px' // Height of AppBar
+          pt: { xs: 10, md: 11 },
         }}
       >
         <Outlet />

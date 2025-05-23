@@ -10,16 +10,20 @@ import {
   Mail as MailIcon,
   Login as LoginIcon,
   PersonAdd as RegisterIcon,
-  AccountBalance as AccountBalanceIcon
+  AccountBalance as AccountBalanceIcon,
+  Dashboard as DashboardIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import styles from './MainLayout.module.scss';
 import BlockchainBadge from '../../components/common/BlockchainBadge/BlockchainBadge';
 import AuthStatus from '../../components/common/AuthStatus';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Define navigation items
 const navItems = [
   { text: 'Trang chủ', path: '/', icon: <HomeIcon sx={{ fontSize: '20px' }} /> },
   { text: 'Xác thực giấy tờ', path: '/document-verify', icon: <VerifiedUserIcon sx={{ fontSize: '20px' }} /> },
+  { text: 'Thủ tục hành chính', path: '/procedures', icon: <AssignmentIcon sx={{ fontSize: '20px' }} /> },
   { text: 'Giới thiệu', path: '/about', icon: <InfoIcon sx={{ fontSize: '20px' }} /> },
   { text: 'Liên hệ', path: '/contact', icon: <MailIcon sx={{ fontSize: '20px' }} /> },
 ];
@@ -42,6 +46,7 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated, currentUser } = useAuth();
   
   // State for mobile sidebar
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -55,6 +60,35 @@ const MainLayout = () => {
   const isActive = (path) => {
     return location.pathname === path;
   };
+  
+  // Function to handle dashboard navigation based on user role
+  const handleDashboardClick = () => {
+    if (!currentUser) return;
+
+    switch(currentUser.role?.toLowerCase()) {
+      case 'chairman':
+        navigate('/admin/chairman');
+        break;
+      case 'officer':
+        navigate('/officer');
+        break;
+      case 'citizen':
+      default:
+        navigate('/citizen');
+        break;
+    }
+  };
+  
+  // Check if we're on a route that has its own layout
+  const isCustomLayoutRoute = () => {
+    const customLayoutPaths = ['/citizen', '/officer', '/chairman', '/auth'];
+    return customLayoutPaths.some(path => location.pathname.startsWith(path));
+  };
+
+  // Skip rendering MainLayout for routes with their own layouts
+  if (isCustomLayoutRoute()) {
+    return <Outlet />;
+  }
   
   // Mobile drawer content
   const drawerContent = (
@@ -141,65 +175,55 @@ const MainLayout = () => {
             </ListItemButton>
           </ListItem>
         ))}
+
+        {/* Dashboard button in mobile menu - Only visible when logged in */}
+        {isAuthenticated && (
+          <ListItem disablePadding sx={{ mb: 1 }}>
+            <ListItemButton
+              onClick={() => {
+                handleDashboardClick();
+                handleDrawerToggle();
+              }}
+              sx={{
+                borderRadius: '8px',
+                py: 1.2,
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                color: '#2563eb',
+                '&:hover': {
+                  backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                },
+                '& .MuiListItemIcon-root': {
+                  color: '#2563eb'
+                }
+              }}
+            >
+              <ListItemIcon sx={{ 
+                minWidth: '42px',
+                color: '#2563eb'
+              }}>
+                <DashboardIcon sx={{ fontSize: '20px' }} />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Dashboard" 
+                primaryTypographyProps={{ 
+                  sx: { 
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    letterSpacing: '0.2px',
+                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                  } 
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
+        
         <Divider sx={{ my: 2 }} />
-        <ListItem disablePadding sx={{ mb: 1 }}>
-          <ListItemButton
-            component={RouterLink}
-            to="/auth/login"
-            onClick={handleDrawerToggle}
-            sx={{
-              borderRadius: '8px',
-              py: 1.2,
-              '&:hover': {
-                backgroundColor: 'rgba(37, 99, 235, 0.08)'
-              }
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: '42px', color: '#2563eb' }}>
-              <LoginIcon />
-            </ListItemIcon>
-            <ListItemText 
-              primary="Đăng nhập" 
-              primaryTypographyProps={{ 
-                sx: { 
-                  fontWeight: 500,
-                  fontSize: '0.95rem',
-                  letterSpacing: '0.2px',
-                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                } 
-              }}
-            />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding sx={{ mb: 1 }}>
-          <ListItemButton
-            component={RouterLink}
-            to="/auth/register"
-            onClick={handleDrawerToggle}
-            sx={{
-              borderRadius: '8px',
-              py: 1.2,
-              '&:hover': {
-                backgroundColor: 'rgba(37, 99, 235, 0.08)'
-              }
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: '42px', color: '#2563eb' }}>
-              <RegisterIcon />
-            </ListItemIcon>
-            <ListItemText 
-              primary="Đăng ký" 
-              primaryTypographyProps={{ 
-                sx: { 
-                  fontWeight: 500,
-                  fontSize: '0.95rem',
-                  letterSpacing: '0.2px',
-                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                } 
-              }}
-            />
-          </ListItemButton>
-        </ListItem>
+        
+        {/* Authentication */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+          <AuthStatus />
+        </Box>
       </List>
     </Box>
   );
@@ -218,8 +242,8 @@ const MainLayout = () => {
             borderBottom: '1px solid rgba(0, 0, 0, 0.08)'
           }}
         >
-          <Container maxWidth="lg">
-            <Toolbar className={styles.toolbar} disableGutters>
+          <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+            <Toolbar className={styles.toolbar} disableGutters sx={{ minHeight: { xs: '56px', md: '64px' } }}>
               {/* Logo */}
               <Box 
                 component={RouterLink} 
@@ -229,14 +253,15 @@ const MainLayout = () => {
                   alignItems: 'center',
                   textDecoration: 'none', 
                   color: 'inherit',
-                  mr: 4
+                  mr: { xs: 1, sm: 2, md: 3 }
                 }}
               >
                 <AccountBalanceIcon 
                   sx={{ 
                     display: { xs: 'none', sm: 'flex' }, 
                     mr: 1, 
-                    color: '#2563eb' 
+                    color: '#2563eb',
+                    fontSize: { sm: '1.5rem', md: '1.75rem' }
                   }} 
                 />
                 <Typography
@@ -248,6 +273,7 @@ const MainLayout = () => {
                     letterSpacing: '.1rem',
                     color: '#2563eb',
                     textDecoration: 'none',
+                    fontSize: { sm: '1.15rem', md: '1.25rem' }
                   }}
                 >
                   BlockAdmin
@@ -255,15 +281,15 @@ const MainLayout = () => {
               </Box>
 
               {/* Mobile menu button */}
-              <Box sx={{ display: { xs: 'flex', md: 'none' }, flexGrow: 1 }}>
+              <Box sx={{ display: { xs: 'flex', md: 'none' }, flexGrow: 0, mr: 1 }}>
                 <IconButton
-                  size="large"
+                  size="small"
                   aria-label="open drawer"
                   edge="start"
                   onClick={handleDrawerToggle}
-                  sx={{ color: '#2563eb' }}
+                  sx={{ color: '#2563eb', p: 1 }}
                 >
-                  <MenuIcon />
+                  <MenuIcon fontSize="medium" />
                 </IconButton>
               </Box>
 
@@ -274,17 +300,17 @@ const MainLayout = () => {
                 sx={{ 
                   display: { xs: 'flex', md: 'none' }, 
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  flexGrow: 1,
                   textDecoration: 'none', 
-                  color: 'inherit',
-                  position: 'absolute',
-                  left: '50%',
-                  transform: 'translateX(-50%)'
+                  color: 'inherit'
                 }}
               >
                 <AccountBalanceIcon 
                   sx={{ 
-                    mr: 1, 
-                    color: '#2563eb' 
+                    mr: 0.5, 
+                    color: '#2563eb',
+                    fontSize: '1.5rem'
                   }} 
                 />
                 <Typography
@@ -292,9 +318,10 @@ const MainLayout = () => {
                   noWrap
                   sx={{
                     fontWeight: 700,
-                    letterSpacing: '.1rem',
+                    letterSpacing: '.05rem',
                     color: '#2563eb',
                     textDecoration: 'none',
+                    fontSize: '1.1rem'
                   }}
                 >
                   BlockAdmin
@@ -316,12 +343,14 @@ const MainLayout = () => {
                     to={item.path}
                     startIcon={item.icon}
                     sx={{
-                      mx: 1,
+                      mx: 0.5,
                       color: isActive(item.path) ? '#2563eb' : 'rgba(0, 0, 0, 0.7)',
                       fontWeight: isActive(item.path) ? 600 : 500,
-                      fontSize: '0.95rem',
+                      fontSize: '0.85rem',
                       borderRadius: '8px',
-                      padding: '6px 12px',
+                      padding: '4px 8px',
+                      whiteSpace: 'nowrap',
+                      minWidth: 'auto',
                       '&:hover': {
                         backgroundColor: 'rgba(37, 99, 235, 0.08)',
                         color: '#2563eb'
@@ -331,51 +360,39 @@ const MainLayout = () => {
                     {item.text}
                   </Button>
                 ))}
+                
+                {/* Dashboard Button - Only visible when logged in */}
+                {isAuthenticated && (
+                  <Button
+                    onClick={handleDashboardClick}
+                    startIcon={<DashboardIcon sx={{ fontSize: '20px' }} />}
+                    className={styles.dashboardButton}
+                    sx={{
+                      mx: 0.5,
+                      fontWeight: 600,
+                      fontSize: '0.85rem',
+                      borderRadius: '8px',
+                      padding: '4px 8px',
+                      whiteSpace: 'nowrap',
+                      '&:hover': {
+                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                      }
+                    }}
+                  >
+                    Dashboard
+                  </Button>
+                )}
               </Box>
 
-              {/* Auth Buttons */}
-              <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                <Button 
-                  component={RouterLink} 
-                  to="/auth/login"
-                  variant="text" 
-                  startIcon={<LoginIcon />}
-                  sx={{ 
-                    color: 'rgba(0, 0, 0, 0.7)',
-                    fontWeight: 500,
-                    mr: 1,
-                    '&:hover': {
-                      backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                      color: '#2563eb'
-                    }
-                  }}
-                >
-                  Đăng nhập
-                </Button>
-                <Button 
-                  component={RouterLink} 
-                  to="/auth/register"
-                  variant="contained" 
-                  startIcon={<RegisterIcon />}
-                  sx={{ 
-                    backgroundColor: '#2563eb',
-                    fontWeight: 500,
-                    boxShadow: 'none',
-                    '&:hover': {
-                      backgroundColor: '#1e40af',
-                      boxShadow: 'none'
-                    }
-                  }}
-                >
-                  Đăng ký
-                </Button>
-              </Box>
-
-              {/* Add this to the header section */}
-              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+              {/* Auth Status */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                ml: { xs: 1, md: 'auto' },
+                mr: { xs: 1, md: 0 }
+              }}>
                 <AuthStatus />
-                <BlockchainBadge sx={{ ml: 2 }} />
-                {/* Add other header icons or buttons here */}
+                <BlockchainBadge sx={{ ml: { xs: 1, md: 2 }, display: { xs: 'none', sm: 'flex' } }} />
               </Box>
             </Toolbar>
           </Container>

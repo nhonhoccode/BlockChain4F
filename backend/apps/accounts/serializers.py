@@ -14,12 +14,42 @@ class UserSerializer(serializers.ModelSerializer):
     """
     Serializer cho model User
     """
+    password_confirm = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+    
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password', 'password_confirm', 'is_staff']
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'is_staff': {'read_only': True},
+            'first_name': {'required': False},
+            'last_name': {'required': False}
         }
+    
+    def validate(self, data):
+        # Kiểm tra xác nhận mật khẩu nếu đang tạo mới user
+        if self.context.get('create_user', False) and 'password' in data:
+            if data.get('password') != data.get('password_confirm'):
+                raise serializers.ValidationError({"password_confirm": "Mật khẩu xác nhận không khớp"})
+        
+        return data
+    
+    def create(self, validated_data):
+        # Loại bỏ password_confirm nếu có
+        if 'password_confirm' in validated_data:
+            validated_data.pop('password_confirm')
+        
+        password = validated_data.pop('password', None)
+        
+        # Tạo user mới
+        user = User(**validated_data)
+        
+        # Đặt mật khẩu nếu có
+        if password:
+            user.set_password(password)
+        
+        user.save()
+        return user
 
 class ProfileSerializer(serializers.ModelSerializer):
     """

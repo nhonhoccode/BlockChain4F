@@ -13,8 +13,11 @@ import OfficerProfilePage from '../pages/officer/Profile/OfficerProfilePage';
 import RequestsQueuePage from '../pages/officer/ProcessRequest/RequestsQueuePage';
 import ProcessRequestPage from '../pages/officer/ProcessRequest/ProcessRequestPage';
 import DocumentGenerationPage from '../pages/officer/ProcessRequest/DocumentGenerationPage';
-import CitizenListPage from '../pages/officer/CitizenManagement/CitizenListPage';
-import CitizenDetailPage from '../pages/officer/CitizenManagement/CitizenDetailPage';
+import CitizenManagement from '../pages/officer/CitizenManagement/CitizenManagement';
+import CitizenDetail from '../pages/officer/CitizenManagement/CitizenDetail';
+import CitizenEdit from '../pages/officer/CitizenManagement/CitizenEdit';
+import CitizenDocuments from '../pages/officer/CitizenManagement/CitizenDocuments';
+import DocumentDetail from '../pages/officer/CitizenManagement/DocumentDetail';
 import ApprovalStatusPage from '../pages/officer/ApprovalStatus/ApprovalStatusPage';
 import StatisticsPage from '../pages/officer/Statistics/StatisticsPage';
 
@@ -51,9 +54,8 @@ const officerRoutes: OfficerRouteObject[] = [
       { path: 'process-request/queue', element: <RequestsQueuePage /> },
       { path: 'process-request/:id', element: <ProcessRequestPage /> },
       { path: 'process-request/document-generation', element: <DocumentGenerationPage /> },
-      { path: 'citizen-management', element: <Navigate to="/officer/citizen-management/list" replace /> },
-      { path: 'citizen-management/list', element: <CitizenListPage /> },
-      { path: 'citizen-management/:id', element: <CitizenDetailPage /> },
+      { path: 'citizens', element: <CitizenManagement /> },
+      { path: 'citizens/:id/edit', element: <CitizenEdit /> },
       { path: 'approval-status', element: <ApprovalStatusPage /> },
       { path: 'statistics', element: <StatisticsPage /> },
     ],

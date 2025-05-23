@@ -30,14 +30,37 @@ import {
   CheckCircle as CheckIcon,
   Groups as GroupsIcon,
   Apartment as ApartmentIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  Dashboard as DashboardIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import styles from './HomePage.module.scss';
 
 const HomePage = () => {
   const theme = useTheme();
+  const { isAuthenticated, currentUser } = useAuth();
+  const navigate = useNavigate();
   
+  // Function to handle dashboard navigation based on user role
+  const handleDashboardClick = () => {
+    if (!currentUser) return;
+
+    switch(currentUser.role?.toLowerCase()) {
+      case 'chairman':
+        navigate('/admin/chairman');
+        break;
+      case 'officer':
+        navigate('officer');
+        break;
+      case 'citizen':
+      default:
+        navigate('citizen');
+        break;
+    }
+  };
+
   // Services data
   const services = [
     {
@@ -150,26 +173,77 @@ const HomePage = () => {
                 Giải pháp hiện đại cho quản lý hành chính cấp xã, đảm bảo tính minh bạch, bảo mật và hiệu quả
               </Typography>
               <Box className={styles.homePage__heroCta}>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  size="large" 
-                  component={Link} 
-                  to="/auth/register"
-                  className={styles.homePage__registerButton}
-                >
-                  Đăng ký tài khoản
-                </Button>
-                <Button 
-                  variant="outlined" 
-                  color="primary" 
-                  size="large" 
-                  component={Link} 
-                  to="/document-verify"
-                  className={styles.homePage__verifyButton}
-                >
-                  Xác thực giấy tờ
-                </Button>
+                {!isAuthenticated ? (
+                  <>
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      size="large" 
+                      component={Link} 
+                      to="/auth/register"
+                      className={styles.homePage__registerButton}
+                    >
+                      Đăng ký tài khoản
+                    </Button>
+                    <Button 
+                      variant="contained"
+                      color="secondary"
+                      size="large" 
+                      component={Link} 
+                      to="/procedures"
+                      startIcon={<AssignmentIcon />}
+                      className={styles.homePage__proceduresButton}
+                      sx={{ ml: 2 }}
+                    >
+                      Thủ tục hành chính
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      color="primary" 
+                      size="large" 
+                      component={Link} 
+                      to="/document-verify"
+                      className={styles.homePage__verifyButton}
+                    >
+                      Xác thực giấy tờ
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="contained" 
+                      color="primary" 
+                      size="large" 
+                      onClick={handleDashboardClick}
+                      className={styles.homePage__dashboardButton}
+                      startIcon={<DashboardIcon />}
+                    >
+                      Đi đến Dashboard
+                    </Button>
+                    <Button 
+                      variant="contained"
+                      color="secondary"
+                      size="large" 
+                      component={Link} 
+                      to="/procedures"
+                      startIcon={<AssignmentIcon />}
+                      className={styles.homePage__proceduresButton}
+                      sx={{ ml: 2 }}
+                    >
+                      Thủ tục hành chính
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      color="primary" 
+                      size="large" 
+                      component={Link} 
+                      to="/document-verify"
+                      className={styles.homePage__verifyButton}
+                    >
+                      Xác thực giấy tờ
+                    </Button>
+                  </>
+                )}
               </Box>
             </Grid>
             <Grid item xs={12} md={6} className={styles.homePage__heroImageContainer}>

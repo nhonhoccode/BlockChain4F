@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
   OFFICER: {
     DASHBOARD: '/api/v1/officer/dashboard/stats/',
     PROFILE: '/api/v1/officer/profile/',
+    PROFILE_PICTURE: '/api/v1/officer/profile/picture/',
     PENDING_REQUESTS: '/api/v1/officer/requests/pending/',
     REQUEST_DETAIL: (id: string) => `/api/v1/officer/requests/${id}/`,
     ASSIGN_TO_SELF: (id: string) => `/api/v1/officer/requests/${id}/assign-to-self/`,
@@ -192,7 +193,19 @@ export const get = async <T>(url: string, params?: any, config?: AxiosRequestCon
  */
 export const post = async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
   try {
-    const response = await api.post<T>(url, data, config);
+    // Kiểm tra nếu data là string JSON và header là application/json
+    const isJsonString = typeof data === 'string' && data.startsWith('{') && data.endsWith('}');
+    const isJsonContentType = config?.headers?.['Content-Type'] === 'application/json';
+    
+    // Nếu data đã là string JSON và header là application/json, không cần stringify lại
+    const finalConfig = config || {};
+    if (isJsonString && isJsonContentType) {
+      console.log('DEBUG: Sending pre-stringified JSON data');
+      // Đảm bảo axios không stringify lại data
+      finalConfig.transformRequest = [(data, headers) => data];
+    }
+    
+    const response = await api.post<T>(url, data, finalConfig);
     return response.data;
   } catch (error) {
     throw error;

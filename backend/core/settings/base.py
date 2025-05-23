@@ -5,6 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-1234567890abcdefghijklmnopqrstuvwxyz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -161,6 +162,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = None
 
 # Google OAuth settings
+
 GOOGLE_REDIRECT_URI = "http://localhost:3000/auth/google/callback"
 GOOGLE_OAUTH_REDIRECT_URIS = [
     "http://localhost:3000",

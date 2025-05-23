@@ -111,28 +111,63 @@ class RegisterView(APIView):
     def post(self, request):
         data = request.data
         
-        # Kiểm tra email đã tồn tại chưa
-        if User.objects.filter(email=data.get('email')).exists():
-            return Response({
-                "message": "Email đã được đăng ký"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Kiểm tra username đã tồn tại chưa
-        if 'username' in data and User.objects.filter(username=data.get('username')).exists():
-            return Response({
-                "message": "Tên người dùng đã tồn tại"
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Tạo tài khoản người dùng
-        user_serializer = UserSerializer(data=data)
-        if user_serializer.is_valid():
+        try:
+            # Log dữ liệu đăng ký để debug
+            print(f"DEBUG: Registration data received: {data}")
+            print(f"DEBUG: first_name: '{data.get('first_name')}'")
+            print(f"DEBUG: last_name: '{data.get('last_name')}'")
+            print(f"DEBUG: gender: '{data.get('gender')}'")
+            print(f"DEBUG: Data type: {type(data)}")
+            
+            # Kiểm tra dữ liệu có phải là chuỗi JSON không
+            if isinstance(data, str):
+                import json
+                try:
+                    data = json.loads(data)
+                    print(f"DEBUG: Parsed JSON data: {data}")
+                except json.JSONDecodeError as e:
+                    print(f"DEBUG: JSON parsing error: {e}")
+            
+            # Kiểm tra email đã tồn tại chưa
+            if User.objects.filter(email=data.get('email')).exists():
+                return Response({
+                    "email": ["Email này đã được đăng ký"]
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Kiểm tra username đã tồn tại chưa
+            if 'username' not in data:
+                # Sử dụng email làm username nếu không cung cấp
+                data['username'] = data.get('email')
+            
+            if User.objects.filter(username=data.get('username')).exists():
+                return Response({
+                    "username": ["Tên người dùng đã tồn tại"]
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Kiểm tra mật khẩu và xác nhận mật khẩu
+            if data.get('password') != data.get('password_confirm'):
+                return Response({
+                    "password_confirm": ["Mật khẩu xác nhận không khớp"]
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Tạo tài khoản người dùng trực tiếp
             try:
-                # Sử dụng transaction để đảm bảo tính nhất quán
                 from django.db import transaction
                 with transaction.atomic():
-                    # Lưu user
-                    user = user_serializer.save()
-                    user.set_password(data.get('password'))
+                    # Đảm bảo first_name và last_name không rỗng
+                    first_name = data.get('first_name', '').strip() or 'Người dùng'
+                    last_name = data.get('last_name', '').strip() or 'Mới'
+                    
+                    # Tạo user trực tiếp
+                    user = User.objects.create_user(
+                        email=data.get('email'),
+                        username=data.get('username') or data.get('email'),
+                        password=data.get('password'),
+                        first_name=first_name,
+                        last_name=last_name
+                    )
+                    
+                    print(f"DEBUG: User created successfully: {user.id} - {user.email}")
                     
                     # Gán vai trò cho người dùng
                     role_name = data.get('role', 'citizen')  # Mặc định là công dân
@@ -142,43 +177,58 @@ class RegisterView(APIView):
                     
                     role, _ = Role.objects.get_or_create(name=role_name)
                     user.roles.add(role)
-                    user.save()
+                    
+                    print(f"DEBUG: Role assigned: {role_name}")
+                    
+                    # Get gender value with default to 'male'
+                    gender_value = data.get('gender', 'male')
+                    print(f"DEBUG: Gender value for profile creation: '{gender_value}'")
                     
                     # Tạo profile cho người dùng
-                    profile_data = {
-                        'user': user.id,
-                        'phone_number': data.get('phone_number', ''),
-                        'address': data.get('address', ''),
-                        'ward': data.get('ward', ''),
-                        'district': data.get('district', ''),
-                        'city': data.get('province', '')  # Lưu ý: profile sử dụng 'city' thay vì 'province'
-                    }
+                    profile = Profile.objects.create(
+                        user=user,
+                        first_name=first_name,
+                        last_name=last_name,
+                        address=data.get('address', ''),
+                        ward=data.get('ward', ''),
+                        district=data.get('district', ''),
+                        city=data.get('province', ''),
+                        id_card_number=data.get('id_card_number', ''),
+                        id_card_issue_date=data.get('id_card_issue_date'),
+                        id_card_issue_place=data.get('id_card_issue_place', ''),
+                        date_of_birth=data.get('date_of_birth'),
+                        gender=gender_value  # Use the gender value we logged
+                    )
                     
-                    profile_serializer = ProfileSerializer(data=profile_data)
-                    if profile_serializer.is_valid():
-                        profile_serializer.save()
-                        
-                        # Tạo token xác thực
-                        token, _ = Token.objects.get_or_create(user=user)
-                        
-                        return Response({
-                            "message": "Đăng ký tài khoản thành công",
-                            "token": token.key,
-                            "user_id": user.id,
-                            "role": role_name
-                        }, status=status.HTTP_201_CREATED)
-                    else:
-                        # Nếu profile không hợp lệ, rollback transaction
-                        transaction.set_rollback(True)
-                        return Response(profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    print(f"DEBUG: Profile created successfully: {profile.id}")
+                    print(f"DEBUG: Gender saved in profile: '{profile.gender}'")
+                    
+                    # Tạo token xác thực
+                    token, _ = Token.objects.get_or_create(user=user)
+                    
+                    return Response({
+                        "message": "Đăng ký tài khoản thành công",
+                        "token": token.key,
+                        "user_id": user.id,
+                        "user": {
+                            "email": user.email,
+                            "first_name": user.first_name,
+                            "last_name": user.last_name
+                        },
+                        "role": role_name
+                    }, status=status.HTTP_201_CREATED)
             except Exception as e:
                 # Xử lý các lỗi khác
-                logger.error(f"Registration error: {str(e)}")
+                logger.error(f"Direct user creation error: {str(e)}")
                 return Response({
                     "message": f"Lỗi khi đăng ký: {str(e)}"
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            # Xử lý lỗi không mong đợi
+            logger.error(f"Unexpected registration error: {str(e)}")
+            return Response({
+                "message": "Đã xảy ra lỗi không mong đợi khi đăng ký. Vui lòng thử lại sau."
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RegisterChairmanView(APIView):
     """
@@ -744,3 +794,48 @@ def google_register(request):
             'success': False,
             'message': f'Có lỗi xảy ra trong quá trình đăng ký: {str(e)}'
         }, status=500)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_token(request):
+    """
+    API endpoint để xác thực token
+    """
+    token_key = request.data.get('token')
+    
+    if not token_key:
+        return Response({
+            'isValid': False,
+            'message': 'Token không được cung cấp'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Tìm token trong database
+        token = Token.objects.get(key=token_key)
+        
+        # Kiểm tra user liên kết với token có tồn tại và active không
+        if token.user and token.user.is_active:
+            return Response({
+                'isValid': True,
+                'message': 'Token hợp lệ',
+                'user_id': token.user.id,
+                'email': token.user.email,
+                'role': get_user_role(token.user)
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'isValid': False,
+                'message': 'Token không hợp lệ hoặc người dùng không còn hoạt động'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+    except Token.DoesNotExist:
+        return Response({
+            'isValid': False,
+            'message': 'Token không tồn tại'
+        }, status=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        logger.error(f"Token verification error: {str(e)}")
+        return Response({
+            'isValid': False,
+            'message': f'Lỗi xác thực token: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

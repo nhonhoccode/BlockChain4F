@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from ..models import User, Profile
-from apps.administrative.models import Document, Request
+from apps.administrative.models import Document, AdminRequest
 from apps.feedback.models import Feedback
+from django.utils import timezone
 
 # ... Các serializer hiện có ...
 
@@ -23,8 +24,8 @@ class CitizenDashboardStatsSerializer(serializers.Serializer):
         
         # Lấy thống kê từ database
         total_documents = Document.objects.filter(issued_to=user).count()
-        pending_requests = Request.objects.filter(requestor=user, status='pending').count()
-        completed_requests = Request.objects.filter(requestor=user, status='completed').count()
+        pending_requests = AdminRequest.objects.filter(requestor=user, status='pending').count()
+        completed_requests = AdminRequest.objects.filter(requestor=user, status='completed').count()
         
         return {
             'totalDocuments': total_documents,
@@ -37,7 +38,7 @@ class CitizenDashboardStatsSerializer(serializers.Serializer):
         user = self.context['request'].user
         
         # Lấy các yêu cầu gần đây
-        recent_requests = Request.objects.filter(requestor=user).order_by('-created_at')[:5]
+        recent_requests = AdminRequest.objects.filter(requestor=user).order_by('-created_at')[:5]
         recent_documents = Document.objects.filter(issued_to=user).order_by('-created_at')[:5]
         
         activities = []

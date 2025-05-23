@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Chip, Tooltip, Box, Stack } from '@mui/material';
+import { Chip, Tooltip, Stack } from '@mui/material';
 import { 
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
@@ -27,30 +27,6 @@ const BlockchainBadge = ({ isVerified, blockchainId, sx = {} }) => {
     
     return () => clearTimeout(timeoutId);
   }, []);
-  
-  // Determine badge appearance based on status
-  let color, icon, label;
-  switch (status) {
-    case 'connected':
-      color = 'success';
-      icon = <CheckCircleIcon fontSize="small" />;
-      label = 'Blockchain đã kết nối';
-      break;
-    case 'connecting':
-      color = 'warning';
-      icon = <WarningIcon fontSize="small" />;
-      label = 'Đang kết nối...';
-      break;
-    case 'error':
-      color = 'error';
-      icon = <ErrorIcon fontSize="small" />;
-      label = 'Lỗi kết nối';
-      break;
-    default:
-      color = 'default';
-      icon = null;
-      label = 'Không xác định';
-  }
 
   return (
     <Stack direction="row" spacing={1} sx={{ ml: 1, ...sx }}>

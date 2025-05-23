@@ -57,16 +57,16 @@ const UserMenu = () => {
   };
   
   const getProfileLink = () => {
-    if (isChairman) return '/chairman/profile';
+    if (isChairman) return '/admin/chairman/profile';
     if (isOfficer) return '/officer/profile';
     if (isCitizen) return '/citizen/profile';
     return '/';
   };
   
   const getDashboardLink = () => {
-    if (isChairman) return '/chairman/dashboard';
-    if (isOfficer) return '/officer/dashboard';
-    if (isCitizen) return '/citizen/dashboard';
+    if (isChairman) return '/admin/chairman';
+    if (isOfficer) return '/officer';
+    if (isCitizen) return '/citizen';
     return '/';
   };
   

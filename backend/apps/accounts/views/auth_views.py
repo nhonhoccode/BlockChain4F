@@ -43,28 +43,44 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = UserCreateSerializer
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            
-            # Generate token for the new user
-            token, created = Token.objects.get_or_create(user=user)
-            
-            # Get user roles
-            roles = [role.name for role in user.roles.all()]
-            
-            return Response({
-                'token': token.key,
-                'user_id': user.pk,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'roles': roles,
-                'is_verified': user.is_verified
-            }, status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+        print(f"DEBUG: Registration data received: {request.data}")
+        print(f"DEBUG: Registration data type: {type(request.data)}")
+        print(f"DEBUG: Registration data keys: {request.data.keys() if hasattr(request.data, 'keys') else 'No keys'}")
+        print(f"DEBUG: Content-Type header: {request.headers.get('Content-Type', 'Not provided')}")
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Kiểm tra dữ liệu first_name và last_name
+        first_name = request.data.get('first_name', None)
+        last_name = request.data.get('last_name', None)
+        print(f"DEBUG: first_name value: '{first_name}', type: {type(first_name)}")
+        print(f"DEBUG: last_name value: '{last_name}', type: {type(last_name)}")
+        
+        serializer = self.get_serializer(data=request.data)
+        
+        if not serializer.is_valid():
+            print(f"DEBUG: Registration validation errors: {serializer.errors}")
+            print(f"DEBUG: Expected fields: {[field.name for field in User._meta.get_fields() if not field.is_relation]}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = serializer.save()
+        
+        # Generate token for the new user
+        token, created = Token.objects.get_or_create(user=user)
+        
+        # Get user roles
+        roles = [role.name for role in user.roles.all()]
+        
+        # Return user data with token
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'roles': roles,
+            'is_verified': user.is_verified,
+            'message': 'Đăng ký thành công!'
+        }, status=status.HTTP_201_CREATED)
 
 
 class LogoutView(APIView):

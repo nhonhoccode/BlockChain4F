@@ -21,7 +21,7 @@ class Approval(models.Model):
     
     # Liên kết đến giấy tờ hoặc yêu cầu
     document = models.ForeignKey('administrative.Document', on_delete=models.CASCADE, related_name='approvals', null=True, blank=True, verbose_name="Giấy tờ")
-    request = models.ForeignKey('administrative.Request', on_delete=models.CASCADE, related_name='approvals', null=True, blank=True, verbose_name="Yêu cầu")
+    request = models.ForeignKey('administrative.AdminRequest', on_delete=models.CASCADE, related_name='approvals', null=True, blank=True, verbose_name="Yêu cầu")
     
     # Thông tin người dùng
     requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='requested_approvals', verbose_name="Người yêu cầu phê duyệt")

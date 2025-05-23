@@ -36,13 +36,21 @@ export const AuthProvider = ({ children }) => {
             // Verify token with API in the background
             try {
               const result = await authService.verifyToken();
-              if (!result.isValid) {
+              if (result && !result.isValid) {
                 console.warn('Token is invalid, logging out...');
                 await logout();
               }
             } catch (verifyError) {
+              // Xử lý lỗi nhẹ nhàng hơn - không đăng xuất người dùng nếu API không khả dụng
               console.error('Error verifying token:', verifyError);
-              // Continue using localStorage data if API is unavailable
+              
+              // Chỉ đăng xuất nếu lỗi không phải là 404 (endpoint không tồn tại)
+              if (verifyError.response && verifyError.response.status !== 404) {
+                console.warn('Token verification failed, logging out...');
+                await logout();
+              } else {
+                console.log('Token verification endpoint not available, continuing with localStorage data');
+              }
             }
           } catch (parseError) {
             console.error('Error parsing user data:', parseError);

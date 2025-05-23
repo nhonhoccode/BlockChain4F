@@ -13,7 +13,7 @@ import ApprovedOfficersPage from '../pages/admin/chairman/OfficerApproval/Approv
 // Import RegisterChairmanPage if available
 import RegisterChairmanPage from '../pages/admin/chairman/RegisterChairmanPage';
 // Import dashboard page
-import ChairmanDashboardPage from '../pages/admin/chairman/Dashboard/ChairmanDashboardPage';
+import ChairmanDashboardPage from '../pages/admin/chairman/Dashboard/ChairmanDashboard';
 
 // Auth guard HOC
 import { withAuthGuard } from '../utils/withAuthGuard';

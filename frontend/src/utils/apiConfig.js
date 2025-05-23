@@ -3,8 +3,8 @@
  * Cấu hình các endpoint API phù hợp với backend thực tế
  */
 
-// Base URL cho tất cả các API calls
-export const API_BASE_URL = 'http://localhost:8000';
+// Base URL cho tất cả các API calls - sử dụng proxy để tránh CORS
+export const API_BASE_URL = '/api';
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -38,12 +38,17 @@ export const API_ENDPOINTS = {
     PROFILE: '/api/v1/officer/profile/',
     PENDING_REQUESTS: '/api/v1/officer/requests/pending/',
     REQUEST_DETAIL: (id) => `/api/v1/officer/requests/${id}/`,
-    ASSIGN_TO_SELF: (id) => `/api/v1/officer/requests/${id}/assign-to-self/`,
-    PROCESS_REQUEST: (id) => `/api/v1/officer/requests/${id}/process/`,
+    ASSIGN_TO_SELF: (id) => `/api/v1/officer/requests/${id}/assign/`,
+    PROCESS_REQUEST: (id) => `/api/v1/officer/requests/${id}/complete/`,
     REJECT_REQUEST: (id) => `/api/v1/officer/requests/${id}/reject/`,
     CITIZENS: '/api/v1/officer/citizens/',
     CITIZEN_DETAIL: (id) => `/api/v1/officer/citizens/${id}/`,
-    STATISTICS: '/api/v1/officer/statistics/'
+    CITIZEN_DOCUMENTS: (id) => `/api/v1/officer/citizens/${id}/documents/`,
+    CITIZEN_DELETE: (id) => `/api/v1/officer/citizens/${id}/delete/`,
+    CITIZEN_UPDATE: (id) => `/api/v1/officer/citizens/${id}/update/`,
+    DOCUMENT_DETAIL: (id) => `/api/v1/officer/citizens/documents/${id}/`,
+    STATISTICS: '/api/v1/officer/statistics/',
+    PROFILE_PICTURE: '/api/v1/officer/profile/picture/'
   },
   CHAIRMAN: {
     DASHBOARD: '/api/v1/chairman/dashboard/stats/',

@@ -49,7 +49,7 @@ class Attachment(models.Model):
     file_type = models.CharField(max_length=50, blank=True, null=True, verbose_name="Loại file")
     
     # Liên kết
-    request = models.ForeignKey('administrative.Request', on_delete=models.CASCADE, related_name='attachments', null=True, blank=True, verbose_name="Yêu cầu")
+    request = models.ForeignKey('administrative.AdminRequest', on_delete=models.CASCADE, related_name='attachments', null=True, blank=True, verbose_name="Yêu cầu")
     document = models.ForeignKey('administrative.Document', on_delete=models.CASCADE, related_name='attachments', null=True, blank=True, verbose_name="Giấy tờ")
     
     # Thông tin người tải lên

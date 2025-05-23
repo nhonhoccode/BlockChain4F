@@ -1,36 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CircularProgress, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  Divider, 
-  Chip, 
-  Button, 
-  Alert,
-  Skeleton
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
-import officerService from '../../../services/api/officerService';
-
-import {
-  Assignment as AssignmentIcon,
-  Description as DescriptionIcon,
-  Pending as PendingIcon,
-  HourglassEmpty as ProcessingIcon,
-  CheckCircle as CheckIcon,
-  ErrorOutline as ErrorIcon,
-  Person as PersonIcon,
-  Note as NoteIcon,
-  Refresh as RefreshIcon
-} from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';import {   Box,   Typography,   Paper,   Grid,   Card,   CardContent,   CircularProgress,   List,   ListItem,   ListItemText,   Divider,   Chip,   Button,   Alert,  Skeleton,  ButtonGroup,  Stack,  IconButton,  Tooltip,  LinearProgress,  Badge,  Avatar} from '@mui/material';import { useNavigate } from 'react-router-dom';import { useAuth } from '../../../contexts/AuthContext';import officerService from '../../../services/api/officerService';import {  Assignment as AssignmentIcon,  Description as DescriptionIcon,  Pending as PendingIcon,  HourglassEmpty as ProcessingIcon,  CheckCircle as CheckIcon,  ErrorOutline as ErrorIcon,  Person as PersonIcon,  Note as NoteIcon,  Refresh as RefreshIcon,  Add as AddIcon,  ViewList as ViewListIcon,  Group as GroupIcon,  BarChart as ChartIcon,  Search as SearchIcon,  AccountCircle as ProfileIcon,  Notifications as NotificationsIcon,  ArrowForward as ArrowForwardIcon,  CalendarToday as CalendarIcon,  Speed as SpeedIcon,  Visibility as VisibilityIcon} from '@mui/icons-material';
 
 /**
  * OfficerDashboard Component - The main dashboard for officer users
@@ -115,6 +83,11 @@ const OfficerDashboard = () => {
 
   const handleViewRequest = (requestId) => {
     navigate(`/officer/process-request/${requestId}`);
+  };
+
+  // Navigation functions
+  const navigateTo = (path) => {
+    navigate(path);
   };
 
   // Skeleton loader for stats cards
@@ -278,286 +251,244 @@ const OfficerDashboard = () => {
         Bảng điều khiển cán bộ
       </Typography>
       
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Chào mừng đến với hệ thống quản lý hành chính blockchain. Với vai trò cán bộ, bạn có thể xử lý yêu cầu của công dân và quản lý giấy tờ.
-      </Typography>
+      {error && (
+        <Alert 
+          severity="error" 
+          action={
+            <Button color="inherit" size="small" onClick={fetchDashboardData}>
+              Thử lại
+            </Button>
+          }
+          sx={{ mb: 3 }}
+        >
+          {error}
+        </Alert>
+      )}
       
-      {/* Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4, mt: 2 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              height: '100%',
-              bgcolor: 'primary.light',
-              color: 'primary.contrastText',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <CardContent>
-              <Box sx={{ position: 'absolute', right: -10, top: -10, opacity: 0.2 }}>
-                <AssignmentIcon sx={{ fontSize: 80 }} />
-              </Box>
-              <Typography variant="h5" component="div" fontWeight="bold">
-                {safeData.stats?.totalRequests || 0}
-              </Typography>
-              <Typography variant="body2">
-                Tổng số yêu cầu
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              height: '100%',
-              bgcolor: 'warning.light',
-              color: 'warning.contrastText',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <CardContent>
-              <Box sx={{ position: 'absolute', right: -10, top: -10, opacity: 0.2 }}>
-                <PendingIcon sx={{ fontSize: 80 }} />
-              </Box>
-              <Typography variant="h5" component="div" fontWeight="bold">
-                {safeData.stats?.pendingRequests || 0}
-              </Typography>
-              <Typography variant="body2">
-                Chờ xử lý
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              height: '100%',
-              bgcolor: 'info.light',
-              color: 'info.contrastText',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <CardContent>
-              <Box sx={{ position: 'absolute', right: -10, top: -10, opacity: 0.2 }}>
-                <ProcessingIcon sx={{ fontSize: 80 }} />
-              </Box>
-              <Typography variant="h5" component="div" fontWeight="bold">
-                {safeData.stats?.processingRequests || 0}
-              </Typography>
-              <Typography variant="body2">
-                Đang xử lý
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        
-        <Grid item xs={12} sm={6} md={3}>
-          <Card 
-            sx={{ 
-              height: '100%',
-              bgcolor: 'success.light',
-              color: 'success.contrastText',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <CardContent>
-              <Box sx={{ position: 'absolute', right: -10, top: -10, opacity: 0.2 }}>
-                <CheckIcon sx={{ fontSize: 80 }} />
-              </Box>
-              <Typography variant="h5" component="div" fontWeight="bold">
-                {safeData.stats?.completedRequests || 0}
-              </Typography>
-              <Typography variant="body2">
-                Đã hoàn thành
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
+      {/* Action Bar */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button
+          variant="outlined"
+          startIcon={<RefreshIcon />}
+          onClick={fetchDashboardData}
+        >
+          Làm mới dữ liệu
+        </Button>
+      </Box>
+      
+            {/* Quick Action Buttons */}      <Paper         sx={{           p: 3,           mb: 3,           borderRadius: '12px',          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',          background: 'linear-gradient(to right, #f5f7fa, #ffffff)'        }}      >        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>          <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary' }}>            Thao tác nhanh          </Typography>          <Chip             label="Cán bộ xã"             color="primary"             size="small"             sx={{ fontWeight: 'medium', borderRadius: '16px' }}          />        </Box>                <Grid container spacing={2}>          <Grid item xs={12} sm={6} md={3}>            <Card               sx={{                 p: 2,                height: '100%',                cursor: 'pointer',                transition: 'all 0.3s',                borderRadius: '12px',                border: '1px solid',                borderColor: 'primary.main',                '&:hover': {                  transform: 'translateY(-5px)',                  boxShadow: '0 10px 20px rgba(0,0,0,0.1)',                  bgcolor: 'primary.main',                  color: 'primary.contrastText',                  '& .icon': {                    color: 'white',                    bgcolor: 'primary.dark'                  },                  '& .title': {                    color: 'white'                  },                  '& .description': {                    color: 'rgba(255,255,255,0.8)'                  }                }              }}              onClick={() => navigateTo('/officer/requests/pending')}            >              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>                <Avatar                   className="icon"                  sx={{                     bgcolor: 'primary.light',                     color: 'primary.main',                    mr: 1.5                  }}                >                  <AssignmentIcon />                </Avatar>                <Box>                  <Typography variant="subtitle1" fontWeight="bold" className="title">                    Xử lý yêu cầu                  </Typography>                  <Typography variant="body2" color="text.secondary" className="description">                    Xem và xử lý các yêu cầu đang chờ                  </Typography>                </Box>              </Box>            </Card>          </Grid>                    <Grid item xs={12} sm={6} md={3}>            <Card               sx={{                 p: 2,                height: '100%',                cursor: 'pointer',                transition: 'all 0.3s',                borderRadius: '12px',                border: '1px solid',                borderColor: 'info.main',                '&:hover': {                  transform: 'translateY(-5px)',                  boxShadow: '0 10px 20px rgba(0,0,0,0.1)',                  bgcolor: 'info.main',                  color: 'info.contrastText',                  '& .icon': {                    color: 'white',                    bgcolor: 'info.dark'                  },                  '& .title': {                    color: 'white'                  },                  '& .description': {                    color: 'rgba(255,255,255,0.8)'                  }                }              }}              onClick={() => navigateTo('/officer/citizens')}            >              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>                <Avatar                   className="icon"                  sx={{                     bgcolor: 'info.light',                     color: 'info.main',                    mr: 1.5                  }}                >                  <GroupIcon />                </Avatar>                <Box>                  <Typography variant="subtitle1" fontWeight="bold" className="title">                    Quản lý công dân                  </Typography>                  <Typography variant="body2" color="text.secondary" className="description">                    Xem và quản lý thông tin công dân                  </Typography>                </Box>              </Box>            </Card>          </Grid>                    <Grid item xs={12} sm={6} md={3}>            <Card               sx={{                 p: 2,                height: '100%',                cursor: 'pointer',                transition: 'all 0.3s',                borderRadius: '12px',                border: '1px solid',                borderColor: 'secondary.main',                '&:hover': {                  transform: 'translateY(-5px)',                  boxShadow: '0 10px 20px rgba(0,0,0,0.1)',                  bgcolor: 'secondary.main',                  color: 'secondary.contrastText',                  '& .icon': {                    color: 'white',                    bgcolor: 'secondary.dark'                  },                  '& .title': {                    color: 'white'                  },                  '& .description': {                    color: 'rgba(255,255,255,0.8)'                  }                }              }}              onClick={() => navigateTo('/officer/statistics')}            >              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>                <Avatar                   className="icon"                  sx={{                     bgcolor: 'secondary.light',                     color: 'secondary.main',                    mr: 1.5                  }}                >                  <ChartIcon />                </Avatar>                <Box>                  <Typography variant="subtitle1" fontWeight="bold" className="title">                    Thống kê                  </Typography>                  <Typography variant="body2" color="text.secondary" className="description">                    Xem báo cáo và thống kê                  </Typography>                </Box>              </Box>            </Card>          </Grid>                    <Grid item xs={12} sm={6} md={3}>            <Card               sx={{                 p: 2,                height: '100%',                cursor: 'pointer',                transition: 'all 0.3s',                borderRadius: '12px',                border: '1px solid',                borderColor: 'success.main',                '&:hover': {                  transform: 'translateY(-5px)',                  boxShadow: '0 10px 20px rgba(0,0,0,0.1)',                  bgcolor: 'success.main',                  color: 'success.contrastText',                  '& .icon': {                    color: 'white',                    bgcolor: 'success.dark'                  },                  '& .title': {                    color: 'white'                  },                  '& .description': {                    color: 'rgba(255,255,255,0.8)'                  }                }              }}              onClick={() => navigateTo('/officer/profile')}            >              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1 }}>                <Avatar                   className="icon"                  sx={{                     bgcolor: 'success.light',                     color: 'success.main',                    mr: 1.5                  }}                >                  <ProfileIcon />                </Avatar>                <Box>                  <Typography variant="subtitle1" fontWeight="bold" className="title">                    Hồ sơ cá nhân                  </Typography>                  <Typography variant="body2" color="text.secondary" className="description">                    Cập nhật thông tin cá nhân                  </Typography>                </Box>              </Box>            </Card>          </Grid>        </Grid>      </Paper>
+      
+            {/* Stats Cards */}      <Grid container spacing={3} sx={{ mb: 4 }}>        <Grid item xs={12} sm={6} md={3}>          <Card             sx={{               height: '100%',               bgcolor: 'primary.light',               color: 'primary.contrastText',              position: 'relative',              overflow: 'hidden',              transition: 'transform 0.3s',              '&:hover': {                transform: 'translateY(-5px)',                boxShadow: '0 8px 16px rgba(0,0,0,0.2)'              }            }}          >            <Box               sx={{                 position: 'absolute',                 top: 0,                 left: 0,                 width: '100%',                 height: '4px',                bgcolor: 'primary.dark'               }}             />            <CardContent sx={{ pt: 3 }}>              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>                <Box>                  <Typography variant="h4" component="div" fontWeight="bold">                    {dashboardData?.stats?.pending_requests || 0}                  </Typography>                  <Typography variant="body1" sx={{ mt: 1 }}>                    Yêu cầu chờ xử lý                  </Typography>                </Box>                <Avatar sx={{ bgcolor: 'primary.dark', p: 1 }}>                  <PendingIcon fontSize="medium" />                </Avatar>              </Box>                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>                <Button                   size="small"                   variant="contained"                   color="primary"                  endIcon={<ArrowForwardIcon />}                  onClick={() => navigateTo('/officer/requests/pending')}                  sx={{                     borderRadius: '20px',                    boxShadow: 'none',                    '&:hover': { boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }                  }}                >                  Xử lý ngay                </Button>              </Box>            </CardContent>          </Card>        </Grid>                <Grid item xs={12} sm={6} md={3}>          <Card             sx={{               height: '100%',               bgcolor: 'success.light',               color: 'success.contrastText',              position: 'relative',              overflow: 'hidden',              transition: 'transform 0.3s',              '&:hover': {                transform: 'translateY(-5px)',                boxShadow: '0 8px 16px rgba(0,0,0,0.2)'              }            }}          >            <Box               sx={{                 position: 'absolute',                 top: 0,                 left: 0,                 width: '100%',                 height: '4px',                bgcolor: 'success.dark'               }}             />            <CardContent sx={{ pt: 3 }}>              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>                <Box>                  <Typography variant="h4" component="div" fontWeight="bold">                    {dashboardData?.stats?.completed_requests || 0}                  </Typography>                  <Typography variant="body1" sx={{ mt: 1 }}>                    Yêu cầu đã xử lý                  </Typography>                </Box>                <Avatar sx={{ bgcolor: 'success.dark', p: 1 }}>                  <CheckIcon fontSize="medium" />                </Avatar>              </Box>                            <Box sx={{ mt: 2 }}>                <LinearProgress                   variant="determinate"                   value={dashboardData?.stats?.completion_rate || 0}                   color="success"                  sx={{ height: 6, borderRadius: 3 }}                />                <Typography variant="caption" sx={{ mt: 0.5, display: 'block' }}>                  Tỷ lệ hoàn thành: {dashboardData?.stats?.completion_rate || 0}%                </Typography>              </Box>            </CardContent>          </Card>        </Grid>                <Grid item xs={12} sm={6} md={3}>          <Card             sx={{               height: '100%',               bgcolor: 'info.light',               color: 'info.contrastText',              position: 'relative',              overflow: 'hidden',              transition: 'transform 0.3s',              '&:hover': {                transform: 'translateY(-5px)',                boxShadow: '0 8px 16px rgba(0,0,0,0.2)'              }            }}          >            <Box               sx={{                 position: 'absolute',                 top: 0,                 left: 0,                 width: '100%',                 height: '4px',                bgcolor: 'info.dark'               }}             />            <CardContent sx={{ pt: 3 }}>              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>                <Box>                  <Typography variant="h4" component="div" fontWeight="bold">                    {dashboardData?.stats?.total_citizens || 0}                  </Typography>                  <Typography variant="body1" sx={{ mt: 1 }}>                    Tổng số công dân                  </Typography>                </Box>                <Avatar sx={{ bgcolor: 'info.dark', p: 1 }}>                  <GroupIcon fontSize="medium" />                </Avatar>              </Box>                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>                <Chip                   icon={<CalendarIcon fontSize="small" />}                   label={`${dashboardData?.stats?.new_citizens_this_month || 0} công dân mới tháng này`}                  size="small"                  color="info"                />              </Box>            </CardContent>          </Card>        </Grid>                <Grid item xs={12} sm={6} md={3}>          <Card             sx={{               height: '100%',               bgcolor: 'secondary.light',               color: 'secondary.contrastText',              position: 'relative',              overflow: 'hidden',              transition: 'transform 0.3s',              '&:hover': {                transform: 'translateY(-5px)',                boxShadow: '0 8px 16px rgba(0,0,0,0.2)'              }            }}          >            <Box               sx={{                 position: 'absolute',                 top: 0,                 left: 0,                 width: '100%',                 height: '4px',                bgcolor: 'secondary.dark'               }}             />            <CardContent sx={{ pt: 3 }}>              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>                <Box>                  <Typography variant="h4" component="div" fontWeight="bold">                    {dashboardData?.stats?.total_documents || 0}                  </Typography>                  <Typography variant="body1" sx={{ mt: 1 }}>                    Giấy tờ đã cấp                  </Typography>                </Box>                <Avatar sx={{ bgcolor: 'secondary.dark', p: 1 }}>                  <DescriptionIcon fontSize="medium" />                </Avatar>              </Box>                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>                <Badge                   badgeContent={dashboardData?.stats?.documents_this_week || 0}                   color="error"                   max={99}                  sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', height: '18px', minWidth: '18px' } }}                >                  <Chip                     icon={<SpeedIcon fontSize="small" />}                     label="Tuần này"                    size="small"                    color="secondary"                  />                </Badge>              </Box>            </CardContent>          </Card>        </Grid>      </Grid>
+      
+      {/* Lists */}
       <Grid container spacing={3}>
         {/* Pending Requests */}
-        <Grid item xs={12} md={6} lg={6}>
-          <Paper sx={{ p: 2, height: '100%' }}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6" fontWeight="medium">
                 Yêu cầu chờ xử lý
               </Typography>
-              
               <Button 
                 variant="outlined" 
-                size="small" 
-                onClick={() => navigate('/officer/requests/pending')}
+                size="small"
+                startIcon={<ViewListIcon />}
+                onClick={() => navigateTo('/officer/pending-requests')}
               >
                 Xem tất cả
               </Button>
             </Box>
             
-            {safeData.pendingRequests && safeData.pendingRequests.length > 0 ? (
-              <List>
-                {safeData.pendingRequests.slice(0, 5).map((request, index) => (
-                  <React.Fragment key={request.id || index}>
+            {dashboardData?.pending_requests?.length > 0 ? (
+              <List disablePadding>
+                {dashboardData.pending_requests.map((request, index) => (
+                  <React.Fragment key={request.id}>
                     <ListItem 
-                      secondaryAction={
-                        <Button 
-                          size="small" 
-                          variant="contained" 
-                          onClick={() => handleViewRequest(request.id)}
-                        >
-                          Xử lý
-                        </Button>
-                      }
+                      alignItems="flex-start" 
+                      sx={{ 
+                        cursor: 'pointer',
+                        '&:hover': { bgcolor: 'action.hover' }
+                      }}
+                      onClick={() => handleViewRequest(request.id)}
                     >
-                      <ListItemText 
+                      <ListItemText
                         primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <NoteIcon fontSize="small" color="primary" />
-                            <Typography variant="body1">
-                              {request.type}
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="subtitle1" fontWeight="medium">
+                              {request.title}
                             </Typography>
+                            {request.priority === 'high' && (
+                              <Chip label="Ưu tiên" color="error" size="small" />
+                            )}
                           </Box>
                         }
                         secondary={
-                          <Box sx={{ mt: 0.5 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <PersonIcon fontSize="small" color="action" />
-                              <Typography variant="body2" color="text.secondary">
-                                {request.citizen || 'Không có thông tin'}
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              Người yêu cầu: {request.citizen?.name || 'Không xác định'}
+                            </Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                              <Typography variant="caption" color="text.secondary">
+                                Ngày nộp: {formatDate(request.submittedDate)}
                               </Typography>
+                              {getStatusChip(request.status)}
                             </Box>
-                            <Typography variant="body2" color="text.secondary">
-                              Ngày yêu cầu: {formatDate(request.date)}
-                            </Typography>
-                            {getStatusChip(request.status)}
                           </Box>
                         }
                       />
                     </ListItem>
-                    {index < safeData.pendingRequests.slice(0, 5).length - 1 && <Divider />}
+                    {index < dashboardData.pending_requests.length - 1 && <Divider />}
                   </React.Fragment>
                 ))}
               </List>
             ) : (
               <Box sx={{ py: 2, textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary">
-                  Không có yêu cầu nào đang chờ xử lý
+                  Không có yêu cầu nào chờ xử lý
                 </Typography>
-                <Button
-                  variant="text"
-                  onClick={fetchDashboardData}
-                  startIcon={<RefreshIcon />}
-                  sx={{ mt: 1 }}
-                >
-                  Làm mới
-                </Button>
               </Box>
             )}
           </Paper>
         </Grid>
         
-        {/* Recent Activities */}
-        <Grid item xs={12} md={6} lg={6}>
-          <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" fontWeight="medium" gutterBottom>
-              Hoạt động gần đây
-            </Typography>
+        {/* Recent Citizens */}
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="medium">
+                Công dân mới đăng ký
+              </Typography>
+              <Button 
+                variant="outlined" 
+                size="small"
+                startIcon={<GroupIcon />}
+                onClick={() => navigateTo('/officer/citizens')}
+              >
+                Quản lý công dân
+              </Button>
+            </Box>
             
-            {safeData.recentActivity && safeData.recentActivity.length > 0 ? (
-              <List>
-                {safeData.recentActivity.slice(0, 5).map((activity, index) => (
-                  <React.Fragment key={activity.id || index}>
-                    <ListItem>
-                      <ListItemText 
+            {dashboardData?.recent_citizens?.length > 0 ? (
+              <List disablePadding>
+                {dashboardData.recent_citizens.map((citizen, index) => (
+                  <React.Fragment key={citizen.id}>
+                    <ListItem 
+                      alignItems="flex-start" 
+                      sx={{ 
+                        cursor: 'pointer',
+                        '&:hover': { bgcolor: 'action.hover' }
+                      }}
+                      onClick={() => navigateTo(`/officer/citizens`)}
+                    >
+                      <ListItemText
                         primary={
-                          <Typography variant="body1">
-                            {activity.action} - {activity.document}
+                          <Typography variant="subtitle1" fontWeight="medium">
+                            {citizen.name}
                           </Typography>
                         }
                         secondary={
-                          <Typography variant="body2" color="text.secondary">
-                            {formatDate(activity.time)}
-                          </Typography>
+                          <Box sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Email: {citizen.email}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              SĐT: {citizen.phone}
+                            </Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                              <Typography variant="caption" color="text.secondary">
+                                Yêu cầu gần nhất: {citizen.lastRequest ? formatDate(citizen.lastRequest) : 'Chưa có'}
+                              </Typography>
+                              <Chip 
+                                label={`${citizen.totalRequests} yêu cầu`} 
+                                size="small" 
+                                color={citizen.totalRequests > 0 ? 'primary' : 'default'} 
+                              />
+                            </Box>
+                          </Box>
                         }
                       />
                     </ListItem>
-                    {index < safeData.recentActivity.slice(0, 5).length - 1 && <Divider />}
+                    {index < dashboardData.recent_citizens.length - 1 && <Divider />}
                   </React.Fragment>
                 ))}
               </List>
             ) : (
               <Box sx={{ py: 2, textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary">
-                  Chưa có hoạt động nào gần đây
+                  Không có công dân mới đăng ký
                 </Typography>
               </Box>
             )}
           </Paper>
         </Grid>
         
-        {/* Recently Processed Requests */}
+        {/* Completed Requests */}
         <Grid item xs={12}>
-          <Paper sx={{ p: 2 }}>
+          <Paper sx={{ p: 2, mt: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6" fontWeight="medium">
                 Yêu cầu đã xử lý gần đây
               </Typography>
-              
               <Button 
                 variant="outlined" 
-                size="small" 
-                onClick={() => navigate('/officer/requests/completed')}
+                size="small"
+                startIcon={<RefreshIcon />}
+                onClick={fetchDashboardData}
               >
-                Xem tất cả
+                Làm mới
               </Button>
             </Box>
             
-            {safeData.completedRequests && safeData.completedRequests.length > 0 ? (
-              <List>
-                {safeData.completedRequests.slice(0, 5).map((request, index) => (
-                  <React.Fragment key={request.id || index}>
-                    <ListItem>
-                      <ListItemText 
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <NoteIcon fontSize="small" color="primary" />
-                            <Typography variant="body1">
-                              {request.type}
-                            </Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <Box sx={{ mt: 0.5 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <PersonIcon fontSize="small" color="action" />
-                              <Typography variant="body2" color="text.secondary">
-                                {request.citizen || 'Không có thông tin'}
+            {dashboardData?.completed_requests?.length > 0 ? (
+              <List disablePadding>
+                <Grid container>
+                  {dashboardData.completed_requests.map((request, index) => (
+                    <Grid item xs={12} md={6} key={request.id}>
+                      <ListItem 
+                        alignItems="flex-start" 
+                        sx={{ 
+                          cursor: 'pointer',
+                          '&:hover': { bgcolor: 'action.hover' }
+                        }}
+                        onClick={() => handleViewRequest(request.id)}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Typography variant="subtitle1" fontWeight="medium">
+                                {request.title}
                               </Typography>
+                              {getStatusChip(request.status)}
                             </Box>
-                            <Typography variant="body2" color="text.secondary">
-                              Ngày yêu cầu: {formatDate(request.date)}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Ngày hoàn thành: {formatDate(request.completedDate)}
-                            </Typography>
-                            {getStatusChip('completed')}
-                          </Box>
-                        }
-                      />
-                    </ListItem>
-                    {index < safeData.completedRequests.slice(0, 5).length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
+                          }
+                          secondary={
+                            <Box sx={{ mt: 1 }}>
+                              <Typography variant="body2" color="text.secondary">
+                                Người yêu cầu: {request.citizen?.name || 'Không xác định'}
+                              </Typography>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Hoàn thành: {formatDate(request.completedDate)}
+                                </Typography>
+                              </Box>
+                              {request.rejectReason && (
+                                <Typography variant="caption" color="error">
+                                  Lý do từ chối: {request.rejectReason}
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                      {index < dashboardData.completed_requests.length - 1 && <Divider />}
+                    </Grid>
+                  ))}
+                </Grid>
               </List>
             ) : (
               <Box sx={{ py: 2, textAlign: 'center' }}>
                 <Typography variant="body1" color="text.secondary">
-                  Chưa có yêu cầu nào đã được xử lý gần đây
+                  Không có yêu cầu nào đã xử lý
                 </Typography>
               </Box>
             )}

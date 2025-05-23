@@ -1,2 +1,2 @@
-import OfficerDashboard from './OfficerDashboard';
-export default OfficerDashboard;
+import OfficerDashboardPage from './OfficerDashboardPage';
+export default OfficerDashboardPage;

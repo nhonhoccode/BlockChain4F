@@ -8,7 +8,8 @@ import {
   Menu, 
   MenuItem, 
   ListItemIcon, 
-  ListItemText 
+  ListItemText,
+  Button
 } from '@mui/material';
 import {
   AccountCircle as AccountCircleIcon,
@@ -16,7 +17,8 @@ import {
   AdminPanelSettings as AdminIcon,
   Assignment as AssignmentIcon,
   ExitToApp as LogoutIcon,
-  Badge as OfficerIcon
+  Badge as OfficerIcon,
+  PersonAdd as RegisterIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../../services/api/authService';
@@ -67,25 +69,48 @@ const AuthStatus = () => {
     handleMenuClose();
   };
   
-  // If no user, show login button
+  // If no user, show login and register buttons
   if (!user) {
     return (
-      <Tooltip title="Đăng nhập">
-        <Chip
-          avatar={<Avatar><AccountCircleIcon /></Avatar>}
-          label="Đăng nhập"
-          variant="outlined"
-          clickable
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Button 
+          variant="outlined" 
+          size="small"
+          color="primary"
+          startIcon={<AccountCircleIcon />}
           onClick={() => navigate('/auth/login')}
           sx={{ 
-            borderColor: 'primary.main',
-            color: 'primary.main',
+            borderColor: '#2563eb',
+            color: '#2563eb',
+            fontWeight: 500,
             '&:hover': {
-              backgroundColor: 'primary.50'
+              backgroundColor: 'rgba(37, 99, 235, 0.04)',
+              borderColor: '#1e40af'
             }
           }}
-        />
-      </Tooltip>
+        >
+          Đăng nhập
+        </Button>
+        
+        <Button 
+          variant="contained" 
+          size="small"
+          color="primary"
+          startIcon={<RegisterIcon />}
+          onClick={() => navigate('/auth/register')}
+          sx={{ 
+            backgroundColor: '#2563eb',
+            fontWeight: 500,
+            boxShadow: 'none',
+            '&:hover': {
+              backgroundColor: '#1e40af',
+              boxShadow: 'none'
+            }
+          }}
+        >
+          Đăng ký
+        </Button>
+      </Box>
     );
   }
   
@@ -199,7 +224,7 @@ const AuthStatus = () => {
           <ListItemText>Hồ sơ cá nhân</ListItemText>
         </MenuItem>
         
-        <MenuItem onClick={() => handleNavigate(`/${user.role}/dashboard`)}>
+        <MenuItem onClick={() => handleNavigate(`/${user.role}`)}>
           <ListItemIcon>
             <AssignmentIcon fontSize="small" />
           </ListItemIcon>

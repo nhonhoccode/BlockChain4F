@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count, Avg
 from django.utils import timezone
 
-from ..models import Request, Document, DocumentType, Approval
+from ..models import AdminRequest, Document, DocumentType, Approval
 from ..serializers import (
     RequestListSerializer, RequestDetailSerializer,
     DocumentSerializer, DocumentListSerializer, DocumentDetailSerializer,
@@ -22,9 +22,9 @@ class ChairmanDashboardView(generics.GenericAPIView):
     
     def get(self, request, *args, **kwargs):
         # Thống kê yêu cầu
-        total_requests = Request.objects.count()
-        pending_requests = Request.objects.filter(status__in=['submitted', 'in_review']).count()
-        completed_requests = Request.objects.filter(status='completed').count()
+        total_requests = AdminRequest.objects.count()
+        pending_requests = AdminRequest.objects.filter(status__in=['submitted', 'in_review']).count()
+        completed_requests = AdminRequest.objects.filter(status='completed').count()
         
         # Thống kê giấy tờ
         total_documents = Document.objects.count()
@@ -40,7 +40,7 @@ class ChairmanDashboardView(generics.GenericAPIView):
         ).values('id', 'name', 'requests_count', 'documents_count')
         
         # Thống kê thời gian xử lý yêu cầu
-        avg_processing_time = Request.objects.filter(status='completed').annotate(
+        avg_processing_time = AdminRequest.objects.filter(status='completed').annotate(
             processing_time=timezone.models.ExpressionWrapper(
                 timezone.models.F('completed_date') - timezone.models.F('submitted_date'),
                 output_field=timezone.models.DurationField()
@@ -136,7 +136,7 @@ class ChairmanRequestListView(generics.ListAPIView):
     search_fields = ['title', 'reference_number', 'description', 'requestor__first_name', 'requestor__last_name']
     ordering_fields = ['created_at', 'submitted_date', 'due_date', 'status', 'priority']
     ordering = ['-priority', '-submitted_date']
-    queryset = Request.objects.all()
+    queryset = AdminRequest.objects.all()
 
 
 @api_view(['GET'])
@@ -170,7 +170,7 @@ def officer_statistics(request):
     ).values('id', 'first_name', 'last_name', 'total_documents')
     
     # Thống kê theo tháng
-    monthly_stats = Request.objects.filter(
+    monthly_stats = AdminRequest.objects.filter(
         status='completed',
         completed_date__isnull=False
     ).annotate(

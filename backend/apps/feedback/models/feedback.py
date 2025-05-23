@@ -38,7 +38,7 @@ class Feedback(models.Model):
     
     # Thông tin liên quan
     related_document = models.ForeignKey('administrative.Document', on_delete=models.SET_NULL, null=True, blank=True, related_name='feedbacks', verbose_name="Giấy tờ liên quan")
-    related_request = models.ForeignKey('administrative.Request', on_delete=models.SET_NULL, null=True, blank=True, related_name='feedbacks', verbose_name="Yêu cầu liên quan")
+    related_request = models.ForeignKey('administrative.AdminRequest', on_delete=models.SET_NULL, null=True, blank=True, related_name='feedbacks', verbose_name="Yêu cầu liên quan")
     
     # Thông tin phản hồi từ cán bộ
     response = models.TextField(blank=True, null=True, verbose_name="Phản hồi")

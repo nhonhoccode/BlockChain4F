@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from apps.accounts.models import User, Role
 from apps.accounts.serializers import UserSerializer
-from apps.administrative.models import Document, Approval, Request, DocumentType
+from apps.administrative.models import Document, Approval, AdminRequest, DocumentType
 from apps.administrative.serializers import DocumentSerializer, ApprovalSerializer
 from apps.officer_management.models import OfficerRequest, OfficerApproval, OfficerAssignment
 from apps.officer_management.serializers import (
@@ -152,9 +152,9 @@ class ChairmanOfficerViewSet(viewsets.ReadOnlyModelViewSet):
         officer = self.get_object()
         
         # Tổng số yêu cầu đã xử lý
-        total_requests = Request.objects.filter(assigned_to=officer).count()
-        completed_requests = Request.objects.filter(assigned_to=officer, status='completed').count()
-        pending_requests = Request.objects.filter(assigned_to=officer, status='processing').count()
+        total_requests = AdminRequest.objects.filter(assigned_to=officer).count()
+        completed_requests = AdminRequest.objects.filter(assigned_to=officer, status='completed').count()
+        pending_requests = AdminRequest.objects.filter(assigned_to=officer, status='processing').count()
         
         # Tổng số giấy tờ đã tạo
         total_documents = Document.objects.filter(created_by=officer).count()
@@ -265,10 +265,10 @@ class ChairmanDashboardStatsView(viewsets.ViewSet):
             total_citizens = User.objects.filter(roles__name='citizen').count()
             
             # Thống kê yêu cầu
-            total_requests = Request.objects.count()
-            pending_requests = Request.objects.filter(status__in=['submitted', 'in_review', 'processing']).count()
-            completed_requests = Request.objects.filter(status__in=['completed', 'approved']).count()
-            rejected_requests = Request.objects.filter(status='rejected').count()
+            total_requests = AdminRequest.objects.count()
+            pending_requests = AdminRequest.objects.filter(status__in=['submitted', 'in_review', 'processing']).count()
+            completed_requests = AdminRequest.objects.filter(status__in=['completed', 'approved']).count()
+            rejected_requests = AdminRequest.objects.filter(status='rejected').count()
             
             # Thống kê giấy tờ
             total_documents = Document.objects.count()
@@ -282,7 +282,7 @@ class ChairmanDashboardStatsView(viewsets.ViewSet):
             thirty_days_ago = timezone.now() - timedelta(days=30)
             
             # Tính thời gian xử lý trung bình (từ khi gửi đến khi hoàn thành)
-            completed_in_timeframe = Request.objects.filter(
+            completed_in_timeframe = AdminRequest.objects.filter(
                 status='completed',
                 submitted_date__gte=thirty_days_ago
             )
@@ -320,7 +320,7 @@ class ChairmanDashboardStatsView(viewsets.ViewSet):
             
             for officer in officers:
                 # Tính số yêu cầu đã xử lý và giấy tờ đã tạo
-                officer_requests = Request.objects.filter(assigned_to=officer)
+                officer_requests = AdminRequest.objects.filter(assigned_to=officer)
                 officer_completed_requests = officer_requests.filter(status='completed').count()
                 officer_total_requests = officer_requests.count()
                 officer_documents = Document.objects.filter(created_by=officer).count()
@@ -364,7 +364,7 @@ class ChairmanDashboardStatsView(viewsets.ViewSet):
             
             for i in range(days):
                 date = timezone.now().date() - timedelta(days=i)
-                date_requests = Request.objects.filter(created_at__date=date).count()
+                date_requests = AdminRequest.objects.filter(created_at__date=date).count()
                 date_documents = Document.objects.filter(created_at__date=date).count()
                 
                 time_stats.append({

@@ -5,11 +5,11 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from django.db.models import Count, Q
 from apps.accounts.models import User
-from apps.administrative.models import Request, Document, Attachment
+from apps.administrative.models import AdminRequest, Document, DocumentType
 from apps.administrative.serializers import (
-    RequestSerializer, DocumentSerializer, 
-    RequestCreateSerializer, AttachmentSerializer
+    DocumentSerializer
 )
+from api.v1.serializers.request_serializers import RequestSerializer, RequestDetailSerializer
 from apps.feedback.models import Feedback
 from apps.feedback.serializers import FeedbackSerializer
 from utils.permissions import IsCitizen, IsOwnerOrAdmin
@@ -25,42 +25,89 @@ class CitizenRequestViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         # Công dân chỉ có thể xem các yêu cầu của chính họ
-        return Request.objects.filter(requestor=self.request.user).order_by('-created_at')
+        return AdminRequest.objects.filter(citizen=self.request.user).order_by('-created_at')
     
     def get_serializer_class(self):
-        if self.action == 'create':
-            return RequestCreateSerializer
+        if self.action == 'retrieve':
+            return RequestDetailSerializer
         return RequestSerializer
     
     def perform_create(self, serializer):
-        serializer.save(requestor=self.request.user)
+        serializer.save(citizen=self.request.user)
     
-    @action(detail=True, methods=['post'], url_path='upload-attachment')
-    def upload_attachment(self, request, pk=None):
+    def list(self, request, *args, **kwargs):
         """
-        Upload tài liệu đính kèm cho yêu cầu
+        Custom list method to handle pagination, filtering, and sorting
+        Also returns stats for different request statuses
         """
-        citizen_request = self.get_object()
+        user = request.user
+        queryset = self.get_queryset()
         
-        # Kiểm tra xem yêu cầu có thuộc về người dùng hiện tại không
-        if citizen_request.requestor != request.user:
-            return Response({'error': 'Bạn không có quyền thêm tài liệu cho yêu cầu này'},
-                            status=status.HTTP_403_FORBIDDEN)
+        # Apply filters
+        status_filter = request.query_params.get('status', None)
+        search = request.query_params.get('search', None)
         
-        # Kiểm tra xem yêu cầu còn ở trạng thái cho phép thêm tài liệu không
-        if citizen_request.status not in ['draft', 'pending', 'additional_info_requested']:
-            return Response({'error': 'Không thể thêm tài liệu cho yêu cầu ở trạng thái này'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = AttachmentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(
-                request=citizen_request,
-                uploaded_by=request.user
+        if status_filter and status_filter != 'all':
+            queryset = queryset.filter(status=status_filter)
+            
+        if search:
+            queryset = queryset.filter(
+                Q(request_id__icontains=search) | 
+                Q(request_type__icontains=search) | 
+                Q(description__icontains=search)
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Get request stats for UI 
+        all_count = AdminRequest.objects.filter(citizen=user).count()
+        pending_count = AdminRequest.objects.filter(citizen=user, status='pending').count()
+        processing_count = AdminRequest.objects.filter(citizen=user, status='processing').count()
+        completed_count = AdminRequest.objects.filter(citizen=user, status='completed').count()
+        rejected_count = AdminRequest.objects.filter(citizen=user, status='rejected').count()
+        
+        stats = {
+            'all': all_count,
+            'pending': pending_count,
+            'processing': processing_count,
+            'completed': completed_count,
+            'rejected': rejected_count
+        }
+        
+        # Paginate results
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+            response.data['stats'] = stats
+            return response
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'results': serializer.data,
+            'count': queryset.count(),
+            'stats': stats
+        })
+    
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel_request(self, request, pk=None):
+        """
+        Cancel a pending request
+        """
+        instance = self.get_object()
+        
+        # Only allow cancellation of pending requests
+        if instance.status != 'pending':
+            return Response(
+                {'detail': 'Only pending requests can be cancelled.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update status to cancelled
+        instance.status = 'cancelled'
+        instance.updated_at = timezone.now()
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class CitizenDocumentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -72,7 +119,7 @@ class CitizenDocumentViewSet(viewsets.ReadOnlyModelViewSet):
     
     def get_queryset(self):
         # Công dân chỉ có thể xem các giấy tờ của chính họ
-        return Document.objects.filter(issued_to=self.request.user).order_by('-created_at')
+        return Document.objects.filter(citizen=self.request.user).order_by('-created_at')
     
     @action(detail=True, methods=['get'], url_path='download')
     def download_document(self, request, pk=None):
@@ -96,9 +143,9 @@ class CitizenDocumentViewSet(viewsets.ReadOnlyModelViewSet):
         # Logic xác thực giấy tờ trên blockchain sẽ được thêm ở đây
         
         return Response({
-            'verified': True,
-            'blockchain_address': document.blockchain_address or 'Chưa có địa chỉ blockchain',
-            'last_verified': document.last_blockchain_update or 'Chưa được xác thực'
+            'verified': document.blockchain_status,
+            'blockchain_tx_id': document.blockchain_tx_id or 'Chưa có địa chỉ blockchain',
+            'last_verified': document.blockchain_timestamp.isoformat() if document.blockchain_timestamp else 'Chưa được xác thực'
         })
 
 
@@ -129,28 +176,34 @@ class CitizenDashboardStatsView(viewsets.ViewSet):
         """
         try:
             user = request.user
-            print(f"Fetching dashboard stats for user: {user.email}")
             
-            # Lấy số lượng giấy tờ - sử dụng issued_to
-            total_documents = Document.objects.filter(issued_to=user).count()
-            print(f"Total documents: {total_documents}")
+            # Lấy số lượng giấy tờ
+            total_documents = Document.objects.filter(citizen=user).count()
             
-            # Lấy số lượng yêu cầu theo trạng thái - sử dụng requestor
-            pending_requests = Request.objects.filter(
-                requestor=user, 
-                status__in=['draft', 'submitted', 'in_review', 'additional_info_requested', 'processing']
+            # Lấy số lượng yêu cầu theo trạng thái
+            pending_requests = AdminRequest.objects.filter(
+                citizen=user, 
+                status='pending'
             ).count()
-            print(f"Pending requests: {pending_requests}")
             
-            completed_requests = Request.objects.filter(
-                requestor=user,
-                status__in=['completed', 'approved']
+            processing_requests = AdminRequest.objects.filter(
+                citizen=user,
+                status='processing'
             ).count()
-            print(f"Completed requests: {completed_requests}")
+            
+            completed_requests = AdminRequest.objects.filter(
+                citizen=user,
+                status='completed'
+            ).count()
+            
+            rejected_requests = AdminRequest.objects.filter(
+                citizen=user,
+                status='rejected'
+            ).count()
             
             # Lấy hoạt động gần đây (5 yêu cầu và 5 giấy tờ gần nhất)
-            recent_requests = Request.objects.filter(requestor=user).order_by('-created_at')[:5]
-            recent_documents = Document.objects.filter(issued_to=user).order_by('-created_at')[:5]
+            recent_requests = AdminRequest.objects.filter(citizen=user).order_by('-created_at')[:5]
+            recent_documents = Document.objects.filter(citizen=user).order_by('-created_at')[:5]
             
             # Tạo danh sách hoạt động gần đây
             recent_activity = []
@@ -158,24 +211,24 @@ class CitizenDashboardStatsView(viewsets.ViewSet):
             # Thêm các yêu cầu gần đây
             for req in recent_requests:
                 recent_activity.append({
-                    'id': req.id,
+                    'id': req.request_id,
                     'type': 'request',
                     'status': req.status,
-                    'title': req.title,
+                    'title': req.request_type,
                     'date': req.created_at.isoformat(),
-                    'request_id': req.id,
-                    'officer': f"{req.assigned_officer.first_name} {req.assigned_officer.last_name}" if req.assigned_officer else None
+                    'request_id': req.request_id,
+                    'officer': f"{req.assigned_to.first_name} {req.assigned_to.last_name}" if req.assigned_to else None
                 })
                 
             # Thêm các giấy tờ gần đây
             for doc in recent_documents:
                 recent_activity.append({
-                    'id': doc.id,
+                    'id': str(doc.id),
                     'type': 'document',
                     'status': doc.status,
                     'title': doc.title,
                     'date': doc.created_at.isoformat(),
-                    'document_id': doc.id,
+                    'document_id': doc.document_id,
                     'issued_by': f"{doc.issued_by.first_name} {doc.issued_by.last_name}" if doc.issued_by else None
                 })
                 
@@ -183,8 +236,7 @@ class CitizenDashboardStatsView(viewsets.ViewSet):
             recent_activity.sort(key=lambda x: x['date'], reverse=True)
             
             # Phân tích số lượng giấy tờ đã được xác minh blockchain
-            verified_documents = Document.objects.filter(issued_to=user, is_verified_blockchain=True).count()
-            rejected_requests = Request.objects.filter(requestor=user, status='rejected').count()
+            verified_documents = Document.objects.filter(citizen=user, blockchain_status=True).count()
             
             # Đếm số thông báo chưa đọc
             unread_notifications = 0
@@ -194,28 +246,74 @@ class CitizenDashboardStatsView(viewsets.ViewSet):
             except ImportError:
                 pass
             
+            # Phân bố loại giấy tờ
+            document_type_distribution = Document.objects.filter(citizen=user).values('document_type').annotate(
+                count=Count('id')
+            ).order_by('-count')
+            
+            # Chuyển đổi document_type_distribution thành định dạng phù hợp
+            document_distribution = []
+            for item in document_type_distribution:
+                doc_type = item['document_type']
+                # Lấy tên loại giấy tờ từ choices hoặc từ DocumentType
+                doc_type_name = doc_type
+                for choice in Document.DOCUMENT_TYPE_CHOICES:
+                    if choice[0] == doc_type:
+                        doc_type_name = choice[1]
+                        break
+                
+                document_distribution.append({
+                    'type': doc_type,
+                    'name': str(doc_type_name),
+                    'count': item['count']
+                })
+            
+            # Thống kê giấy tờ theo trạng thái
+            document_status_stats = Document.objects.filter(citizen=user).values('status').annotate(
+                count=Count('id')
+            ).order_by('status')
+            
+            # Chuyển đổi document_status_stats thành định dạng phù hợp
+            document_stats = []
+            for item in document_status_stats:
+                status = item['status']
+                # Lấy tên trạng thái từ choices
+                status_name = status
+                for choice in Document.DOCUMENT_STATUS_CHOICES:
+                    if choice[0] == status:
+                        status_name = choice[1]
+                        break
+                
+                document_stats.append({
+                    'status': status,
+                    'name': str(status_name),
+                    'count': item['count']
+                })
+            
             # Trả về dữ liệu dashboard
             dashboard_data = {
                 'user': {
                     'id': user.id,
                     'name': f"{user.first_name} {user.last_name}".strip(),
                     'email': user.email,
-                    'phone': user.phone,
-                    'address': user.address,
+                    'phone': getattr(user, 'phone', ''),
+                    'address': getattr(user, 'address', ''),
                     'last_login': user.last_login.isoformat() if user.last_login else None
                 },
                 'stats': {
                     'total_documents': total_documents,
                     'pending_requests': pending_requests,
+                    'processing_requests': processing_requests,
                     'completed_requests': completed_requests,
+                    'rejected_requests': rejected_requests,
                     'notifications': unread_notifications,
-                    'verified_documents': verified_documents,
-                    'rejected_requests': rejected_requests
+                    'verified_documents': verified_documents
                 },
+                'document_distribution': document_distribution,
+                'document_stats': document_stats,
                 'recent_activity': recent_activity[:5]  # Giới hạn 5 hoạt động gần nhất
             }
             
-            print(f"Returning dashboard data: {dashboard_data}")
             return Response(dashboard_data)
         
         except Exception as e:
@@ -230,20 +328,22 @@ class CitizenDashboardStatsView(viewsets.ViewSet):
                     'id': user.id if 'user' in locals() else None,
                     'name': f"{user.first_name} {user.last_name}".strip() if 'user' in locals() else 'Công dân',
                     'email': user.email if 'user' in locals() else '',
-                    'phone': user.phone if 'user' in locals() else '',
-                    'address': user.address if 'user' in locals() else '',
+                    'phone': getattr(user, 'phone', '') if 'user' in locals() else '',
+                    'address': getattr(user, 'address', '') if 'user' in locals() else '',
                     'last_login': user.last_login.isoformat() if 'user' in locals() and user.last_login else None,
                 },
                 'stats': {
                     'total_documents': 0,
                     'pending_requests': 0,
+                    'processing_requests': 0,
                     'completed_requests': 0,
+                    'rejected_requests': 0,
                     'notifications': 0,
-                    'verified_documents': 0,
-                    'rejected_requests': 0
+                    'verified_documents': 0
                 },
+                'document_distribution': [],
+                'document_stats': [],
                 'recent_activity': []
             }
             
-            print(f"Returning fallback data due to error: {fallback_data}")
             return Response(fallback_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

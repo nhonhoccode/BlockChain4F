@@ -1,7 +1,8 @@
 import React from 'react';
+import CitizenManagement from './CitizenManagement';
 
 const CitizenListPage = () => {
-  return <div>Citizen List Page (Demo)</div>;
+  return <CitizenManagement />;
 };
 
 export default CitizenListPage;

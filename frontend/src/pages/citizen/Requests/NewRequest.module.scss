@@ -4,6 +4,8 @@
 .newRequestContainer {
   padding: 24px;
   animation: fadeIn 0.5s ease-in-out;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .pageHeader {
@@ -108,6 +110,7 @@
   padding: 24px;
   border-radius: 8px;
   margin-bottom: 24px;
+  background-color: #fafafa;
 }
 
 .attachmentList {
@@ -159,6 +162,41 @@
   justify-content: center;
   padding: 48px 0;
   text-align: center;
+}
+
+.procedureCard {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.procedureInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  svg {
+    margin-right: 8px;
+    color: var(--color-text-secondary, #757575);
+  }
+}
+
+.procedureChip {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+  
+  &.verified {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
 }
 
 @keyframes fadeIn {

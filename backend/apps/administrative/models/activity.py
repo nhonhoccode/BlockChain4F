@@ -27,8 +27,8 @@ class Activity(models.Model):
     description = models.TextField(_('Mô tả'), blank=True, null=True)
     
     # Các tham chiếu đến đối tượng liên quan
-    request = models.ForeignKey('blockchain.Request', on_delete=models.SET_NULL, null=True, blank=True, related_name='activities', verbose_name=_('Yêu cầu liên quan'))
-    document = models.ForeignKey('blockchain.Document', on_delete=models.SET_NULL, null=True, blank=True, related_name='activities', verbose_name=_('Giấy tờ liên quan'))
+    request = models.ForeignKey('administrative.AdminRequest', on_delete=models.SET_NULL, null=True, blank=True, related_name='activities', verbose_name=_('Yêu cầu liên quan'))
+    document = models.ForeignKey('administrative.Document', on_delete=models.SET_NULL, null=True, blank=True, related_name='activities', verbose_name=_('Giấy tờ liên quan'))
     
     is_read = models.BooleanField(_('Đã đọc'), default=False)
     is_important = models.BooleanField(_('Quan trọng'), default=False)

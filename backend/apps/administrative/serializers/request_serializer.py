@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from ..models import Request
+from ..models import AdminRequest
 from .document_type_serializer import DocumentTypeListSerializer
 
 
@@ -9,7 +9,7 @@ class RequestSerializer(serializers.ModelSerializer):
     Serializer cho model Request
     """
     class Meta:
-        model = Request
+        model = AdminRequest
         fields = '__all__'
         read_only_fields = ['request_id', 'created_at', 'updated_at', 
                            'blockchain_transaction_id', 'blockchain_updated_at', 
@@ -29,7 +29,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     days_until_due = serializers.IntegerField(read_only=True)
     
     class Meta:
-        model = Request
+        model = AdminRequest
         fields = [
             'id', 'request_id', 'reference_number', 'title', 
             'document_type', 'document_type_name', 'status', 'status_display',
@@ -66,7 +66,7 @@ class RequestDetailSerializer(serializers.ModelSerializer):
     resulting_documents = serializers.SerializerMethodField()
     
     class Meta:
-        model = Request
+        model = AdminRequest
         fields = '__all__'
         read_only_fields = ['request_id', 'created_at', 'updated_at', 
                            'blockchain_transaction_id', 'blockchain_updated_at', 
@@ -112,7 +112,7 @@ class CitizenRequestCreateSerializer(serializers.ModelSerializer):
     Serializer để công dân tạo yêu cầu mới
     """
     class Meta:
-        model = Request
+        model = AdminRequest
         fields = [
             'document_type', 'title', 'description', 
             'data', 'notes', 'status'
@@ -132,7 +132,7 @@ class SubmitRequestSerializer(serializers.ModelSerializer):
     Serializer để nộp yêu cầu (chuyển từ draft sang submitted)
     """
     class Meta:
-        model = Request
+        model = AdminRequest
         fields = ['status']
         read_only_fields = ['request_id', 'reference_number']
         
@@ -161,7 +161,7 @@ class OfficerRequestUpdateSerializer(serializers.ModelSerializer):
     Serializer để cán bộ xã cập nhật yêu cầu
     """
     class Meta:
-        model = Request
+        model = AdminRequest
         fields = [
             'status', 'assigned_officer', 'notes',
             'priority', 'due_date', 'rejection_reason',

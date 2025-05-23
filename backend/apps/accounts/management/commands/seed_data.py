@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from apps.accounts.models import Role, Profile, CustomPermission
-from apps.administrative.models import DocumentType, Document, Request, Approval, Attachment
+from apps.administrative.models import DocumentType, Document, AdminRequest, Approval, Attachment
 from apps.officer_management.models import OfficerRequest, OfficerApproval, OfficerAssignment
 from apps.feedback.models import Feedback
 from apps.notifications.models import Notification
@@ -10,6 +10,7 @@ import random
 from django.db import transaction
 from faker import Faker
 import os
+from datetime import timedelta
 
 User = get_user_model()
 fake = Faker('vi_VN')  # Sử dụng tiếng Việt
@@ -331,7 +332,7 @@ class Command(BaseCommand):
                                 end_date='now'
                             )
                     
-                    request = Request.objects.create(**request_data)
+                    request = AdminRequest.objects.create(**request_data)
                     
                     # Tạo file đính kèm
                     Attachment.objects.create(

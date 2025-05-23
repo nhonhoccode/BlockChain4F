@@ -15,6 +15,7 @@ import DocumentVerifyPage from './pages/public/DocumentVerify';
 import AboutPage from './pages/public/About';
 import ContactPage from './pages/public/Contact';
 import NotFoundPage from './pages/public/NotFound';
+import { PublicProceduresPage, ProcedureDetailPage } from './pages/public/Procedures';
 
 // Auth Pages
 import LoginPage from './pages/auth/Login';
@@ -28,6 +29,11 @@ import CitizenDashboard from './pages/citizen/Dashboard';
 
 // Officer Pages
 import OfficerDashboard from './pages/officer/Dashboard';
+import PendingRequests from './pages/officer/RequestManagement/PendingRequests';
+import ProcessRequest from './pages/officer/ProcessRequest';
+import OfficerProfilePage from './pages/officer/Profile';
+import StatisticsPage from './pages/officer/Statistics/StatisticsPage';
+import CitizenList from './pages/officer/CitizenManagement/CitizenList';
 
 // Chairman Pages
 import ChairmanDashboard from './pages/admin/chairman/Dashboard';
@@ -35,6 +41,11 @@ import ChairmanDashboard from './pages/admin/chairman/Dashboard';
 // Apply withAuthGuard to components
 const ProtectedCitizenDashboard = withAuthGuard(CitizenDashboard, { requiredRole: 'citizen' });
 const ProtectedOfficerDashboard = withAuthGuard(OfficerDashboard, { requiredRole: 'officer' });
+const ProtectedOfficerProfilePage = withAuthGuard(OfficerProfilePage, { requiredRole: 'officer' });
+const ProtectedPendingRequests = withAuthGuard(PendingRequests, { requiredRole: 'officer' });
+const ProtectedProcessRequest = withAuthGuard(ProcessRequest, { requiredRole: 'officer' });
+const ProtectedStatisticsPage = withAuthGuard(StatisticsPage, { requiredRole: 'officer' });
+const ProtectedCitizenList = withAuthGuard(CitizenList, { requiredRole: 'officer' });
 const ProtectedChairmanDashboard = withAuthGuard(ChairmanDashboard, { requiredRole: 'chairman' });
 
 // Define routes
@@ -48,6 +59,8 @@ const routes = [
       { path: "document-verify", element: <DocumentVerifyPage /> },
       { path: "about", element: <AboutPage /> },
       { path: "contact", element: <ContactPage /> },
+      { path: "procedures", element: <PublicProceduresPage /> },
+      { path: "procedures/:procedureId", element: <ProcedureDetailPage /> },
     ]
   },
   
@@ -81,7 +94,13 @@ const routes = [
     element: <OfficerLayout />,
     children: [
       { path: "dashboard", element: <ProtectedOfficerDashboard /> },
-      // { path: "*", element: <Navigate to="/officer/dashboard" replace /> }
+      { path: "pending-requests", element: <ProtectedPendingRequests /> },
+      { path: "process-request/:requestId", element: <ProtectedProcessRequest /> },
+      { path: "profile", element: <ProtectedOfficerProfilePage /> },
+      { path: "statistics", element: <ProtectedStatisticsPage /> },
+      { path: "citizens", element: <ProtectedCitizenList /> },
+      { path: "", element: <Navigate to="/officer/dashboard" replace /> },
+      { path: "*", element: <Navigate to="/officer/dashboard" replace /> }
     ]
   },
   

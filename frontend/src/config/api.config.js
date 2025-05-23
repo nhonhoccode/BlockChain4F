@@ -25,10 +25,10 @@ export const API_ENDPOINTS = {
   USER_PROFILE: '/api/v1/users/profile',
   
   // Citizen
-  CITIZEN_DASHBOARD: '/api/v1/citizen/dashboard',
-  CITIZEN_REQUESTS: '/api/v1/citizen/requests',
-  CITIZEN_DOCUMENTS: '/api/v1/citizen/documents',
-  CITIZEN_FEEDBACK: '/api/v1/citizen/feedback',
+  CITIZEN_DASHBOARD: '/api/v1/citizen/dashboard/stats/',
+  CITIZEN_REQUESTS: '/api/v1/citizen/requests/',
+  CITIZEN_DOCUMENTS: '/api/v1/citizen/documents/',
+  CITIZEN_FEEDBACK: '/api/v1/citizen/feedback/',
   
   // Officer
   OFFICER_DASHBOARD: '/api/v1/officer/dashboard',

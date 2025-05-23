@@ -18,7 +18,6 @@ import {
   Checkbox,
   CircularProgress,
   useTheme,
-  useMediaQuery,
   Radio,
   FormHelperText,
   Avatar
@@ -32,17 +31,14 @@ import {
   Email as EmailIcon,
   AdminPanelSettings as AdminIcon,
   Badge as OfficerIcon,
-  AccountCircle as CitizenIcon,
-  Security as SecurityIcon
+  AccountCircle as CitizenIcon
 } from '@mui/icons-material';
-import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import authService from '../../../services/api/authService';
 
 const LoginPage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const navigate = useNavigate();
   const location = useLocation();
   
   // Lấy từ query parameter để xác định vai trò mặc định
@@ -50,7 +46,6 @@ const LoginPage = () => {
   const roleParam = queryParams.get('role');
   
   // State
-  const [loginType, setLoginType] = useState('email'); // 'email' or 'google'
   const [role, setRole] = useState(roleParam || 'citizen');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -97,8 +92,8 @@ const LoginPage = () => {
   // Handle form submission
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
-    // Validate form only for email login
-    if (loginType === 'email' && !validateForm()) {
+    // Validate form
+    if (!validateForm()) {
       return;
     }
     setLoading(true);
@@ -119,16 +114,12 @@ const LoginPage = () => {
         throw new Error(response.message || 'Đăng nhập thất bại');
       }
       
-      // Lấy vai trò từ phản hồi API
-      const userRole = Array.isArray(response.roles) ? response.roles[0] : response.role || role;
-      
-      // Đảm bảo có token và thông tin người dùng trước khi lưu
-      if (!response.token) {
-        throw new Error('Không nhận được token xác thực từ máy chủ');
-      }
-      
       // Lưu thông tin đăng nhập vào localStorage
       localStorage.setItem('token', response.token);
+      
+      // Get the role from the response or use the selected role
+      const userRole = response.role || role;
+      
       const userData = {
         id: response.user?.id || response.user_id,
         name: `${response.user?.first_name || response.first_name || ''} ${response.user?.last_name || response.last_name || ''}`.trim(),
@@ -419,7 +410,7 @@ const LoginPage = () => {
             <AdminIcon />, 
             'Admin (Chủ tịch xã)',
             'Đăng nhập với quyền quản trị hệ thống và phê duyệt cán bộ',
-            loginType === 'google' // Disable if using Google login
+            false // No longer using loginType
           )}
         </Box>
         

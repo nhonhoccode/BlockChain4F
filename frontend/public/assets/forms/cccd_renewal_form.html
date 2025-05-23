@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tờ khai cấp đổi Căn cước công dân</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap&subset=vietnamese" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1976d2;
+            margin-bottom: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header .ministry {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .header .document-number {
+            font-style: italic;
+        }
+        .form-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            margin: 30px 0;
+            text-transform: uppercase;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-field .input-box {
+            border: 1px solid #ccc;
+            height: 30px;
+            width: 100%;
+            margin-bottom: 5px;
+            position: relative;
+        }
+        .form-field .input-box input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 5px;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-size: 14px;
+        }
+        .form-footer {
+            margin-top: 40px;
+            text-align: right;
+        }
+        .signature-area {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .print-button:hover {
+            background-color: #1565c0;
+        }
+        .reason-section {
+            margin: 20px 0;
+        }
+        .reason-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #333;
+            margin-right: 10px;
+            display: inline-block;
+            cursor: pointer;
+            position: relative;
+        }
+        .checkbox.checked:after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: #1976d2;
+        }
+        
+        /* Style cho các controls */
+        .form-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .form-controls button {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            margin-right: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-controls button:hover {
+            background-color: #e0e0e0;
+        }
+        
+        @media print {
+            .print-button, .form-controls {
+                display: none;
+            }
+            body {
+                font-size: 12pt;
+                color: #000;
+                background: #fff;
+                margin: 0;
+                padding: 10mm;
+            }
+            h1 {
+                color: #000;
+            }
+            .no-print {
+                display: none;
+            }
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            input, textarea, select {
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-controls no-print">
+        <button onclick="fillSampleData()">Điền mẫu</button>
+        <button onclick="resetForm()">Xóa dữ liệu</button>
+    </div>
+    <button class="print-button" onclick="window.print()">In biểu mẫu</button>
+
+    <div class="header">
+        <div class="ministry">Bộ Công An</div>
+        <div class="document-number">Mẫu CC03/ĐKCC</div>
+    </div>
+
+    <div class="form-title">
+        TỜ KHAI CẤP ĐỔI/CẤP LẠI CĂN CƯỚC CÔNG DÂN
+    </div>
+
+    <div class="form-section">
+        <h3>1. Thông tin cá nhân</h3>
+        
+        <div class="form-field">
+            <label>Họ, chữ đệm và tên:</label>
+            <div class="input-box">
+                <input type="text" id="fullname" placeholder="Nhập họ tên đầy đủ">
+            </div>
+        </div>
+        
+        <div class="form-field">
+            <label>Ngày, tháng, năm sinh:</label>
+            <div class="input-box">
+                <input type="text" id="dob" placeholder="DD/MM/YYYY">
+            </div>
+        </div>
+        
+        <div class="form-field">
+            <label>Số CMND/CCCD đã được cấp:</label>
+            <div class="input-box">
+                <input type="text" id="oldId" placeholder="Số CMND/CCCD cũ">
+            </div>
+        </div>
+        
+        <div class="form-field">
+            <label>Ngày cấp:</label>
+            <div class="input-box">
+                <input type="text" id="issueDate" placeholder="DD/MM/YYYY">
+            </div>
+        </div>
+        
+        <div class="form-field">
+            <label>Nơi cấp:</label>
+            <div class="input-box">
+                <input type="text" id="issuePlace" placeholder="Nơi cấp">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>2. Nơi thường trú hiện tại</h3>
+        <div class="form-field">
+            <div class="input-box" style="height: 60px;">
+                <input type="text" id="address" style="height: 100%" placeholder="Địa chỉ thường trú hiện tại">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>3. Lý do cấp đổi/cấp lại</h3>
+        
+        <div class="reason-section">
+            <div class="reason-box">
+                <div class="checkbox" id="reason1" onclick="toggleCheckbox('reason1')"></div>
+                <span>Thẻ bị hỏng, mất</span>
+            </div>
+            
+            <div class="reason-box">
+                <div class="checkbox" id="reason2" onclick="toggleCheckbox('reason2')"></div>
+                <span>Thay đổi thông tin công dân</span>
+            </div>
+            
+            <div class="reason-box">
+                <div class="checkbox" id="reason3" onclick="toggleCheckbox('reason3')"></div>
+                <span>Thẻ hết hạn sử dụng</span>
+            </div>
+            
+            <div class="reason-box">
+                <div class="checkbox" id="reason4" onclick="toggleCheckbox('reason4')"></div>
+                <span>Chuyển từ CMND sang CCCD gắn chip</span>
+            </div>
+            
+            <div class="reason-box">
+                <div class="checkbox" id="reason5" onclick="toggleCheckbox('reason5')"></div>
+                <span>Lý do khác: </span>
+                <div class="input-box" style="margin-left: 10px; width: 70%;">
+                    <input type="text" id="otherReason" placeholder="Ghi rõ lý do khác">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <div class="signature-area">
+            <p><em><input type="text" id="signaturePlace" placeholder="Địa điểm">, ngày <input type="text" id="signatureDate" placeholder="..." size="2"> tháng <input type="text" id="signatureMonth" placeholder="..." size="2"> năm <input type="text" id="signatureYear" placeholder="..." size="4"></em></p>
+            <p><strong>NGƯỜI KHAI</strong></p>
+            <p><em>(Ký, ghi rõ họ tên)</em></p>
+            <div style="height: 80px;"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCheckbox(id) {
+            const checkbox = document.getElementById(id);
+            checkbox.classList.toggle('checked');
+        }
+        
+        function fillSampleData() {
+            document.getElementById('fullname').value = 'Nguyễn Văn A';
+            document.getElementById('dob').value = '01/01/1990';
+            document.getElementById('oldId').value = '079123456789';
+            document.getElementById('issueDate').value = '15/06/2015';
+            document.getElementById('issuePlace').value = 'Cục Cảnh sát ĐKQL cư trú và DLQG về dân cư';
+            document.getElementById('address').value = 'Số 123, đường ABC, phường X, quận Y, TP.HCM';
+            
+            // Chọn lý do
+            document.getElementById('reason4').classList.add('checked');
+            
+            const now = new Date();
+            document.getElementById('signaturePlace').value = 'TP.HCM';
+            document.getElementById('signatureDate').value = now.getDate();
+            document.getElementById('signatureMonth').value = now.getMonth() + 1;
+            document.getElementById('signatureYear').value = now.getFullYear();
+        }
+        
+        function resetForm() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+            
+            const checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.classList.remove('checked');
+            });
+        }
+    </script>
+
+</body>
+</html> 

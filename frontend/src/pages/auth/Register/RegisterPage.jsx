@@ -23,71 +23,41 @@ import {
   Link,
   CircularProgress,
   FormHelperText,
-  InputLabel,
   Select,
   MenuItem,
-  OutlinedInput,
-  useTheme
+  InputLabel
 } from '@mui/material';
 import {
   Person as PersonIcon,
   Phone as PhoneIcon,
-  Home as HomeIcon,
-  AlternateEmail as EmailIcon,
-  Badge as BadgeIcon,
+  Email as EmailIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   Check as CheckIcon,
   ChevronRight as ChevronRightIcon,
-  ChevronLeft as ChevronLeftIcon,
-  Google as GoogleIcon,
-  Facebook as FacebookIcon,
-  Security as SecurityIcon,
-  AccountCircle as AccountCircleIcon,
-  AccountBalance as AccountBalanceIcon,
-  AdminPanelSettings as AdminPanelSettingsIcon
+  ChevronLeft as ChevronLeftIcon
 } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { vi } from 'date-fns/locale';
-import styles from './RegisterPage.module.scss';
-import { useGoogleLogin } from '@react-oauth/google';
-import authService from '../../../services/api/authService';
+import axios from 'axios';
+import { API_BASE_URL, API_ENDPOINTS } from '../../../utils/apiConfig';
+import * as vietnamData from '../../../utils/vietnamData';
 
 // Các bước đăng ký
-const steps = [
-  'Thông tin cá nhân',
-  'Địa chỉ & Liên hệ',
-  'Tài khoản & Vai trò'
-];
-
-// Danh sách tỉnh/thành phố
-const provinces = [
-  'Hà Nội', 'TP Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
-  'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước',
-  'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông',
-  'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang',
-  'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hậu Giang', 'Hòa Bình',
-  'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu',
-  'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định',
-  'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị',
-  'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên',
-  'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang',
-  'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái'
-];
+const steps = ['Thông tin tài khoản', 'Thông tin cá nhân', 'Xác nhận'];
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [userId, setUserId] = useState('');
-  const [registerMethod, setRegisterMethod] = useState('form'); // 'form' or 'google'
+  
+  // State for region selection
+  const [selectedProvinceId, setSelectedProvinceId] = useState('');
+  const [selectedDistrictId, setSelectedDistrictId] = useState('');
+  const [selectedWardId, setSelectedWardId] = useState('');
+  const [availableDistricts, setAvailableDistricts] = useState([]);
+  const [availableWards, setAvailableWards] = useState([]);
   
   // State cho password
   const [showPassword, setShowPassword] = useState(false);
@@ -95,28 +65,31 @@ const RegisterPage = () => {
   
   // Form data
   const [formData, setFormData] = useState({
+    // Thông tin tài khoản
+    email: '',
+    password: '',
+    password_confirm: '',
+    role: 'citizen',
+    
     // Thông tin cá nhân
     first_name: '',
     last_name: '',
-    dateOfBirth: null,
-    gender: 'male',
-    idNumber: '',
-    idIssueDate: null,
-    idIssuePlace: '',
-    nationality: 'Việt Nam',
-    
-    // Địa chỉ & Liên hệ
-    address: '',
-    city: '',
-    district: '',
-    ward: '',
     phone_number: '',
-    email: '',
     
-    // Tài khoản
-    password: '',
-    confirmPassword: '',
-    role: 'citizen', // Mặc định là người dân
+    // Thông tin địa chỉ
+    address: '',
+    ward: '',
+    district: '',
+    province: '',
+    
+    // Thông tin CMND/CCCD
+    id_card_number: '',
+    id_card_issue_date: '',
+    id_card_issue_place: '',
+    
+    // Thông tin khác
+    date_of_birth: '',
+    gender: 'male',
     
     // Điều khoản
     agreeTerms: false
@@ -129,9 +102,79 @@ const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     
+    // Đảm bảo first_name và last_name không bị rỗng
+    let newValue = type === 'checkbox' ? checked : value;
+    
+    // Log để debug
+    console.log(`Field ${name} changed to: "${newValue}"`);
+    
+    // Xử lý đặc biệt cho trường hợp chọn tỉnh/thành phố
+    if (name === 'province') {
+      const provinceId = parseInt(value);
+      setSelectedProvinceId(provinceId);
+      
+      // Reset district and ward when province changes
+      setSelectedDistrictId('');
+      setSelectedWardId('');
+      
+      // Update form data with province name
+      const provinceName = vietnamData.provinces.find(p => p.id === provinceId)?.name || '';
+      setFormData({
+        ...formData,
+        province: provinceName,
+        district: '',
+        ward: ''
+      });
+      
+      // Update available districts
+      const newDistricts = vietnamData.getDistrictsByProvinceId(provinceId);
+      setAvailableDistricts(newDistricts);
+      setAvailableWards([]);
+      
+      return;
+    }
+    
+    // Xử lý đặc biệt cho trường hợp chọn quận/huyện
+    if (name === 'district') {
+      const districtId = parseInt(value);
+      setSelectedDistrictId(districtId);
+      
+      // Reset ward when district changes
+      setSelectedWardId('');
+      
+      // Update form data with district name
+      const districtName = availableDistricts.find(d => d.id === districtId)?.name || '';
+      setFormData({
+        ...formData,
+        district: districtName,
+        ward: ''
+      });
+      
+      // Update available wards
+      const newWards = vietnamData.getWardsByDistrictId(selectedProvinceId, districtId);
+      setAvailableWards(newWards);
+      
+      return;
+    }
+    
+    // Xử lý đặc biệt cho trường hợp chọn phường/xã
+    if (name === 'ward') {
+      const wardId = parseInt(value);
+      setSelectedWardId(wardId);
+      
+      // Update form data with ward name
+      const wardName = availableWards.find(w => w.id === wardId)?.name || '';
+      setFormData({
+        ...formData,
+        ward: wardName
+      });
+      
+      return;
+    }
+    
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: newValue
     });
     
     // Xóa lỗi khi người dùng sửa trường có lỗi
@@ -139,36 +182,6 @@ const RegisterPage = () => {
       setErrors({
         ...errors,
         [name]: ''
-      });
-    }
-  };
-  
-  // Xử lý thay đổi ngày sinh
-  const handleDateOfBirthChange = (date) => {
-    setFormData({
-      ...formData,
-      dateOfBirth: date
-    });
-    
-    if (errors.dateOfBirth) {
-      setErrors({
-        ...errors,
-        dateOfBirth: null
-      });
-    }
-  };
-  
-  // Xử lý thay đổi ngày cấp CMND
-  const handleIdIssueDateChange = (date) => {
-    setFormData({
-      ...formData,
-      idIssueDate: date
-    });
-    
-    if (errors.idIssueDate) {
-      setErrors({
-        ...errors,
-        idIssueDate: null
       });
     }
   };
@@ -204,72 +217,8 @@ const RegisterPage = () => {
     let stepErrors = {};
     let isValid = true;
     
-    // Validate Step 1: Thông tin cá nhân
+    // Validate Step 1: Thông tin tài khoản
     if (activeStep === 0) {
-      if (!formData.first_name.trim()) {
-        stepErrors.first_name = 'Vui lòng nhập tên';
-        isValid = false;
-      }
-      
-      if (!formData.last_name.trim()) {
-        stepErrors.last_name = 'Vui lòng nhập họ';
-        isValid = false;
-      }
-      
-      if (!formData.dateOfBirth) {
-        stepErrors.dateOfBirth = 'Vui lòng chọn ngày sinh';
-        isValid = false;
-      }
-      
-      if (!formData.idNumber.trim()) {
-        stepErrors.idNumber = 'Vui lòng nhập số CMND/CCCD';
-        isValid = false;
-      } else if (!/^\d{9}$|^\d{12}$/.test(formData.idNumber)) {
-        stepErrors.idNumber = 'Số CMND/CCCD không hợp lệ (9 hoặc 12 số)';
-        isValid = false;
-      }
-      
-      if (!formData.idIssueDate) {
-        stepErrors.idIssueDate = 'Vui lòng chọn ngày cấp';
-        isValid = false;
-      }
-      
-      if (!formData.idIssuePlace.trim()) {
-        stepErrors.idIssuePlace = 'Vui lòng nhập nơi cấp';
-        isValid = false;
-      }
-    }
-    
-    // Validate Step 2: Địa chỉ & Liên hệ
-    else if (activeStep === 1) {
-      if (!formData.address.trim()) {
-        stepErrors.address = 'Vui lòng nhập địa chỉ';
-        isValid = false;
-      }
-      
-      if (!formData.city.trim()) {
-        stepErrors.city = 'Vui lòng chọn tỉnh/thành phố';
-        isValid = false;
-      }
-      
-      if (!formData.district.trim()) {
-        stepErrors.district = 'Vui lòng nhập quận/huyện';
-        isValid = false;
-      }
-      
-      if (!formData.ward.trim()) {
-        stepErrors.ward = 'Vui lòng nhập phường/xã';
-        isValid = false;
-      }
-      
-      if (!formData.phone_number.trim()) {
-        stepErrors.phone_number = 'Vui lòng nhập số điện thoại';
-        isValid = false;
-      } else if (!/^(0|\+84)[3|5|7|8|9][0-9]{8}$/.test(formData.phone_number)) {
-        stepErrors.phone_number = 'Số điện thoại không hợp lệ';
-        isValid = false;
-      }
-      
       if (!formData.email.trim()) {
         stepErrors.email = 'Vui lòng nhập email';
         isValid = false;
@@ -277,32 +226,20 @@ const RegisterPage = () => {
         stepErrors.email = 'Email không hợp lệ';
         isValid = false;
       }
-    }
-    
-    // Validate Step 3: Tài khoản
-    else if (activeStep === 2) {
+      
       if (!formData.password) {
         stepErrors.password = 'Vui lòng nhập mật khẩu';
         isValid = false;
       } else if (formData.password.length < 8) {
         stepErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
         isValid = false;
-      } else if (!/[A-Z]/.test(formData.password)) {
-        stepErrors.password = 'Mật khẩu phải có ít nhất 1 chữ hoa';
-        isValid = false;
-      } else if (!/[0-9]/.test(formData.password)) {
-        stepErrors.password = 'Mật khẩu phải có ít nhất 1 chữ số';
-        isValid = false;
-      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-        stepErrors.password = 'Mật khẩu phải có ít nhất 1 ký tự đặc biệt';
-        isValid = false;
       }
       
-      if (!formData.confirmPassword) {
-        stepErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+      if (!formData.password_confirm) {
+        stepErrors.password_confirm = 'Vui lòng xác nhận mật khẩu';
         isValid = false;
-      } else if (formData.confirmPassword !== formData.password) {
-        stepErrors.confirmPassword = 'Mật khẩu xác nhận không khớp';
+      } else if (formData.password_confirm !== formData.password) {
+        stepErrors.password_confirm = 'Mật khẩu xác nhận không khớp';
         isValid = false;
       }
       
@@ -310,7 +247,67 @@ const RegisterPage = () => {
         stepErrors.role = 'Vui lòng chọn vai trò';
         isValid = false;
       }
+    }
+    
+    // Validate Step 2: Thông tin cá nhân
+    else if (activeStep === 1) {
+      console.log('Validating personal info:', formData);
       
+      if (!formData.first_name || formData.first_name.trim() === '') {
+        stepErrors.first_name = 'Vui lòng nhập tên';
+        isValid = false;
+        console.log('First name validation failed');
+      } else {
+        console.log('First name is valid:', formData.first_name);
+      }
+      
+      if (!formData.last_name || formData.last_name.trim() === '') {
+        stepErrors.last_name = 'Vui lòng nhập họ';
+        isValid = false;
+        console.log('Last name validation failed');
+      } else {
+        console.log('Last name is valid:', formData.last_name);
+      }
+      
+      if (formData.phone_number && !/^(0|\+84)[3|5|7|8|9][0-9]{8}$/.test(formData.phone_number)) {
+        stepErrors.phone_number = 'Số điện thoại không hợp lệ';
+        isValid = false;
+      }
+      
+      // Validate ID card number (CMND 9 digits or CCCD 12 digits)
+      if (formData.id_card_number && !/^(\d{9}|\d{12})$/.test(formData.id_card_number)) {
+        stepErrors.id_card_number = 'Số CMND/CCCD không hợp lệ (9 hoặc 12 số)';
+        isValid = false;
+      }
+      
+      // Validate date fields
+      if (formData.date_of_birth) {
+        const birthDate = new Date(formData.date_of_birth);
+        const today = new Date();
+        if (isNaN(birthDate.getTime())) {
+          stepErrors.date_of_birth = 'Ngày sinh không hợp lệ';
+          isValid = false;
+        } else if (birthDate > today) {
+          stepErrors.date_of_birth = 'Ngày sinh không thể là ngày trong tương lai';
+          isValid = false;
+        }
+      }
+      
+      if (formData.id_card_issue_date) {
+        const issueDate = new Date(formData.id_card_issue_date);
+        const today = new Date();
+        if (isNaN(issueDate.getTime())) {
+          stepErrors.id_card_issue_date = 'Ngày cấp không hợp lệ';
+          isValid = false;
+        } else if (issueDate > today) {
+          stepErrors.id_card_issue_date = 'Ngày cấp không thể là ngày trong tương lai';
+          isValid = false;
+        }
+      }
+    }
+    
+    // Validate Step 3: Xác nhận
+    else if (activeStep === 2) {
       if (!formData.agreeTerms) {
         stepErrors.agreeTerms = 'Bạn phải đồng ý với điều khoản sử dụng';
         isValid = false;
@@ -321,196 +318,127 @@ const RegisterPage = () => {
     return isValid;
   };
   
-  // Handle Google Registration
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setRegisterMethod('google');
-      setLoading(true);
-      
-      try {
-        // Check if we have auth code or access token
-        if (tokenResponse.code) {
-          console.log('Google OAuth auth code success:', tokenResponse);
-          sessionStorage.setItem('googleToken', tokenResponse.code);
-          sessionStorage.setItem('isAuthCode', 'true');
-        } else if (tokenResponse.access_token) {
-          console.log('Google OAuth access token success:', tokenResponse);
-          sessionStorage.setItem('googleToken', tokenResponse.access_token);
-          sessionStorage.setItem('isAuthCode', 'false');
-          
-          // Attempt to get user info from Google
-          try {
-            const userInfoResponse = await fetch(
-              `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${tokenResponse.access_token}`
-            );
-            
-            if (!userInfoResponse.ok) {
-              throw new Error(`Failed to fetch user info: ${userInfoResponse.status}`);
-            }
-            
-            const userInfo = await userInfoResponse.json();
-            console.log('Google user info:', userInfo);
-            
-            // Update form with basic info from Google
-            setFormData({
-              ...formData,
-              first_name: userInfo.given_name || '',
-              last_name: userInfo.family_name || '',
-              email: userInfo.email || '',
-              // Keep the selected role, but default to citizen if chairman was selected
-              role: formData.role === 'chairman' ? 'citizen' : formData.role,
-            });
-          } catch (error) {
-            console.error('Error fetching user info from Google:', error);
-          }
-        } else {
-          console.error('No token received from Google');
-          setError('Không thể lấy token từ Google. Vui lòng thử lại.');
-        }
-        
-        // Skip to the role selection step
-        setActiveStep(2);
-        setLoading(false);
-        
-      } catch (err) {
-        console.error('Google registration error:', err);
-        setError('Đăng ký bằng Google thất bại: ' + (err.message || 'Lỗi không xác định'));
-        setLoading(false);
-      }
-    },
-    onError: (errorResponse) => {
-      console.error('Google registration error:', errorResponse);
-      setError('Đăng ký bằng Google thất bại: ' + (errorResponse.error || 'Lỗi không xác định'));
-    },
-    // Use auth-code flow to be consistent with login page
-    flow: 'auth-code',
-    scope: 'email profile openid',
-    // Use popup instead of redirect to preserve form data
-    ux_mode: 'popup',
-    // Additional configuration for compatibility
-    select_account: true,
-    prompt: 'consent',
-    redirect_uri: window.location.origin + '/auth/google/callback'
-  });
-  
-  const handleGoogleRegister = () => {
-    googleLogin();
-  };
-
   // Xử lý đăng ký
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
+    
     try {
-      let response;
-      if (registerMethod === 'google') {
-        // Sử dụng Google OAuth để đăng ký
-        const token = sessionStorage.getItem('googleToken');
-        if (!token) {
-          throw new Error('Không tìm thấy token Google. Vui lòng thử lại.');
-        }
+      // Kiểm tra các trường bắt buộc
+      if (!formData.first_name || formData.first_name.trim() === '') {
+        setError('Tên không được để trống');
+        setLoading(false);
+        return;
+      }
+      
+      if (!formData.last_name || formData.last_name.trim() === '') {
+        setError('Họ không được để trống');
+        setLoading(false);
+        return;
+      }
+      
+      // Log dữ liệu form để kiểm tra
+      console.log('Form data before submission:', formData);
+      
+      // Chuẩn bị dữ liệu đăng ký theo đúng yêu cầu của backend
+      const registrationData = {
+        username: formData.email, // Sử dụng email làm username
+        email: formData.email,
+        password: formData.password,
+        password_confirm: formData.password_confirm,
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        phone_number: formData.phone_number || '',
+        role: formData.role,
         
-        const isAuthCode = sessionStorage.getItem('isAuthCode') === 'true';
+        // Thông tin địa chỉ
+        address: formData.address || '',
+        ward: formData.ward || '',
+        district: formData.district || '',
+        province: formData.province || '',
         
-        response = await authService.googleRegister({
-          token: token,
-          role: formData.role,
-          isAuthCode: isAuthCode,
-          additionalData: {
-            phone_number: formData.phone_number,
-            address: formData.address,
-            ward: formData.ward,
-            district: formData.district,
-            province: formData.city,
-            gender: formData.gender,
-            id_number: formData.idNumber,
-            id_issue_date: formData.idIssueDate,
-            id_issue_place: formData.idIssuePlace
+        // Thông tin CMND/CCCD
+        id_card_number: formData.id_card_number || '',
+        id_card_issue_date: formData.id_card_issue_date || null,
+        id_card_issue_place: formData.id_card_issue_place || '',
+        
+        // Thông tin khác
+        date_of_birth: formData.date_of_birth || null,
+        gender: formData.gender || 'male'
+      };
+      
+      console.log('Sending registration data:', registrationData);
+      console.log('Gender value being sent:', registrationData.gender);
+      
+      // Kiểm tra endpoint
+      console.log('Registration endpoint:', `${API_BASE_URL}${API_ENDPOINTS.AUTH.REGISTER}`);
+      
+      // Gọi API đăng ký trực tiếp thay vì qua authService
+      try {
+        const response = await axios({
+          method: 'post',
+          url: `${API_BASE_URL}${API_ENDPOINTS.AUTH.REGISTER}`,
+          data: registrationData,
+          headers: { 
+            'Content-Type': 'application/json'
           }
         });
-      } else {
-        // Đăng ký thông thường
-        const firstName = formData.first_name ? formData.first_name.trim() : '';
-        const lastName = formData.last_name ? formData.last_name.trim() : '';
-        if (!firstName || !lastName) {
-          setError('Bạn phải nhập đầy đủ họ và tên.');
-          setLoading(false);
-          return;
-        }
-        const userData = {
-          username: formData.email,
-          email: formData.email,
-          password: formData.password,
-          password_confirm: formData.confirmPassword,
-          first_name: firstName,
-          last_name: lastName,
-          role: formData.role,
-          phone_number: formData.phone_number,
-          address: formData.address,
-          ward: formData.ward,
-          district: formData.district,
-          province: formData.city
-        };
-        console.log('Payload gửi lên backend:', userData);
-        response = await authService.register(userData);
-      }
-      
-      console.log('Registration response:', response);
-      
-      if (!response.success) {
-        throw new Error(response.message || 'Đăng ký thất bại. Vui lòng thử lại.');
-      }
-      
-      setSuccess(true);
-      setUserId(response.user_id || response.userId);
-      
-      // Store the token in localStorage
-      if (response.token) {
-        const userData = {
-          id: response.user_id || response.userId,
-          email: formData.email,
-          name: `${formData.first_name} ${formData.last_name}`,
-          role: formData.role,
-          token: response.token
-        };
         
-        console.log('Saving user data to localStorage:', userData);
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('authUser', JSON.stringify(userData));
+        console.log('Registration successful:', response.data);
+        setSuccess(true);
         
-        // Chuyển hướng người dùng đến trang dashboard tương ứng
-        setTimeout(() => {
-          let redirectTo;
-          if (formData.role === 'citizen') {
-            redirectTo = '/citizen';
-          } else if (formData.role === 'officer') {
-            redirectTo = '/officer';
-          } else if (formData.role === 'chairman') {
-            redirectTo = '/admin/chairman';
-          } else {
-            redirectTo = '/';
-          }
+        // Lưu token nếu có
+        if (response.data && response.data.token) {
+          localStorage.setItem('token', response.data.token);
           
-          console.log(`Redirecting to ${redirectTo} based on role: ${formData.role}`);
-          navigate(redirectTo, { replace: true });
-        }, 1500);
+          // Lưu thông tin người dùng
+          const userData = {
+            id: response.data.user_id,
+            email: response.data.email || formData.email,
+            name: `${formData.first_name} ${formData.last_name}`.trim(),
+            role: response.data.role || formData.role
+          };
+          
+          localStorage.setItem('authUser', JSON.stringify(userData));
+        }
+        
+        // Chuyển hướng đến trang đăng nhập sau khi đăng ký thành công
+        setTimeout(() => {
+          navigate('/auth/login', { 
+            state: { 
+              message: 'Đăng ký thành công! Vui lòng đăng nhập.' 
+            } 
+          });
+        }, 2000);
+      } catch (err) {
+        console.error('Direct API call error:', err);
+        if (err.response) {
+          console.error('Error response:', err.response.data);
+          
+          // Hiển thị lỗi từ API một cách rõ ràng
+          if (typeof err.response.data === 'object') {
+            const errorMessages = [];
+            for (const [key, value] of Object.entries(err.response.data)) {
+              if (Array.isArray(value)) {
+                errorMessages.push(`${key}: ${value.join(', ')}`);
+              } else {
+                errorMessages.push(`${key}: ${value}`);
+              }
+            }
+            setError(errorMessages.join('. '));
+          } else {
+            setError(JSON.stringify(err.response.data));
+          }
+        } else {
+          setError(`Lỗi kết nối: ${err.message}`);
+        }
       }
-      
-      // Clean up the session storage
-      sessionStorage.removeItem('googleToken');
-      sessionStorage.removeItem('isAuthCode');
     } catch (err) {
-      setError(err.message);
-      window.scrollTo(0, 0);
+      console.error('Registration error:', err);
+      setError('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
-  };
-  
-  // Helper to show error message
-  const showError = (message) => {
-    setError(message);
-    window.scrollTo(0, 0);
   };
   
   // Render nội dung cho từng bước
@@ -518,252 +446,17 @@ const RegisterPage = () => {
     switch (step) {
       case 0:
         return (
-          <Grid container spacing={2} className={styles.form}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Họ"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                error={!!errors.last_name}
-                helperText={errors.last_name}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Tên"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                error={!!errors.first_name}
-                helperText={errors.first_name}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                <DatePicker
-                  label="Ngày sinh"
-                  value={formData.dateOfBirth}
-                  onChange={handleDateOfBirthChange}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      error: !!errors.dateOfBirth,
-                      helperText: errors.dateOfBirth
-                    }
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Giới tính</FormLabel>
-                <RadioGroup
-                  row
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                >
-                  <FormControlLabel value="male" control={<Radio />} label="Nam" />
-                  <FormControlLabel value="female" control={<Radio />} label="Nữ" />
-                  <FormControlLabel value="other" control={<Radio />} label="Khác" />
-                </RadioGroup>
-              </FormControl>
-            </Grid>
-            
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }}>Thông tin CMND/CCCD</Divider>
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Số CMND/CCCD"
-                name="idNumber"
-                value={formData.idNumber}
-                onChange={handleChange}
-                error={!!errors.idNumber}
-                helperText={errors.idNumber}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <BadgeIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                <DatePicker
-                  label="Ngày cấp"
-                  value={formData.idIssueDate}
-                  onChange={handleIdIssueDateChange}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      error: !!errors.idIssueDate,
-                      helperText: errors.idIssueDate
-                    }
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Nơi cấp"
-                name="idIssuePlace"
-                value={formData.idIssuePlace}
-                onChange={handleChange}
-                error={!!errors.idIssuePlace}
-                helperText={errors.idIssuePlace}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AccountBalanceIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-          </Grid>
-        );
-        
-      case 1:
-        return (
-          <Grid container spacing={2} className={styles.form}>
-            {/* Address Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>Địa chỉ</Typography>
-              <TextField
-                fullWidth
-                name="address"
-                label="Số nhà, tên đường"
-                value={formData.address}
-                onChange={handleChange}
-                error={!!errors.address}
-                helperText={errors.address}
-                disabled={loading}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <HomeIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth required error={!!errors.city}>
-                <InputLabel>Tỉnh/Thành phố</InputLabel>
-                <Select
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  label="Tỉnh/Thành phố"
-                  error={!!errors.city}
-                  disabled={loading}
-                  required
-                >
-                  {provinces.map((province) => (
-                    <MenuItem key={province} value={province}>
-                      {province}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.city && <FormHelperText error>{errors.city}</FormHelperText>}
-              </FormControl>
-            </Grid>
-            
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                name="district"
-                label="Quận/Huyện"
-                value={formData.district}
-                onChange={handleChange}
-                error={!!errors.district}
-                helperText={errors.district}
-                disabled={loading}
-                required
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                name="ward"
-                label="Phường/Xã"
-                value={formData.ward}
-                onChange={handleChange}
-                error={!!errors.ward}
-                helperText={errors.ward}
-                disabled={loading}
-                required
-              />
-            </Grid>
-            
-            {/* Contact Information */}
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }}>Thông tin liên hệ</Divider>
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                name="phone_number"
-                label="Số điện thoại"
-                value={formData.phone_number}
-                onChange={handleChange}
-                error={!!errors.phone_number}
-                helperText={errors.phone_number}
-                disabled={loading}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PhoneIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                name="email"
                 label="Email"
+                name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
                 error={!!errors.email}
                 helperText={errors.email}
-                disabled={loading || registerMethod === 'google'}
                 required
                 InputProps={{
                   startAdornment: (
@@ -774,86 +467,59 @@ const RegisterPage = () => {
                 }}
               />
             </Grid>
-          </Grid>
-        );
-        
-      case 2:
-        return (
-          <Grid container spacing={2} className={styles.form}>
-            {registerMethod === 'form' && (
-              <>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1" gutterBottom>Thông tin đăng nhập</Typography>
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Mật khẩu"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={handleChange}
-                    error={!!errors.password}
-                    helperText={errors.password}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SecurityIcon />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleTogglePassword}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                  />
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="confirmPassword"
-                    label="Xác nhận mật khẩu"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    error={!!errors.confirmPassword}
-                    helperText={errors.confirmPassword}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SecurityIcon />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle confirm password visibility"
-                            onClick={handleToggleConfirmPassword}
-                            edge="end"
-                          >
-                            {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                  />
-                </Grid>
-              </>
-            )}
             
             <Grid item xs={12}>
-              <Divider sx={{ my: 2 }}>Chọn vai trò</Divider>
+              <TextField
+                fullWidth
+                label="Mật khẩu"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={handleChange}
+                error={!!errors.password}
+                helperText={errors.password}
+                required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleTogglePassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Xác nhận mật khẩu"
+                name="password_confirm"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={formData.password_confirm}
+                onChange={handleChange}
+                error={!!errors.password_confirm}
+                helperText={errors.password_confirm}
+                required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={handleToggleConfirmPassword}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
             </Grid>
             
             <Grid item xs={12}>
@@ -879,8 +545,334 @@ const RegisterPage = () => {
                 {errors.role && <FormHelperText>{errors.role}</FormHelperText>}
               </FormControl>
             </Grid>
+          </Grid>
+        );
+        
+      case 1:
+        return (
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Họ"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                error={!!errors.last_name}
+                helperText={errors.last_name}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Tên"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                error={!!errors.first_name}
+                helperText={errors.first_name}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Số điện thoại"
+                name="phone_number"
+                value={formData.phone_number}
+                onChange={handleChange}
+                error={!!errors.phone_number}
+                helperText={errors.phone_number || "Số điện thoại Việt Nam (VD: 0912345678)"}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PhoneIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Ngày sinh"
+                name="date_of_birth"
+                type="date"
+                value={formData.date_of_birth}
+                onChange={handleChange}
+                error={!!errors.date_of_birth}
+                helperText={errors.date_of_birth}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
             
             <Grid item xs={12}>
+              <FormControl component="fieldset" error={!!errors.gender}>
+                <FormLabel component="legend">Giới tính</FormLabel>
+                <RadioGroup
+                  row
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                >
+                  <FormControlLabel
+                    value="male"
+                    control={<Radio />}
+                    label="Nam"
+                  />
+                  <FormControlLabel
+                    value="female"
+                    control={<Radio />}
+                    label="Nữ"
+                  />
+                  <FormControlLabel
+                    value="other"
+                    control={<Radio />}
+                    label="Khác"
+                  />
+                </RadioGroup>
+                {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
+                Thông tin địa chỉ
+              </Typography>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Địa chỉ"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                error={!!errors.address}
+                helperText={errors.address}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth error={!!errors.province}>
+                <InputLabel id="province-label">Tỉnh/Thành phố</InputLabel>
+                <Select
+                  labelId="province-label"
+                  id="province"
+                  name="province"
+                  value={selectedProvinceId}
+                  label="Tỉnh/Thành phố"
+                  onChange={(e) => handleChange({
+                    target: {
+                      name: 'province',
+                      value: e.target.value
+                    }
+                  })}
+                >
+                  <MenuItem value="">
+                    <em>Chọn Tỉnh/Thành phố</em>
+                  </MenuItem>
+                  {vietnamData.provinces.map((province) => (
+                    <MenuItem key={province.id} value={province.id}>
+                      {province.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.province && <FormHelperText>{errors.province}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth error={!!errors.district} disabled={!selectedProvinceId}>
+                <InputLabel id="district-label">Quận/Huyện</InputLabel>
+                <Select
+                  labelId="district-label"
+                  id="district"
+                  name="district"
+                  value={selectedDistrictId}
+                  label="Quận/Huyện"
+                  onChange={(e) => handleChange({
+                    target: {
+                      name: 'district',
+                      value: e.target.value
+                    }
+                  })}
+                >
+                  <MenuItem value="">
+                    <em>Chọn Quận/Huyện</em>
+                  </MenuItem>
+                  {availableDistricts.map((district) => (
+                    <MenuItem key={district.id} value={district.id}>
+                      {district.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.district && <FormHelperText>{errors.district}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth error={!!errors.ward} disabled={!selectedDistrictId}>
+                <InputLabel id="ward-label">Phường/Xã</InputLabel>
+                <Select
+                  labelId="ward-label"
+                  id="ward"
+                  name="ward"
+                  value={selectedWardId}
+                  label="Phường/Xã"
+                  onChange={(e) => handleChange({
+                    target: {
+                      name: 'ward',
+                      value: e.target.value
+                    }
+                  })}
+                >
+                  <MenuItem value="">
+                    <em>Chọn Phường/Xã</em>
+                  </MenuItem>
+                  {availableWards.map((ward) => (
+                    <MenuItem key={ward.id} value={ward.id}>
+                      {ward.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.ward && <FormHelperText>{errors.ward}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
+                Thông tin CMND/CCCD
+              </Typography>
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Số CMND/CCCD"
+                name="id_card_number"
+                value={formData.id_card_number}
+                onChange={handleChange}
+                error={!!errors.id_card_number}
+                helperText={errors.id_card_number}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Ngày cấp"
+                name="id_card_issue_date"
+                type="date"
+                value={formData.id_card_issue_date}
+                onChange={handleChange}
+                error={!!errors.id_card_issue_date}
+                helperText={errors.id_card_issue_date}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Nơi cấp"
+                name="id_card_issue_place"
+                value={formData.id_card_issue_place}
+                onChange={handleChange}
+                error={!!errors.id_card_issue_place}
+                helperText={errors.id_card_issue_place}
+              />
+            </Grid>
+          </Grid>
+        );
+        
+      case 2:
+        return (
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Xác nhận thông tin
+              </Typography>
+              
+              <Box sx={{ bgcolor: 'background.paper', p: 2, borderRadius: 1, mb: 2 }}>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Email:</strong> {formData.email}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Họ tên:</strong> {formData.last_name} {formData.first_name}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Số điện thoại:</strong> {formData.phone_number || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Ngày sinh:</strong> {formData.date_of_birth || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Giới tính:</strong> {formData.gender === 'male' ? 'Nam' : formData.gender === 'female' ? 'Nữ' : 'Khác'}
+                </Typography>
+                
+                <Divider sx={{ my: 1 }} />
+                
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Thông tin địa chỉ:</strong>
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Địa chỉ:</strong> {formData.address || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Phường/Xã:</strong> {formData.ward || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Quận/Huyện:</strong> {formData.district || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Tỉnh/Thành phố:</strong> {formData.province || 'Không cung cấp'}
+                </Typography>
+                
+                <Divider sx={{ my: 1 }} />
+                
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Thông tin CMND/CCCD:</strong>
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Số CMND/CCCD:</strong> {formData.id_card_number || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Ngày cấp:</strong> {formData.id_card_issue_date || 'Không cung cấp'}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  <strong>Nơi cấp:</strong> {formData.id_card_issue_place || 'Không cung cấp'}
+                </Typography>
+                
+                <Divider sx={{ my: 1 }} />
+                
+                <Typography variant="body1" gutterBottom>
+                  <strong>Vai trò:</strong> {formData.role === 'citizen' ? 'Công dân' : 'Cán bộ'}
+                </Typography>
+              </Box>
+              
               <FormControlLabel
                 control={
                   <Checkbox
@@ -913,11 +905,6 @@ const RegisterPage = () => {
       </Typography>
       <Typography variant="body1" paragraph>
         Xin chào, {formData.first_name} {formData.last_name}! Tài khoản của bạn đã được tạo thành công.
-      </Typography>
-      <Typography variant="body2" gutterBottom>
-        {userId && (
-          <>Mã người dùng của bạn: <strong>{userId}</strong></>
-        )}
       </Typography>
       <Box sx={{ mt: 3 }}>
         <Button

@@ -16,6 +16,8 @@ const AboutPage = lazy(() => import('../pages/public/About/AboutPage'));
 const ContactPage = lazy(() => import('../pages/public/Contact/ContactPage'));
 const DocumentVerifyPage = lazy(() => import('../pages/public/DocumentVerify/DocumentVerifyPage'));
 const NotFoundPage = lazy(() => import('../pages/public/NotFound/NotFoundPage'));
+const PublicProceduresPage = lazy(() => import('../pages/public/Procedures/PublicProceduresPage'));
+const ProcedureDetailPage = lazy(() => import('../pages/public/Procedures/ProcedureDetailPage'));
 
 // Auth pages
 const LoginPage = lazy(() => import('../pages/auth/Login/LoginPage'));
@@ -35,11 +37,11 @@ const CitizenFeedback = lazy(() => import('../pages/citizen/Feedback/FeedbackPag
 
 // Officer pages
 const OfficerDashboard = lazy(() => import('../pages/officer/Dashboard/OfficerDashboard'));
-const OfficerProfile = lazy(() => import('../pages/officer/Profile/OfficerProfile'));
+const OfficerProfile = lazy(() => import('../pages/officer/Profile/OfficerProfilePage'));
 const OfficerPendingRequests = lazy(() => import('../pages/officer/RequestManagement/PendingRequests'));
 const OfficerProcessRequest = lazy(() => import('../pages/officer/RequestManagement/ProcessRequest'));
 const OfficerCitizens = lazy(() => import('../pages/officer/CitizenManagement/CitizenList'));
-const OfficerCitizenDetail = lazy(() => import('../pages/officer/CitizenManagement/CitizenDetail'));
+const OfficerCitizenEdit = lazy(() => import('../pages/officer/CitizenManagement/CitizenEdit'));
 const OfficerStatistics = lazy(() => import('../pages/officer/Statistics/StatisticsPage'));
 
 // Chairman pages
@@ -70,6 +72,8 @@ const AppRoutes = () => {
           <Route path="about" element={<AboutPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="document-verify" element={<DocumentVerifyPage />} />
+          <Route path="procedures" element={<PublicProceduresPage />} />
+          <Route path="procedures/:procedureId" element={<ProcedureDetailPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         
@@ -100,7 +104,7 @@ const AppRoutes = () => {
           <Route path="requests/pending" element={isAuthenticated && (userRole === 'officer' || userRole === 'chairman') ? <OfficerPendingRequests /> : <Navigate to="/auth/login" />} />
           <Route path="process-request/:id" element={isAuthenticated && (userRole === 'officer' || userRole === 'chairman') ? <OfficerProcessRequest /> : <Navigate to="/auth/login" />} />
           <Route path="citizens" element={isAuthenticated && (userRole === 'officer' || userRole === 'chairman') ? <OfficerCitizens /> : <Navigate to="/auth/login" />} />
-          <Route path="citizens/:id" element={isAuthenticated && (userRole === 'officer' || userRole === 'chairman') ? <OfficerCitizenDetail /> : <Navigate to="/auth/login" />} />
+          <Route path="citizens/:citizenId/edit" element={isAuthenticated && (userRole === 'officer' || userRole === 'chairman') ? <OfficerCitizenEdit /> : <Navigate to="/auth/login" />} />
           <Route path="statistics" element={isAuthenticated && (userRole === 'officer' || userRole === 'chairman') ? <OfficerStatistics /> : <Navigate to="/auth/login" />} />
         </Route>
         

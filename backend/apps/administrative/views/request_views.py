@@ -4,68 +4,34 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from rest_framework.parsers import MultiPartParser, FormParser
 
-from ..models import Request, Attachment
+from ..models import AdminRequest, Attachment
 from ..serializers import (
     RequestSerializer, RequestListSerializer, RequestDetailSerializer, 
     RequestCreateSerializer, SubmitRequestSerializer, OfficerRequestUpdateSerializer,
     AttachmentSerializer, AttachmentUploadSerializer, AttachmentListSerializer, 
     AttachmentDetailSerializer, AttachmentVerificationSerializer
 )
-from utils.permissions import IsChairman, IsOfficer, IsCitizen
+from utils.permissions import IsChairman, IsOfficer, IsCitizen, IsOwnerOrAdmin
 
 
 class RequestViewSet(viewsets.ModelViewSet):
     """
-    API endpoint cho yêu cầu giấy tờ
+    API endpoint cho quản lý yêu cầu giấy tờ
     """
-    queryset = Request.objects.all()
     serializer_class = RequestSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'reference_number', 'description']
-    ordering_fields = ['created_at', 'submitted_date', 'due_date', 'status', 'priority']
-    ordering = ['-created_at']
-    
-    def get_permissions(self):
-        """
-        Quyền hạn truy cập:
-        - Tạo: tất cả người dùng đã xác thực (chủ yếu là citizen)
-        - Cập nhật: officer và chairman
-        - Xem: citizen chỉ xem yêu cầu của họ, officer và chairman xem tất cả
-        """
-        if self.action in ['update', 'partial_update', 'assign_officer', 'update_status']:
-            permission_classes = [permissions.IsAuthenticated & (IsChairman | IsOfficer)]
-        elif self.action == 'destroy':
-            permission_classes = [permissions.IsAuthenticated & IsChairman]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
     
     def get_queryset(self):
-        """
-        Lọc danh sách yêu cầu dựa trên vai trò:
-        - Citizens chỉ thấy yêu cầu của họ
-        - Officers thấy yêu cầu được giao cho họ và chưa được gán
-        - Chairman thấy tất cả
-        """
-        queryset = super().get_queryset()
         user = self.request.user
         
-        if user.is_authenticated:
-            if hasattr(user, 'role'):
-                if user.role.name == 'chairman':
-                    return queryset
-                elif user.role.name == 'officer':
-                    # Officers thấy yêu cầu được giao cho họ và các yêu cầu chưa gán
-                    return queryset.filter(Q(assigned_officer=user) | Q(assigned_officer__isnull=True))
-                else:
-                    # Citizens chỉ thấy yêu cầu của họ
-                    return queryset.filter(requestor=user)
-            else:
-                # Citizens chỉ thấy yêu cầu của họ
-                return queryset.filter(requestor=user)
+        # Nếu là admin hoặc cán bộ, có thể xem tất cả yêu cầu
+        if user.is_staff or user.role in ['chairman', 'officer']:
+            return AdminRequest.objects.all()
         
-        return Request.objects.none()
+        # Nếu là công dân, chỉ xem được yêu cầu của mình
+        return AdminRequest.objects.filter(requestor=user)
     
     def get_serializer_class(self):
         if self.action == 'list':
@@ -80,23 +46,53 @@ class RequestViewSet(viewsets.ModelViewSet):
             return OfficerRequestUpdateSerializer
         return RequestSerializer
     
-    @action(detail=True, methods=['post'])
+    def perform_create(self, serializer):
+        serializer.save(requestor=self.request.user)
+    
+    @action(detail=True, methods=['post'], url_path='submit')
     def submit_request(self, request, pk=None):
-        """API nộp yêu cầu (chuyển từ draft sang submitted)"""
+        """
+        Nộp yêu cầu (chuyển từ draft sang submitted)
+        """
         instance = self.get_object()
         
-        # Kiểm tra quyền hạn: chỉ người tạo yêu cầu mới được nộp
-        if instance.requestor != request.user:
+        if instance.status != 'draft':
             return Response(
-                {"error": "Bạn không có quyền nộp yêu cầu này"},
-                status=status.HTTP_403_FORBIDDEN
+                {'detail': 'Chỉ có thể nộp yêu cầu ở trạng thái draft.'},
+                status=status.HTTP_400_BAD_REQUEST
             )
         
-        serializer = SubmitRequestSerializer(instance, data={'status': 'submitted'}, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        instance.status = 'submitted'
+        instance.submitted_date = timezone.now()
+        
+        # Tính toán ngày đến hạn dựa trên số ngày xử lý dự kiến của loại giấy tờ
+        if not instance.due_date and instance.document_type and instance.document_type.estimated_processing_days:
+            days = instance.document_type.estimated_processing_days
+            instance.due_date = (timezone.now() + timezone.timedelta(days=days)).date()
+        
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel_request(self, request, pk=None):
+        """
+        Hủy yêu cầu
+        """
+        instance = self.get_object()
+        
+        if instance.status in ['completed', 'cancelled']:
+            return Response(
+                {'detail': 'Không thể hủy yêu cầu đã hoàn thành hoặc đã hủy.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        instance.status = 'cancelled'
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
     
     @action(detail=True, methods=['patch'])
     def update_status(self, request, pk=None):
@@ -158,7 +154,7 @@ class RequestViewSet(viewsets.ModelViewSet):
     def my_requests(self, request):
         """API lấy danh sách yêu cầu của người dùng hiện tại"""
         user = request.user
-        queryset = Request.objects.filter(requestor=user).order_by('-created_at')
+        queryset = AdminRequest.objects.filter(requestor=user).order_by('-created_at')
         
         # Lọc theo status nếu có
         status_param = request.query_params.get('status')
@@ -185,7 +181,7 @@ class RequestViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        queryset = Request.objects.filter(assigned_officer=user).order_by('-submitted_date')
+        queryset = AdminRequest.objects.filter(assigned_officer=user).order_by('-submitted_date')
         
         # Lọc theo status nếu có
         status_param = request.query_params.get('status')
@@ -203,49 +199,21 @@ class RequestViewSet(viewsets.ModelViewSet):
 
 class AttachmentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint cho tài liệu đính kèm
+    API endpoint cho quản lý tài liệu đính kèm
     """
-    queryset = Attachment.objects.all()
     serializer_class = AttachmentSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name', 'description', 'attachment_type']
-    ordering_fields = ['created_at', 'name', 'attachment_type']
-    ordering = ['-created_at']
-    
-    def get_permissions(self):
-        """
-        Quyền hạn truy cập:
-        - Tạo, cập nhật: người dùng đã xác thực (phải kiểm tra quyền hạn với request/document)
-        - Xóa: chỉ chairman và officer
-        """
-        if self.action == 'destroy':
-            permission_classes = [permissions.IsAuthenticated & (IsChairman | IsOfficer)]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
+    parser_classes = [MultiPartParser, FormParser]
     
     def get_queryset(self):
-        """
-        Lọc danh sách tài liệu đính kèm dựa trên vai trò:
-        - Citizens chỉ thấy tài liệu của họ
-        - Officers và Chairman thấy tất cả
-        """
-        queryset = super().get_queryset()
         user = self.request.user
         
-        if user.is_authenticated:
-            # Admin, chairman và officers thấy tất cả
-            if hasattr(user, 'role') and user.role.name in ['chairman', 'officer']:
-                return queryset
-            
-            # Citizens chỉ thấy tài liệu của họ
-            return queryset.filter(
-                Q(uploaded_by=user) | 
-                Q(request__requestor=user) | 
-                Q(document__issued_to=user)
-            )
+        # Nếu là admin hoặc cán bộ, có thể xem tất cả tài liệu đính kèm
+        if user.is_staff or user.role in ['chairman', 'officer']:
+            return Attachment.objects.all()
         
-        return Attachment.objects.none()
+        # Nếu là công dân, chỉ xem được tài liệu đính kèm của mình
+        return Attachment.objects.filter(request__requestor=user)
     
     def get_serializer_class(self):
         if self.action == 'list':
@@ -255,6 +223,17 @@ class AttachmentViewSet(viewsets.ModelViewSet):
         elif self.action == 'verify_attachment':
             return AttachmentVerificationSerializer
         return AttachmentSerializer
+    
+    def perform_create(self, serializer):
+        # Kiểm tra quyền truy cập vào request
+        request_obj = get_object_or_404(AdminRequest, pk=self.request.data.get('request'))
+        
+        if not (self.request.user.is_staff or 
+                self.request.user.role in ['chairman', 'officer'] or 
+                request_obj.requestor == self.request.user):
+            self.permission_denied(self.request)
+        
+        serializer.save(uploaded_by=self.request.user)
     
     @action(detail=True, methods=['patch'])
     def verify_attachment(self, request, pk=None):

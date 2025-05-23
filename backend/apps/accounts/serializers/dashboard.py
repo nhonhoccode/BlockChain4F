@@ -3,8 +3,8 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
 from apps.accounts.models import User
-from apps.blockchain.models.document import Document
-from apps.blockchain.models.request import Request
+from apps.administrative.models import Document
+from apps.administrative.models import AdminRequest
 from apps.administrative.models.activity import Activity
 
 class CitizenDashboardSerializer(serializers.Serializer):
@@ -27,11 +27,11 @@ class CitizenDashboardSerializer(serializers.Serializer):
         user = self.context['request'].user
         return {
             'total_documents': Document.objects.filter(issued_to=user).count(),
-            'pending_requests': Request.objects.filter(requestor=user, status__in=['pending', 'submitted']).count(),
-            'completed_requests': Request.objects.filter(requestor=user, status__in=['completed', 'approved']).count(),
+            'pending_requests': AdminRequest.objects.filter(requestor=user, status__in=['pending', 'submitted']).count(),
+            'completed_requests': AdminRequest.objects.filter(requestor=user, status__in=['completed', 'approved']).count(),
             'notifications': Activity.objects.filter(user=user, is_read=False).count(),
             'verified_documents': Document.objects.filter(issued_to=user, is_verified=True).count(),
-            'rejected_requests': Request.objects.filter(requestor=user, status='rejected').count()
+            'rejected_requests': AdminRequest.objects.filter(requestor=user, status='rejected').count()
         }
     
     def get_recent_activity(self, obj):
@@ -39,7 +39,7 @@ class CitizenDashboardSerializer(serializers.Serializer):
         activities = []
         
         # Lấy requests gần đây
-        requests = Request.objects.filter(requestor=user).order_by('-created_at')[:3]
+        requests = AdminRequest.objects.filter(requestor=user).order_by('-created_at')[:3]
         for req in requests:
             activities.append({
                 'id': req.id,
@@ -76,74 +76,112 @@ class OfficerDashboardSerializer(serializers.Serializer):
     
     def get_stats(self, obj):
         user = self.context['request'].user
+        
+        # Get assigned requests
+        assigned_requests = AdminRequest.objects.filter(assigned_to=user)
+        
+        # Get pending requests (either assigned to this officer or not assigned yet)
+        pending_requests = AdminRequest.objects.filter(
+            Q(assigned_to=user) | Q(assigned_to=None),
+            status__in=['submitted', 'in_review', 'processing']
+        )
+        
+        # Get completed requests by this officer
+        completed_requests = AdminRequest.objects.filter(
+            assigned_to=user,
+            status__in=['completed', 'approved']
+        )
+        
         return {
-            'total_requests': Request.objects.filter(officer=user).count(),
-            'pending_requests': Request.objects.filter(officer=user, status__in=['pending', 'processing']).count(),
-            'completed_requests': Request.objects.filter(officer=user, status__in=['completed', 'approved']).count(),
-            'total_citizens': User.objects.filter(role='citizen').count()
+            'total_requests': assigned_requests.count(),
+            'pending_requests': pending_requests.count(),
+            'completed_requests': completed_requests.count(),
+            'total_citizens': User.objects.filter(roles__name='citizen').count(),
+            'total_documents': Document.objects.filter(created_by=user).count()
         }
     
     def get_pending_requests(self, obj):
         user = self.context['request'].user
-        requests = Request.objects.filter(
-            officer=user, 
-            status__in=['pending', 'processing']
+        
+        # Get pending requests (either assigned to this officer or not assigned yet)
+        requests = AdminRequest.objects.filter(
+            Q(assigned_to=user) | Q(assigned_to=None),
+            status__in=['submitted', 'in_review', 'processing']
         ).order_by('-created_at')[:5]
         
         result = []
         for req in requests:
+            # Calculate deadline (7 days from creation)
+            deadline = req.created_at + timedelta(days=7)
+            
+            # Determine priority
+            priority = 'high' if req.notes and 'urgent' in req.notes.lower() else 'normal'
+            
             result.append({
-                'id': req.id,
-                'request_code': f"REQ-{req.id:06d}",
-                'title': req.title,
-                'citizen_name': f"{req.requestor.first_name} {req.requestor.last_name}".strip(),
-                'citizen_avatar': None,  # URL của avatar nếu có
+                'id': str(req.id),
+                'type': req.request_type,
                 'status': req.status,
-                'created_at': req.created_at
+                'title': req.title,
+                'submittedDate': req.created_at.isoformat(),
+                'deadline': deadline.isoformat(),
+                'priority': priority,
+                'citizen': {
+                    'id': str(req.requestor.id),
+                    'name': f"{req.requestor.first_name} {req.requestor.last_name}".strip(),
+                    'phone': getattr(req.requestor.profile, 'phone_number', 'N/A') if hasattr(req.requestor, 'profile') else 'N/A'
+                }
             })
         return result
     
     def get_completed_requests(self, obj):
         user = self.context['request'].user
-        requests = Request.objects.filter(
-            officer=user, 
+        
+        # Get completed requests by this officer
+        requests = AdminRequest.objects.filter(
+            assigned_to=user,
             status__in=['completed', 'approved', 'rejected']
         ).order_by('-updated_at')[:5]
         
         result = []
         for req in requests:
+            # Determine priority
+            priority = 'high' if req.notes and 'urgent' in req.notes.lower() else 'normal'
+            
             result.append({
-                'id': req.id,
-                'request_code': f"REQ-{req.id:06d}",
-                'title': req.title,
-                'citizen_name': f"{req.requestor.first_name} {req.requestor.last_name}".strip(),
-                'citizen_avatar': None,  # URL của avatar nếu có
+                'id': str(req.id),
+                'type': req.request_type,
                 'status': req.status,
-                'completed_date': req.updated_at
+                'title': req.title,
+                'submittedDate': req.created_at.isoformat(),
+                'completedDate': req.updated_at.isoformat() if req.updated_at else None,
+                'priority': priority,
+                'citizen': {
+                    'id': str(req.requestor.id),
+                    'name': f"{req.requestor.first_name} {req.requestor.last_name}".strip()
+                },
+                'rejectReason': req.rejection_reason if req.status == 'rejected' else None
             })
         return result
     
     def get_recent_citizens(self, obj):
-        # Lấy các công dân mới đăng ký trong 30 ngày qua
-        thirty_days_ago = timezone.now() - timedelta(days=30)
-        citizens = User.objects.filter(
-            role='citizen',
-            date_joined__gte=thirty_days_ago
-        ).order_by('-date_joined')[:5]
+        # Get recent citizens
+        citizens = User.objects.filter(roles__name='citizen').order_by('-date_joined')[:5]
         
         result = []
         for citizen in citizens:
-            # Đếm yêu cầu của công dân
-            request_count = Request.objects.filter(requestor=citizen).count()
-            # Lấy yêu cầu gần nhất
-            latest_request = Request.objects.filter(requestor=citizen).order_by('-created_at').first()
+            # Get latest request from citizen
+            latest_request = AdminRequest.objects.filter(requestor=citizen).order_by('-created_at').first()
+            
+            # Count total requests from citizen
+            request_count = AdminRequest.objects.filter(requestor=citizen).count()
             
             result.append({
-                'id': citizen.id,
+                'id': str(citizen.id),
                 'name': f"{citizen.first_name} {citizen.last_name}".strip(),
                 'email': citizen.email,
-                'phone': citizen.phone or 'Không có',
-                'lastRequest': latest_request.created_at if latest_request else None,
+                'phone': getattr(citizen.profile, 'phone_number', 'N/A') if hasattr(citizen, 'profile') else 'N/A',
+                'status': 'active',  # Assuming all citizens are active
+                'lastRequest': latest_request.created_at.isoformat() if latest_request else None,
                 'totalRequests': request_count
             })
         return result
@@ -158,22 +196,22 @@ class ChairmanDashboardSerializer(serializers.Serializer):
     def get_summary_stats(self, obj):
         return {
             'total_officers': User.objects.filter(role='officer').count(),
-            'pending_approvals': Request.objects.filter(
+            'pending_approvals': AdminRequest.objects.filter(
                 status='pending',
                 needs_chairman_approval=True
             ).count(),
             'total_citizens': User.objects.filter(role='citizen').count(),
             'approved_documents': Document.objects.filter(status='approved').count(),
             'pending_documents': Document.objects.filter(status='pending').count(),
-            'pending_requests': Request.objects.filter(status='pending').count(),
-            'completed_requests': Request.objects.filter(status__in=['completed', 'approved']).count(),
-            'rejected_requests': Request.objects.filter(status='rejected').count(),
+            'pending_requests': AdminRequest.objects.filter(status='pending').count(),
+            'completed_requests': AdminRequest.objects.filter(status__in=['completed', 'approved']).count(),
+            'rejected_requests': AdminRequest.objects.filter(status='rejected').count(),
             'avg_processing_time': 3  # Giả định, trong thực tế sẽ tính toán từ dữ liệu
         }
     
     def get_pending_approvals(self, obj):
         # Lấy các yêu cầu chờ chủ tịch phê duyệt
-        approvals = Request.objects.filter(
+        approvals = AdminRequest.objects.filter(
             status='pending',
             needs_chairman_approval=True
         ).order_by('-created_at')[:5]
@@ -198,8 +236,8 @@ class ChairmanDashboardSerializer(serializers.Serializer):
         
         result = []
         for officer in officers[:5]:  # Chỉ lấy 5 cán bộ
-            total_requests = Request.objects.filter(officer=officer).count()
-            completed_requests = Request.objects.filter(
+            total_requests = AdminRequest.objects.filter(officer=officer).count()
+            completed_requests = AdminRequest.objects.filter(
                 officer=officer,
                 status__in=['completed', 'approved']
             ).count()
@@ -255,7 +293,7 @@ class ChairmanDashboardSerializer(serializers.Serializer):
             date = today - timedelta(days=i)
             
             # Đếm số yêu cầu và giấy tờ trong ngày
-            requests_count = Request.objects.filter(
+            requests_count = AdminRequest.objects.filter(
                 created_at__date=date
             ).count()
             
