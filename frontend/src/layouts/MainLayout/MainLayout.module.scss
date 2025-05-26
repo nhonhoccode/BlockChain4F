@@ -1,0 +1,391 @@
+// Biến màu sắc
+$primary: #2563eb;
+$primary-light: #3b82f6;
+$primary-dark: #1d4ed8;
+$secondary: #64748b;
+$text-primary: #1e293b;
+$text-secondary: #475569;
+$background: #f8fafc;
+$white: #ffffff;
+$gray-100: #f1f5f9;
+$gray-200: #e2e8f0;
+$gray-300: #cbd5e1;
+$border-radius: 8px;
+$transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background;
+  color: $text-primary;
+}
+
+.appBar {
+  background-color: $white;
+  color: $text-primary;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: $transition;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  padding: 0 20px;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: $primary;
+  margin-right: 10px;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.logoIcon {
+  margin-right: 12px;
+  font-size: 28px;
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+}
+
+.menuButton {
+  display: none;
+  @media (max-width: 960px) {
+    display: block;
+  }
+}
+
+.navItems {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  
+  @media (max-width: 960px) {
+    display: none;
+  }
+}
+
+.navItem {
+  position: relative;
+  padding: 6px 12px;
+  color: $text-primary;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.2px;
+  transition: $transition;
+  border-radius: $border-radius;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 0;
+    height: 2px;
+    background-color: $primary;
+    transition: width 0.3s ease;
+  }
+  
+  &.active {
+    color: $primary;
+    font-weight: 600;
+    
+    &:after {
+      width: 60%;
+    }
+  }
+  
+  &:hover {
+    color: $primary;
+    background-color: rgba($primary, 0.04);
+    
+    &:after {
+      width: 60%;
+    }
+  }
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+  
+  @media (max-width: 960px) {
+    display: none;
+  }
+}
+
+.loginButton {
+  padding: 5px 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border-radius: $border-radius;
+  transition: $transition;
+  border: 1.5px solid $primary;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  min-width: 80px;
+  
+  &:hover {
+    background-color: rgba($primary, 0.04);
+  }
+}
+
+.registerButton {
+  padding: 5px 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border-radius: $border-radius;
+  transition: $transition;
+  background-color: $primary;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  min-width: 80px;
+  
+  &:hover {
+    background-color: $primary-dark;
+  }
+}
+
+.dashboardButton {
+  padding: 5px 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border-radius: $border-radius;
+  transition: $transition;
+  background-color: rgba($primary, 0.1);
+  color: $primary;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &:hover {
+    background-color: rgba($primary, 0.2);
+  }
+}
+
+.drawer {
+  width: 300px;
+  background-color: $white;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  padding: 20px 16px;
+  justify-content: space-between;
+  border-bottom: 1px solid $gray-200;
+}
+
+.main {
+  flex: 1;
+  padding-top: 70px;
+  background-color: $background;
+}
+
+.content {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer {
+  padding: 48px 0 24px;
+  background-color: $primary-dark;
+  color: $white;
+}
+
+.footerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footerLogo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 24px 0;
+  gap: 16px;
+}
+
+.footerLink {
+  color: $white;
+  margin: 0;
+  padding: 6px 12px;
+  text-decoration: none;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  border-radius: $border-radius;
+  transition: $transition;
+  white-space: nowrap;
+  
+  &:hover {
+    background-color: rgba($white, 0.1);
+  }
+}
+
+.footerBottom {
+  margin-top: 32px;
+  font-size: 0.9rem;
+  color: rgba($white, 0.8);
+  text-align: center;
+}
+
+// MainLayout styles
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  padding-top: 64px; // Adjust for AppBar height
+}
+
+.content {
+  flex: 1 0 auto;
+}
+
+.footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.drawer {
+  width: 280px;
+  max-width: 90vw;
+}
+
+.drawerHeader {
+  padding: 16px;
+}
+
+.appBar {
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  color: #2563eb;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.logoText {
+  font-weight: 600;
+  margin-left: 8px;
+  font-size: 1.2rem;
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+}
+
+.navItem {
+  margin: 0 4px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  padding: 6px 12px;
+  border-radius: 8px;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: #2563eb;
+  }
+  
+  &.active {
+    color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.08);
+  }
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.loginButton {
+  margin-right: 8px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.appBar {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.toolbar {
+  min-height: 64px;
+  padding: 0 16px;
+}
+
+.drawer {
+  width: 100%;
+  max-width: 300px;
+}
+
+.content {
+  flex: 1 0 auto;
+  padding-top: 64px; /* Height of AppBar */
+}
+
+.footer {
+  flex-shrink: 0;
+  width: 100%;
+  background-color: #f9fafb;
+}
+
+@media (max-width: 600px) {
+  .content {
+    padding-top: 56px; /* Mobile AppBar height */
+  }
+}

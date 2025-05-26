@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Đường Dẫn - Blockchain Administrative</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      background-color: #f8fafc;
+    }
+    h1 {
+      color: #1976d2;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .section {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .section h2 {
+      color: #1976d2;
+      margin-top: 0;
+    }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    button {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #1565c0;
+    }
+    button.secondary {
+      background-color: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    button.secondary:hover {
+      background-color: #e0e0e0;
+    }
+    .info {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .log {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 15px;
+      font-family: monospace;
+      height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 13px;
+    }
+    .clear-log {
+      margin-top: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Kiểm tra Đường Dẫn</h1>
+    
+    <div class="section">
+      <h2>Thông tin đường dẫn hiện tại</h2>
+      <div class="info">
+        <div><strong>URL hiện tại:</strong> <span id="currentUrl"></span></div>
+        <div><strong>Pathname:</strong> <span id="currentPathname"></span></div>
+        <div><strong>Origin:</strong> <span id="currentOrigin"></span></div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Điều hướng đến trang hỗ trợ</h2>
+      <p>Chọn một trong các phương pháp dưới đây để điều hướng đến trang hỗ trợ:</p>
+      
+      <div class="button-row">
+        <button onclick="navigateWithHref('/citizen/support')">
+          window.location.href (Đường dẫn tuyệt đối)
+        </button>
+        
+        <button onclick="navigateWithHref('citizen/support')">
+          window.location.href (Đường dẫn tương đối)
+        </button>
+        
+        <button onclick="navigateWithReplace('/citizen/support')">
+          window.location.replace
+        </button>
+        
+        <button onclick="navigateWithAssign('/citizen/support')">
+          window.location.assign
+        </button>
+        
+        <button onclick="navigateWithAnchor('/citizen/support')">
+          Thẻ a (Anchor)
+        </button>
+      </div>
+      
+      <div class="button-row">
+        <button class="secondary" onclick="navigateWithHref('/support')">
+          Đến /support
+        </button>
+        
+        <button class="secondary" onclick="navigateWithHref('/direct-support')">
+          Đến /direct-support
+        </button>
+        
+        <button class="secondary" onclick="navigateWithHref('/test/citizen/support')">
+          Đến /test/citizen/support
+        </button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Log</h2>
+      <div class="log" id="logOutput"></div>
+      <div class="clear-log">
+        <button class="secondary" onclick="clearLog()">Xóa Log</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Update current URL info
+    function updateUrlInfo() {
+      document.getElementById('currentUrl').textContent = window.location.href;
+      document.getElementById('currentPathname').textContent = window.location.pathname;
+      document.getElementById('currentOrigin').textContent = window.location.origin;
+    }
+    
+    // Log messages
+    function log(message) {
+      const logElem = document.getElementById('logOutput');
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString() + '.' + now.getMilliseconds().toString().padStart(3, '0');
+      logElem.textContent += `[${timeStr}] ${message}\n`;
+      logElem.scrollTop = logElem.scrollHeight;
+    }
+    
+    // Clear log
+    function clearLog() {
+      document.getElementById('logOutput').textContent = '';
+    }
+    
+    // Navigation functions
+    function navigateWithHref(path) {
+      log(`Navigating to ${path} using window.location.href`);
+      try {
+        window.location.href = path;
+      } catch (e) {
+        log(`Error: ${e.message}`);
+      }
+    }
+    
+    function navigateWithReplace(path) {
+      log(`Navigating to ${path} using window.location.replace`);
+      try {
+        window.location.replace(path);
+      } catch (e) {
+        log(`Error: ${e.message}`);
+      }
+    }
+    
+    function navigateWithAssign(path) {
+      log(`Navigating to ${path} using window.location.assign`);
+      try {
+        window.location.assign(path);
+      } catch (e) {
+        log(`Error: ${e.message}`);
+      }
+    }
+    
+    function navigateWithAnchor(path) {
+      log(`Navigating to ${path} using anchor tag`);
+      try {
+        const link = document.createElement('a');
+        link.href = path;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (e) {
+        log(`Error: ${e.message}`);
+      }
+    }
+    
+    // Initialize
+    window.onload = function() {
+      updateUrlInfo();
+      log('Route test page loaded');
+    };
+  </script>
+</body>
+</html> 

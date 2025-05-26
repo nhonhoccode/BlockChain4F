@@ -1,0 +1,35 @@
+# Cấu hình Môi trường Development
+
+database:
+  host: localhost
+  port: 5432
+  name: blockchain_admin_dev
+  user: dev_user
+  password: dev_password
+
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+
+blockchain:
+  network: development
+  hyperledger:
+    peers: ["peer0.org1.example.com:7051"]
+    orderers: ["orderer.example.com:7050"]
+  quorum:
+    nodes: ["http://localhost:22000"]
+
+security:
+  jwt_secret: dev_secret_key
+  encryption_key: dev_encryption_key
+  ssl_enabled: false
+
+logging:
+  level: DEBUG
+  file: logs/development.log
+
+external_services:
+  email_service: false
+  sms_service: false
+  backup_service: false 

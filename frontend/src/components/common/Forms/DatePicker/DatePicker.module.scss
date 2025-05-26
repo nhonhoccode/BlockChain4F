@@ -1,0 +1,43 @@
+.datePicker {
+  margin-bottom: 0.5rem;
+  width: 100%;
+
+  // Tùy chỉnh màu sắc cho DatePicker
+  :global(.MuiPickersDay-root.Mui-selected) {
+    background-color: var(--color-primary);
+    
+    &:hover, &:focus {
+      background-color: var(--color-primary-dark);
+    }
+  }
+
+  :global(.MuiPickersDay-today) {
+    border-color: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  // Tùy chỉnh font cho calendar
+  :global(.MuiPickersCalendarHeader-label) {
+    font-weight: 600;
+  }
+
+  // Tùy chỉnh màu cho current year/month
+  :global(.MuiPickersYear-yearSelected),
+  :global(.MuiPickersMonth-monthSelected) {
+    color: var(--color-primary);
+  }
+
+  // Tùy chỉnh style khi focus
+  :global(.MuiOutlinedInput-root.Mui-focused) {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: var(--color-primary);
+    }
+  }
+
+  // Tùy chỉnh cho lỗi
+  :global(.Mui-error) {
+    .MuiOutlinedInput-notchedOutline {
+      border-color: var(--color-error);
+    }
+  }
+}

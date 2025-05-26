@@ -1,0 +1,75 @@
+@import '../../../../assets/styles/_variables.scss';
+@import '../../../../assets/styles/mixins.scss';
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--border-radius-small);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  box-shadow: var(--shadow-1);
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  
+  &:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-1);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--color-grey-400);
+    transform: none;
+    box-shadow: none;
+  }
+  
+  // Kích thước
+  &.small {
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-sm);
+  }
+  
+  &.medium {
+    padding: 0.75rem 1.5rem;
+    font-size: var(--font-size-md);
+  }
+  
+  &.large {
+    padding: 1rem 2rem;
+    font-size: var(--font-size-lg);
+  }
+  
+  // Chiều rộng
+  &.fullWidth {
+    width: 100%;
+  }
+  
+  // Icons
+  .startIcon {
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .endIcon {
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .buttonText {
+    display: inline-block;
+  }
+}

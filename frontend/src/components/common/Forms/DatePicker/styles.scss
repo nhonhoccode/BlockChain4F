@@ -1,0 +1,382 @@
+@import '../../../../assets/styles/_variables.scss';
+@import '../../../../assets/styles/mixins.scss';
+
+.date-picker {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 250px;
+  margin-bottom: var(--spacing-md);
+  
+  &--full-width {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  &--small {
+    font-size: var(--font-size-sm);
+    
+    .date-picker__input-container {
+      min-height: 36px;
+    }
+    
+    .date-picker__input {
+      padding: 8px 10px;
+      padding-right: 36px;
+    }
+    
+    .date-picker__label {
+      font-size: var(--font-size-sm);
+      
+      &--float {
+        transform: translateY(-75%) scale(0.85);
+      }
+    }
+    
+    .date-picker__calendar {
+      width: 280px;
+    }
+    
+    .date-picker__day {
+      width: 30px;
+      height: 30px;
+      font-size: var(--font-size-xs);
+    }
+  }
+  
+  &--medium {
+    font-size: var(--font-size-md);
+    
+    .date-picker__input-container {
+      min-height: 44px;
+    }
+    
+    .date-picker__input {
+      padding: 12px 14px;
+      padding-right: 44px;
+    }
+    
+    .date-picker__label {
+      font-size: var(--font-size-md);
+      
+      &--float {
+        transform: translateY(-75%) scale(0.85);
+      }
+    }
+    
+    .date-picker__calendar {
+      width: 320px;
+    }
+    
+    .date-picker__day {
+      width: 36px;
+      height: 36px;
+      font-size: var(--font-size-sm);
+    }
+  }
+  
+  &--large {
+    font-size: var(--font-size-lg);
+    
+    .date-picker__input-container {
+      min-height: 52px;
+    }
+    
+    .date-picker__input {
+      padding: 16px 18px;
+      padding-right: 52px;
+    }
+    
+    .date-picker__label {
+      font-size: var(--font-size-lg);
+      
+      &--float {
+        transform: translateY(-75%) scale(0.85);
+      }
+    }
+    
+    .date-picker__calendar {
+      width: 360px;
+    }
+    
+    .date-picker__day {
+      width: 40px;
+      height: 40px;
+      font-size: var(--font-size-md);
+    }
+  }
+  
+  &--focused {
+    .date-picker__input-container {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+    }
+    
+    .date-picker__label {
+      color: var(--color-primary);
+    }
+  }
+  
+  &--error {
+    .date-picker__input-container {
+      border-color: var(--color-error);
+    }
+    
+    .date-picker__label {
+      color: var(--color-error);
+    }
+    
+    .date-picker__helper-text--error {
+      color: var(--color-error);
+    }
+  }
+  
+  &--disabled {
+    opacity: 0.7;
+    pointer-events: none;
+    
+    .date-picker__input-container {
+      background-color: var(--color-grey-100);
+      cursor: not-allowed;
+    }
+    
+    .date-picker__input {
+      color: var(--color-text-disabled);
+    }
+  }
+  
+  &--readonly {
+    .date-picker__input-container {
+      background-color: var(--color-grey-50);
+    }
+    
+    .date-picker__input {
+      cursor: default;
+    }
+  }
+  
+  &__input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid var(--color-grey-300);
+    border-radius: var(--border-radius-small);
+    background-color: var(--color-background-paper);
+    transition: all var(--transition-normal);
+    min-height: 44px;
+  }
+  
+  &__input {
+    width: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--color-text-primary);
+    
+    &::placeholder {
+      color: var(--color-text-secondary);
+      opacity: 0.7;
+    }
+  }
+  
+  &__label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    pointer-events: none;
+    background-color: var(--color-background-paper);
+    padding: 0 var(--spacing-xs);
+    transition: all var(--transition-normal);
+    margin: 0;
+    
+    &--float {
+      top: 0;
+      left: 10px;
+    }
+    
+    &--error {
+      color: var(--color-error);
+    }
+    
+    &--disabled {
+      color: var(--color-text-disabled);
+    }
+    
+    &--required {
+      &:after {
+        content: '*';
+        color: var(--color-error);
+        margin-left: 2px;
+      }
+    }
+  }
+  
+  &__indicators {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  &__clear-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--color-grey-500);
+    cursor: pointer;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      color: var(--color-error);
+    }
+  }
+  
+  &__calendar-icon {
+    color: var(--color-grey-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+  }
+  
+  &__helper-text {
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    min-height: 20px;
+    
+    &--error {
+      color: var(--color-error);
+    }
+  }
+  
+  &__calendar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--z-index-popover);
+    margin-top: 4px;
+    background-color: var(--color-background-paper);
+    border: 1px solid var(--color-grey-300);
+    border-radius: var(--border-radius-small);
+    box-shadow: var(--shadow-2);
+    width: 320px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    
+    @include respond-below(sm) {
+      right: 0;
+      left: auto;
+    }
+  }
+  
+  &__calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-grey-200);
+  }
+  
+  &__current-month {
+    font-weight: var(--font-weight-medium);
+    text-align: center;
+    flex: 1;
+  }
+  
+  &__nav-button {
+    background: none;
+    border: none;
+    color: var(--color-grey-600);
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      background-color: var(--color-grey-100);
+      color: var(--color-grey-900);
+    }
+  }
+  
+  &__nav-icon {
+    font-size: 12px;
+    line-height: 1;
+  }
+  
+  &__weekdays {
+    display: flex;
+    border-bottom: 1px solid var(--color-grey-200);
+  }
+  
+  &__weekday {
+    flex: 1;
+    text-align: center;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    padding: var(--spacing-xs) 0;
+  }
+  
+  &__days {
+    padding: var(--spacing-xs);
+  }
+  
+  &__week {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2px;
+  }
+  
+  &__day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    font-size: var(--font-size-sm);
+    border-radius: 50%;
+    cursor: pointer;
+    
+    &:hover:not(&--disabled):not(&--empty) {
+      background-color: var(--color-grey-100);
+    }
+    
+    &--empty {
+      cursor: default;
+    }
+    
+    &--disabled {
+      color: var(--color-grey-400);
+      cursor: default;
+    }
+    
+    &--today {
+      border: 1px solid var(--color-primary);
+      font-weight: var(--font-weight-medium);
+    }
+    
+    &--selected {
+      background-color: var(--color-primary);
+      color: white;
+      
+      &:hover {
+        background-color: var(--color-primary-dark);
+      }
+    }
+  }
+} 

@@ -1,0 +1,313 @@
+.chairman-dashboard {
+  &__welcome {
+    border-radius: 1rem;
+    position: relative;
+    overflow: hidden;
+    
+    &-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    &-subtitle {
+      opacity: 0.85;
+      max-width: 600px;
+    }
+    
+    &-decoration {
+      position: absolute;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.1);
+      
+      &--1 {
+        width: 200px;
+        height: 200px;
+        top: -20px;
+        right: -20px;
+      }
+      
+      &--2 {
+        width: 120px;
+        height: 120px;
+        bottom: -30px;
+        left: 50%;
+      }
+    }
+  }
+  
+  &__stat-card {
+    position: relative;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    overflow: visible;
+    
+    &:hover {
+      transform: translateY(-5px);
+    }
+    
+    &-icon {
+      position: absolute;
+      top: -15px;
+      left: 20px;
+      width: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+    
+    &-content {
+      padding-top: 2rem;
+      margin-left: 1rem;
+      
+      &-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+      }
+      
+      &-title {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.875rem;
+      }
+    }
+  }
+  
+  &__card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      
+      &-title {
+        display: flex;
+        align-items: center;
+        
+        &-icon {
+          margin-right: 0.5rem;
+        }
+        
+        &-text {
+          font-weight: 600;
+        }
+      }
+    }
+    
+    &-content {
+      padding: 0;
+      
+      &-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1.5rem;
+        
+        &-icon {
+          font-size: 3rem;
+          color: rgba(0, 0, 0, 0.2);
+          margin-bottom: 1rem;
+        }
+        
+        &-text {
+          color: rgba(0, 0, 0, 0.6);
+        }
+      }
+    }
+  }
+  
+  &__list-item {
+    padding: 0.75rem 1.5rem;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    &-avatar {
+      width: 40px;
+      height: 40px;
+    }
+    
+    &-content {
+      &-title {
+        font-weight: 500;
+      }
+      
+      &-subtitle {
+        display: flex;
+        flex-direction: column;
+        margin-top: 0.25rem;
+        
+        &-item {
+          color: rgba(0, 0, 0, 0.6);
+          font-size: 0.75rem;
+        }
+        
+        &-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+  
+  &__performance-card {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    &-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      
+      &-avatar {
+        margin-right: 0.75rem;
+      }
+      
+      &-info {
+        &-name {
+          font-weight: 600;
+        }
+        
+        &-position {
+          font-size: 0.75rem;
+          color: rgba(0, 0, 0, 0.6);
+        }
+      }
+    }
+    
+    &-stats {
+      &-item {
+        margin-bottom: 0.75rem;
+        
+        &-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.25rem;
+          
+          &-label {
+            font-size: 0.75rem;
+            color: rgba(0, 0, 0, 0.6);
+          }
+          
+          &-value {
+            font-size: 0.75rem;
+            font-weight: 500;
+          }
+        }
+        
+        &-progress {
+          height: 6px;
+          border-radius: 3px;
+        }
+      }
+    }
+  }
+  
+  &__search-bar {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.04);
+    
+    &-icon {
+      margin-right: 0.5rem;
+      color: rgba(0, 0, 0, 0.4);
+    }
+    
+    &-input {
+      border: none;
+      outline: none;
+      background-color: transparent;
+      width: 100%;
+      font-size: 0.875rem;
+    }
+  }
+  
+  // Dark mode styles
+  &.dark-mode {
+    .chairman-dashboard {
+      &__welcome {
+        &-decoration {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+      }
+      
+      &__card {
+        background-color: rgba(30, 30, 30, 1);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+        
+        &-header {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+      }
+      
+      &__list-item {
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        &-content {
+          &-subtitle {
+            &-item {
+              color: rgba(255, 255, 255, 0.6);
+            }
+          }
+        }
+      }
+      
+      &__performance-card {
+        background-color: rgba(30, 30, 30, 1);
+        
+        &-header {
+          &-info {
+            &-position {
+              color: rgba(255, 255, 255, 0.6);
+            }
+          }
+        }
+        
+        &-stats {
+          &-item {
+            &-header {
+              &-label {
+                color: rgba(255, 255, 255, 0.6);
+              }
+            }
+          }
+        }
+      }
+      
+      &__search-bar {
+        background-color: rgba(255, 255, 255, 0.05);
+        
+        &-icon {
+          color: rgba(255, 255, 255, 0.4);
+        }
+        
+        &-input {
+          color: rgba(255, 255, 255, 0.9);
+        }
+      }
+    }
+  }
+} 

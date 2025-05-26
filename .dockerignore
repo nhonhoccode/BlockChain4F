@@ -1,0 +1,119 @@
+# Version control
+.git
+.gitignore
+.gitlab-ci.yml
+
+# Documentation
+README.md
+CONTRIBUTING.md
+docs/
+*.md
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.coverage
+.pytest_cache/
+coverage/
+.nyc_output
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Database
+*.sqlite3
+*.db
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+
+# Kubernetes
+kubernetes/
+k8s/
+
+# Analytics
+analytics/reports/
+
+# CI/CD
+.ci/
+.github/
+.project/
+
+# Monitoring
+monitoring/
+prometheus/
+grafana/
+
+# Security
+security/keys/
+*.pem
+*.key
+*.crt
+
+# Media files (already in production)
+media/ 

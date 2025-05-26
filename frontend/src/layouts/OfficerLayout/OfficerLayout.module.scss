@@ -1,0 +1,164 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.drawer {
+  width: 240px;
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+}
+
+.drawerPaper {
+  width: 240px;
+  background: linear-gradient(180deg, #f5f7fa 0%, #ffffff 100%);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+}
+
+.appBar {
+  z-index: 1201;
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+  // Gradient background for appBar
+  background: linear-gradient(90deg, #1976d2 0%, #2196f3 100%);
+  color: white;
+  
+  // Make sure the toolbar is properly aligned
+  .MuiToolbar-root {
+    padding-left: 16px;
+    padding-right: 16px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.menuButton {
+  margin-right: 16px;
+  color: white;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.title {
+  flex-grow: 1;
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  flex-grow: 1;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  margin: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  
+  // Add nice styles for content children
+  & > * {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+  min-height: 64px;
+}
+
+.userInfo {
+  padding: 24px 16px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(33, 150, 243, 0.1) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 12px;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.userName {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #1976d2;
+}
+
+.userRole {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.875rem;
+  background-color: rgba(25, 118, 210, 0.1);
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.menuItem {
+  margin: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+
+  &.selected {
+    background-color: rgba(25, 118, 210, 0.15);
+    color: #1976d2;
+    border-left: 4px solid #1976d2;
+    
+    .menuItemIcon {
+      color: #1976d2;
+    }
+  }
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.menuItemIcon {
+  color: rgba(0, 0, 0, 0.54);
+  min-width: 40px;
+}
+
+.footer {
+  padding: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: auto;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+@media (max-width: 960px) {
+  .drawer {
+    width: 0;
+  }
+  
+  .drawerOpen {
+    width: 240px;
+  }
+  
+  .content {
+    margin: 8px;
+  }
+}

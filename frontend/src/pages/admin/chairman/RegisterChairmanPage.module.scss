@@ -1,0 +1,60 @@
+.chairmanRegisterPage {
+  padding: 1.5rem;
+  
+  .formPaper {
+    padding: 2rem;
+    background-color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    
+    .headerIcon {
+      font-size: 2.5rem;
+      margin-right: 1rem;
+      color: #1976d2;
+    }
+    
+    .formSection {
+      margin-bottom: 1.5rem;
+      
+      .sectionTitle {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+      }
+    }
+    
+    .formButtons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+  }
+  
+  .infoAlert {
+    margin-bottom: 1.5rem;
+    background-color: #e3f2fd;
+    border-radius: 4px;
+    
+    .alertTitle {
+      font-weight: 500;
+      color: #0d47a1;
+    }
+  }
+  
+  .successMessage {
+    text-align: center;
+    padding: 2rem;
+    
+    .successIcon {
+      font-size: 4rem;
+      color: #4caf50;
+      margin-bottom: 1rem;
+    }
+    
+    .successTitle {
+      color: #2e7d32;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+  }
+} 

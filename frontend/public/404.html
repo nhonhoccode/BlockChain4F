@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redirecting...</title>
+  <script>
+    // Capture the URL the user was trying to access
+    var pathname = window.location.pathname;
+    var search = window.location.search;
+    var hash = window.location.hash;
+    
+    // Log information for debugging
+    console.log('404 handler - Requested path:', pathname);
+    
+    // Create a special object with route info to pass to the app
+    var routeData = {
+      originalUrl: window.location.href,
+      pathname: pathname,
+      search: search,
+      hash: hash,
+      timestamp: new Date().getTime()
+    };
+    
+    // Store this information in sessionStorage
+    sessionStorage.setItem('redirectData', JSON.stringify(routeData));
+    
+    // Special handling for the support page
+    if (pathname.includes('/citizen/support') || pathname.includes('/support')) {
+      console.log('Support page redirect detected');
+      
+      // Option 1: Try to navigate directly to the correct React route
+      // This only works if the server is configured to serve index.html for all routes
+      window.location.replace('/?supportPage=true&redirectFrom=404');
+    } else {
+      // For all other pages, redirect to the main app with the original path in a query param
+      // The app can then read this and redirect appropriately
+      window.location.replace('/?redirect=' + encodeURIComponent(pathname + search + hash));
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    
+    h2 {
+      color: #1976d2;
+    }
+    
+    p {
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    
+    .redirect-link {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Đang chuyển hướng...</h2>
+  <p>Bạn đang được chuyển hướng đến trang chính.</p>
+  <a href="/" class="redirect-link">Nhấn vào đây nếu không được chuyển hướng tự động</a>
+</body>
+</html> 

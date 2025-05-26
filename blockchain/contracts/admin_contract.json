@@ -1,0 +1,209 @@
+{
+  "contractName": "AdminContract",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "approvalId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "approverId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "txId",
+          "type": "string"
+        }
+      ],
+      "name": "ApprovalWorkflowApproved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "approvalId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "finalState",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "txId",
+          "type": "string"
+        }
+      ],
+      "name": "ApprovalWorkflowCompleted",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "approvalId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "requestType",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "requesterId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "targetId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
+        }
+      ],
+      "name": "createApprovalWorkflow",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "approvalId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "approverId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "comments",
+          "type": "string"
+        }
+      ],
+      "name": "approveWorkflow",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "approvalId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "rejecterId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "rejectWorkflow",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "approvalId",
+          "type": "string"
+        }
+      ],
+      "name": "getApprovalWorkflow",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "approvalId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "requestType",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "requesterId",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "targetId",
+              "type": "string"
+            },
+            {
+              "internalType": "uint8",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct AdminContract.ApprovalWorkflow",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "approverId",
+          "type": "string"
+        }
+      ],
+      "name": "getPendingApprovals",
+      "outputs": [
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+} 

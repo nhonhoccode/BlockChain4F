@@ -1,0 +1,47 @@
+# Backend Development Dockerfile for Django Application
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=core.settings.development
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        postgresql-client \
+        build-essential \
+        libpq-dev \
+        curl \
+        git \
+        vim \
+        htop \
+        gcc \
+        g++ \
+        make \
+        python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements/ requirements/
+# Cài đặt các dependencies theo thứ tự để tránh xung đột
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir cython \
+    && pip install --no-cache-dir -r requirements/base.txt \
+    && pip install --no-cache-dir -r requirements/dev.txt
+
+# Create necessary directories
+RUN mkdir -p media static logs
+
+# Copy project
+COPY . .
+
+# Expose port
+EXPOSE 8000
+
+# Development command (will be overridden in docker-compose)
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] 

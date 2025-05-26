@@ -1,0 +1,211 @@
+@import '../../../assets/styles/variables';
+@import '../../../assets/styles/mixins';
+
+.newRequestContainer {
+  padding: 24px;
+  animation: fadeIn 0.5s ease-in-out;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h1 {
+    font-weight: 700;
+    color: var(--color-primary-dark, #1565c0);
+    margin-left: 8px;
+  }
+  
+  .backButton {
+    color: var(--color-text-secondary, #757575);
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      color: var(--color-primary, #1976d2);
+    }
+  }
+}
+
+.formContainer {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stepper {
+  padding: 24px 24px 16px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.formContent {
+  padding: 24px;
+}
+
+.stepContent {
+  margin-bottom: 24px;
+  min-height: 300px;
+}
+
+.uploadArea {
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  border: 2px dashed rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.01);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: var(--color-primary, #1976d2);
+    background-color: rgba(25, 118, 210, 0.02);
+  }
+}
+
+.uploadButton {
+  margin-bottom: 8px;
+}
+
+.fileList {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .fileIcon {
+    color: var(--color-primary, #1976d2);
+    margin-right: 12px;
+  }
+  
+  .fileInfo {
+    flex: 1;
+  }
+  
+  .removeButton {
+    color: var(--color-text-secondary, #757575);
+    
+    &:hover {
+      color: var(--color-error, #d32f2f);
+      background-color: rgba(211, 47, 47, 0.04);
+    }
+  }
+}
+
+.summaryContainer {
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  background-color: #fafafa;
+}
+
+.attachmentList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.attachmentChip {
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.disclaimerBox {
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  border-left: 4px solid var(--color-warning, #ed6c02);
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.nextButton, .submitButton {
+  background: linear-gradient(45deg, #1976d2, #2196f3);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  border-radius: 8px;
+  padding: 8px 24px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  
+  &:hover {
+    background: linear-gradient(45deg, #1565c0, #1976d2);
+    box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+  }
+}
+
+.successContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  text-align: center;
+}
+
+.procedureCard {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.procedureInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  
+  svg {
+    margin-right: 8px;
+    color: var(--color-text-secondary, #757575);
+  }
+}
+
+.procedureChip {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+  
+  &.verified {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

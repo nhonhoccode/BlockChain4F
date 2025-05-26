@@ -1,0 +1,8 @@
+# Local development requirements
+-r base.txt
+
+# Development tools
+ipython>=8.0.0
+django-debug-toolbar>=4.0.0
+
+# No additional blockchain dependencies needed for basic local testing 

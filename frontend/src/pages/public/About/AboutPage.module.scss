@@ -1,0 +1,114 @@
+.aboutPage {
+  &__header {
+    background-color: rgba(25, 118, 210, 0.1);
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  &__title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    max-width: 700px;
+    margin: 0 auto;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__container {
+    margin-bottom: 3rem;
+  }
+
+  &__section {
+    margin-bottom: 4rem;
+  }
+
+  &__sectionTitle {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__divider {
+    margin: 2rem 0;
+  }
+
+  &__missionPaper {
+    padding: 1.5rem;
+    height: 100%;
+  }
+
+  &__teamGrid {
+    margin-top: 2rem;
+  }
+
+  &__teamCard {
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__teamMember {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  &__teamAvatar {
+    margin-bottom: 1rem;
+  }
+
+  &__teamName {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+
+  &__teamRole {
+    margin-bottom: 1rem;
+    color: #1976d2;
+  }
+
+  &__teamDescription {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  &__techCard {
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__techIcon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    
+    svg {
+      font-size: 3rem;
+    }
+  }
+
+  &__techName {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  &__techDescription {
+    text-align: center;
+    color: rgba(0, 0, 0, 0.6);
+  }
+} 

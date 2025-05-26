@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: blockchain_admin_db_dev
+    environment:
+      POSTGRES_DB: blockchain_admin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - blockchain_dev_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: blockchain_admin_redis_dev
+    command: redis-server --appendonly yes --requirepass redis123
+    volumes:
+      - redis_data_dev:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - blockchain_dev_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Django Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: blockchain_admin_backend_dev
+    volumes:
+      - ./backend:/app
+      - media_files_dev:/app/media
+      - static_files_dev:/app/static
+    ports:
+      - "8000:8000"
+    environment:
+      # Django Settings
+      DJANGO_SETTINGS_MODULE: core.settings.development
+      DEBUG: 'true'
+      SECRET_KEY: 'dev_secret_key_12345'
+      ALLOWED_HOSTS: 'localhost,127.0.0.1,backend,frontend,0.0.0.0'
+      
+      # Database Configuration
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: blockchain_admin
+      DB_USER: postgres
+      DB_PASSWORD: admin123
+      DB_HOST: db
+      DB_PORT: '5432'
+      
+      # Redis Configuration
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      REDIS_PASSWORD: redis123
+      
+      # Development settings
+      PYTHONUNBUFFERED: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - blockchain_dev_network
+    command: >
+      bash -c "
+        echo 'Waiting for database...' &&
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: blockchain_admin_frontend_dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000/ws
+    depends_on:
+      - backend
+    networks:
+      - blockchain_dev_network
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+  media_files_dev:
+    driver: local
+  static_files_dev:
+    driver: local
+
+networks:
+  blockchain_dev_network:
+    driver: bridge 

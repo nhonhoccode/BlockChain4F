@@ -1,0 +1,201 @@
+.citizen-dashboard {
+  padding: 24px;
+  
+  &__error {
+    margin-bottom: 24px;
+  }
+  
+  &__title {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  &__subtitle {
+    margin-bottom: 32px;
+  }
+  
+  &__stats-container {
+    margin-bottom: 24px;
+  }
+  
+  &__stat-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: 8px;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card__icon-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 16px;
+      
+      &.document {
+        background-color: rgba(25, 118, 210, 0.1);
+        color: #1976d2;
+      }
+      
+      &.request {
+        background-color: rgba(255, 152, 0, 0.1);
+        color: #ff9800;
+      }
+      
+      &.notification {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+      }
+    }
+    
+    .stat-card__content {
+      flex: 1;
+    }
+    
+    .stat-card__label {
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    .stat-card__value {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+  
+  &__activity-card {
+    margin-top: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    
+    .status-chip {
+      &.completed {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+      }
+      
+      &.pending {
+        background-color: rgba(255, 152, 0, 0.1);
+        color: #ff9800;
+      }
+      
+      &.rejected {
+        background-color: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+    }
+  }
+  
+  &__activity-row {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+  }
+  
+  &__profile-card {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    
+    .profile-card__content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+    
+    .profile-card__avatar {
+      width: 80px;
+      height: 80px;
+      font-size: 32px;
+      margin-bottom: 16px;
+      background-color: #1976d2;
+    }
+    
+    .profile-card__name {
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    
+    .profile-card__email {
+      margin-bottom: 16px;
+    }
+    
+    .profile-card__edit-button {
+      margin-bottom: 8px;
+    }
+    
+    .profile-card__stats {
+      padding: 16px;
+      
+      .profile-card__stat-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        svg {
+          margin-right: 16px;
+        }
+      }
+    }
+  }
+  
+  &__actions-card {
+    border-radius: 8px;
+    
+    .actions-card__button {
+      margin-bottom: 12px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  @media (max-width: 600px) {
+    padding: 16px;
+    
+    &__title {
+      font-size: 1.5rem;
+    }
+    
+    &__subtitle {
+      margin-bottom: 24px;
+    }
+    
+    &__stat-card {
+      padding: 12px;
+      
+      .stat-card__icon-container {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .stat-card__value {
+        font-size: 1.5rem;
+      }
+    }
+    
+    &__profile-card {
+      .profile-card__avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+      }
+    }
+  }
+} 

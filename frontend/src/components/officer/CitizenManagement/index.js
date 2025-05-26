@@ -1,0 +1,2 @@
+export { default as CitizenManagement } from '../../../pages/officer/CitizenManagement/CitizenManagement';
+export { default as CitizenEdit } from '../../../pages/officer/CitizenManagement/CitizenEdit'; 

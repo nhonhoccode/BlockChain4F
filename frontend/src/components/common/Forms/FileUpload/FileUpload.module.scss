@@ -1,0 +1,59 @@
+.fileUpload {
+  margin-bottom: 1rem;
+}
+
+.dropzone {
+  border: 2px dashed #cccccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border 0.2s ease-in-out;
+  background-color: #fafafa;
+  margin-bottom: 1rem;
+  
+  &:hover {
+    border-color: #999999;
+  }
+  
+  &.active {
+    border-color: var(--color-primary);
+    background-color: rgba(0, 120, 212, 0.05);
+  }
+  
+  &.error {
+    border-color: var(--color-error);
+    background-color: rgba(211, 47, 47, 0.05);
+  }
+  
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.fileList {
+  margin-top: 1rem;
+  padding: 0;
+}
+
+.fileItem {
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.imagePreview {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 16px;
+}
+
+.requiredStar {
+  color: var(--color-error);
+  margin-left: 4px;
+}

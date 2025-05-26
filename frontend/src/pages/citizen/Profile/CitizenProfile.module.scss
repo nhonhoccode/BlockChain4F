@@ -1,0 +1,258 @@
+@import '../../../assets/styles/variables';
+@import '../../../assets/styles/mixins';
+
+.profileContainer {
+  animation: fadeIn 0.5s ease-in-out;
+  
+  .pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    
+    @media (max-width: 600px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    h1 {
+      font-weight: 700;
+      color: var(--color-primary-dark, #1565c0);
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background-color: var(--color-primary, #1976d2);
+        border-radius: 2px;
+      }
+    }
+    
+    .editButton {
+      background: linear-gradient(45deg, #1976d2, #2196f3);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0.5px;
+      
+      &:hover {
+        background: linear-gradient(45deg, #1565c0, #1976d2);
+        box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+      }
+    }
+  }
+  
+  .profileCard {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    
+    .profileHeader {
+      padding: 2rem;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(25, 118, 210, 0.95), rgba(30, 136, 229, 0.95));
+        z-index: 0;
+      }
+      
+      .profileHeaderContent {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        
+        @media (max-width: 600px) {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+        
+        .avatar {
+          width: 90px;
+          height: 90px;
+          font-size: 2.5rem;
+          background-color: white;
+          color: var(--color-primary, #1976d2);
+          border: 4px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profileInfo {
+          h5 {
+            color: white;
+            font-weight: 600;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+          }
+          
+          .profileStatus {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            
+            @media (max-width: 600px) {
+              justify-content: center;
+            }
+            
+            .statusChip {
+              background-color: rgba(255, 255, 255, 0.15);
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.3);
+              
+              .chipIcon {
+                color: white;
+              }
+              
+              .chipLabel {
+                color: white;
+              }
+            }
+            
+            .profileId {
+              color: rgba(255, 255, 255, 0.8);
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .profileContent {
+      padding: 2rem;
+      
+      .formContainer {
+        .formActions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+          margin-top: 1rem;
+          
+          .cancelButton {
+            color: var(--color-secondary, #9c27b0);
+            border-color: var(--color-secondary, #9c27b0);
+            
+            &:hover {
+              background-color: rgba(156, 39, 176, 0.04);
+            }
+          }
+          
+          .saveButton {
+            background-color: var(--color-primary, #1976d2);
+            
+            &:hover {
+              background-color: var(--color-primary-dark, #1565c0);
+            }
+            
+            &:disabled {
+              background-color: rgba(0, 0, 0, 0.12);
+              color: rgba(0, 0, 0, 0.26);
+            }
+          }
+        }
+      }
+      
+      .infoCard {
+        height: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease;
+        
+        &:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .cardContent {
+          padding: 1.5rem;
+          
+          .sectionTitle {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--color-text-primary, #212121);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            
+            svg {
+              color: var(--color-primary, #1976d2);
+            }
+          }
+          
+          .infoItem {
+            margin-bottom: 1.25rem;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+            
+            .infoLabel {
+              font-size: 0.75rem;
+              color: var(--color-text-secondary, #757575);
+              margin-bottom: 0.25rem;
+            }
+            
+            .infoValue {
+              font-size: 1rem;
+              color: var(--color-text-primary, #212121);
+            }
+            
+            &.contactItem {
+              display: flex;
+              align-items: flex-start;
+              
+              .contactIcon {
+                color: var(--color-text-secondary, #757575);
+                margin-right: 0.75rem;
+                margin-top: 0.125rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .passwordButton {
+    margin-top: 1rem;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    border: 2px solid var(--color-primary, #1976d2);
+    
+    &:hover {
+      background-color: rgba(25, 118, 210, 0.04);
+    }
+    
+    svg {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

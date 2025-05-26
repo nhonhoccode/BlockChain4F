@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuyển hướng đến Trang Hỗ trợ</title>
+  <script>
+    // Store original URL for debugging
+    const originalUrl = window.location.href;
+    
+    // Function to log to console and visually if redirect fails
+    function logInfo(message) {
+      console.log(message);
+      
+      // Create an info element if redirect doesn't happen
+      setTimeout(() => {
+        const infoDiv = document.getElementById('redirectInfo');
+        if (infoDiv) {
+          const p = document.createElement('p');
+          p.textContent = message;
+          infoDiv.appendChild(p);
+        }
+      }, 100);
+    }
+    
+    // Log browser info
+    logInfo(`Browser: ${navigator.userAgent}`);
+    logInfo(`Current URL: ${originalUrl}`);
+    
+    // Try several methods to redirect
+    function tryRedirect() {
+      try {
+        // Method 1: Using history API
+        logInfo('Trying history.pushState...');
+        history.pushState({}, '', '/citizen/support');
+        
+        // Method 2: Using location.href
+        logInfo('Trying location.href...');
+        window.location.href = '/citizen/support';
+        
+        // If we're still here after 500ms, try method 3
+        setTimeout(() => {
+          logInfo('Trying location.replace...');
+          window.location.replace('/citizen/support');
+        }, 500);
+        
+        // If we're still here after 1000ms, fallback to rendering in place
+        setTimeout(() => {
+          logInfo('All redirect methods failed, loading app directly...');
+          // Create root element for React
+          const rootDiv = document.createElement('div');
+          rootDiv.id = 'root';
+          document.body.appendChild(rootDiv);
+          
+          // Load the main scripts
+          const script = document.createElement('script');
+          script.src = '/static/js/main.js';
+          document.body.appendChild(script);
+        }, 1000);
+      } catch (e) {
+        logInfo(`Error during redirect: ${e.message}`);
+      }
+    }
+    
+    // Start redirect on page load
+    window.onload = tryRedirect;
+  </script>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    
+    h1 {
+      color: #1976d2;
+    }
+    
+    #redirectInfo {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      text-align: left;
+    }
+    
+    .help-link {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+    
+    .help-link:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Đang chuyển hướng đến Trang Hỗ trợ...</h1>
+  <p>Bạn sẽ được chuyển hướng tự động.</p>
+  
+  <a href="/citizen/support" class="help-link">
+    Nhấn vào đây nếu không được chuyển hướng tự động
+  </a>
+  
+  <div id="redirectInfo" style="margin-top: 30px;">
+    <h3>Thông tin chẩn đoán:</h3>
+  </div>
+</body>
+</html> 

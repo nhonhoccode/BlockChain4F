@@ -1,0 +1,1 @@
+name: Blockchain CI/CD\n\non:\n  push:\n    branches: [ main ]\n    paths:\n      - 'blockchain/**'\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      # Add CI/CD steps here

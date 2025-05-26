@@ -1,0 +1,361 @@
+.chairman-dashboard {
+  padding: 24px;
+  
+  &__container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  &__welcome {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    background-color: #f7f9fc;
+    border-left: 4px solid #3f51b5;
+  }
+  
+  &__stats-cards {
+    margin-bottom: 24px;
+  }
+  
+  &__stats-card {
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+    
+    .stats-value {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 8px 0;
+      color: #3f51b5;
+    }
+  }
+  
+  &__section {
+    margin-bottom: 24px;
+  }
+  
+  &__card {
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    
+    &-title {
+      font-size: 1.25rem;
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      background-color: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    &-content {
+      padding: 16px;
+    }
+  }
+  
+  &__tabs {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    background-color: #fff;
+    
+    .MuiTabs-root {
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .tab-content {
+      padding: 24px;
+      min-height: 300px;
+    }
+  }
+  
+  &__chart-container {
+    height: 350px;
+    width: 100%;
+    padding: 16px;
+  }
+  
+  &__pending-approvals-table,
+  &__officer-stats-table,
+  &__document-type-table {
+    .MuiTableRow-root {
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+    }
+    
+    .MuiTableCell-head {
+      background-color: #f5f7fa;
+      font-weight: 600;
+    }
+  }
+  
+  &__pending-officer {
+    display: flex;
+    align-items: center;
+    
+    &-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+      background-color: #3f51b5;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+    
+    &-details {
+      display: flex;
+      flex-direction: column;
+      
+      .officer-name {
+        font-weight: 500;
+      }
+      
+      .officer-position {
+        font-size: 0.875rem;
+        color: #666;
+      }
+    }
+  }
+  
+  &__completion-rate {
+    display: flex;
+    align-items: center;
+    
+    &-circle {
+      margin-right: 12px;
+      position: relative;
+      
+      .MuiCircularProgress-root {
+        width: 50px !important;
+        height: 50px !important;
+      }
+      
+      .rate-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+    }
+    
+    &-label {
+      font-size: 0.875rem;
+      
+      &.high {
+        color: #4caf50;
+      }
+      
+      &.medium {
+        color: #ff9800;
+      }
+      
+      &.low {
+        color: #f44336;
+      }
+    }
+  }
+  
+  &__overview-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+    
+    .stat-item {
+      padding: 16px;
+      background-color: #f7f9fc;
+      border-radius: 8px;
+      text-align: center;
+      
+      &__value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #3f51b5;
+        margin-bottom: 8px;
+      }
+      
+      &__label {
+        color: #666;
+        font-size: 0.875rem;
+      }
+    }
+  }
+  
+  // Status badges
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    
+    &-icon {
+      margin-right: 4px;
+    }
+    
+    &--completed,
+    &--approved {
+      color: #4caf50;
+    }
+    
+    &--pending,
+    &--submitted {
+      color: #ff9800;
+    }
+    
+    &--processing,
+    &--in-review {
+      color: #2196f3;
+    }
+    
+    &--rejected {
+      color: #f44336;
+    }
+  }
+  
+  // Empty state
+  &__empty-state {
+    padding: 40px 0;
+    text-align: center;
+    color: #757575;
+    
+    .empty-icon {
+      font-size: 48px;
+      color: #bdbdbd;
+      margin-bottom: 16px;
+    }
+    
+    .empty-text {
+      margin-bottom: 16px;
+    }
+  }
+  
+  // Action buttons
+  &__action-buttons {
+    display: flex;
+    gap: 8px;
+    
+    .action-button {
+      &--primary {
+        background-color: #3f51b5;
+        color: white;
+        
+        &:hover {
+          background-color: #303f9f;
+        }
+      }
+      
+      &--secondary {
+        border: 1px solid #3f51b5;
+        color: #3f51b5;
+        
+        &:hover {
+          background-color: rgba(63, 81, 181, 0.08);
+        }
+      }
+    }
+  }
+  
+  // Legend items
+  &__legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      
+      &__color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        margin-right: 8px;
+      }
+      
+      &__label {
+        font-size: 0.875rem;
+        color: #666;
+      }
+    }
+  }
+  
+  // Responsive styles
+  @media (max-width: 960px) {
+    &__overview-stats {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    
+    &__chart-container {
+      height: 300px;
+    }
+    
+    &__completion-rate {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      &-circle {
+        margin-bottom: 8px;
+      }
+    }
+  }
+  
+  @media (max-width: 600px) {
+    padding: 16px;
+    
+    &__welcome {
+      padding: 16px;
+    }
+    
+    &__stats-card {
+      margin-bottom: 16px;
+      
+      .stats-value {
+        font-size: 1.5rem;
+      }
+    }
+    
+    &__overview-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    &__tabs {
+      .tab-content {
+        padding: 16px;
+      }
+    }
+    
+    &__action-buttons {
+      flex-direction: column;
+      
+      .action-button {
+        width: 100%;
+      }
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+  }
+} 

@@ -1,0 +1,21 @@
+# Development specific packages
+pytest>=7.3.1
+pytest-django>=4.5.2
+black==22.10.0
+flake8>=6.0.0
+isort>=5.12.0
+django-debug-toolbar>=4.1.0
+coverage>=7.2.2
+factory-boy>=3.2.1
+Faker>=18.3.1
+django-extensions>=3.2.1
+
+# Redis for development
+django-redis>=5.2.0
+redis>=4.5.0
+
+# API documentation
+drf-yasg>=1.21.7
+
+# Additional development tools
+ipython>=8.0.0

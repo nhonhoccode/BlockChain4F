@@ -1,0 +1,39 @@
+{
+  "common": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "register": "Đăng ký",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "view": "Xem",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "warning": "Cảnh báo",
+    "info": "Thông tin"
+  },
+  "navigation": {
+    "dashboard": "Bảng điều khiển",
+    "profile": "Thông tin cá nhân",
+    "documents": "Tài liệu",
+    "requests": "Yêu cầu",
+    "citizens": "Công dân",
+    "officers": "Cán bộ",
+    "reports": "Báo cáo"
+  },
+  "forms": {
+    "firstName": "Họ",
+    "lastName": "Tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ",
+    "birthDate": "Ngày sinh",
+    "idCard": "CMND/CCCD",
+    "required": "Trường này là bắt buộc",
+    "invalid": "Dữ liệu không hợp lệ"
+  }
+} 
