@@ -51,7 +51,7 @@ Hệ thống quản lý hành chính dựa trên công nghệ Blockchain nhằm 
 
 **Giảng viên hướng dẫn**: TS. Bùi Thanh Hùng
 
-**Môn học**: Phát triển ứng dụng
+**Môn học**: Công nghệ mới trong Phát triển ứng dụng
 
 **Năm học** 2024-2025
 
