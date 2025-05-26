@@ -49,7 +49,7 @@ Hệ thống quản lý hành chính dựa trên công nghệ Blockchain nhằm 
 | 3 | [Tên thành viên 3] | [MSSV] | Blockchain Developer | [email] |
 
 
-**Giảng viên hướng dẫn**: ThS. Trương Vĩnh Linh
+**Giảng viên hướng dẫn**: TS. Bùi Thanh Hùng
 
 **Môn học**: Phát triển ứng dụng
 
